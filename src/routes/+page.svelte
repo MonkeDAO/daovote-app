@@ -10,19 +10,21 @@
 		DEFAULT_OG_IMAGE,
 		MY_TWITTER_HANDLE
 	} from '$lib/siteConfig';
-
-
+	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { workSpace } from '@svelte-on-solana/wallet-adapter-ui';
+	import { balanceStore } from '$lib/balance';
 	/** @type {import('./$types').PageData} */
 	export let data;
 	// technically this is a slighlty different type because doesnt have 'content' but we'll let it slide
 	/** @type {import('$lib/types').ContentItem[]} */
 	$: items = data.items;
+	$: $walletStore.connected &&
+		balanceStore.getUserSOLBalance($walletStore.publicKey, $workSpace.connection);
 </script>
 
 <svelte:head>
 	<title>{SITE_TITLE}</title>
 	<link rel="canonical" href={SITE_URL} />
-	<link rel="alternate" type="application/rss+xml" href={SITE_URL + '/rss.xml'} />
 	<meta property="og:url" content={SITE_URL} />
 	<meta property="og:type" content="article" />
 	<meta property="og:title" content={SITE_TITLE} />
@@ -37,7 +39,7 @@
 </svelte:head>
 
 <div
-	class="flex flex-col items-start justify-center max-w-2xl px-4 pb-16 mx-auto border-gray-200 dark:border-gray-700 sm:px-8"
+	class="mx-auto flex max-w-2xl flex-col items-start justify-center border-gray-200 px-4 pb-16 dark:border-gray-700 sm:px-8"
 >
 	<div class="flex flex-col-reverse items-start sm:flex-row">
 		<div class="flex flex-col pr-8">
@@ -45,41 +47,40 @@
 				This is
 
 				<span
-					class="relative inline-block ml-2 before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-red-500"
+					class="relative ml-2 inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-green-800"
 				>
-					<span class="relative text-yellow-400 skew-y-3">{SITE_TITLE}</span>
+					<span class="relative skew-y-3 text-yellow-50">{SITE_TITLE}</span>
 				</span>
 				!
 			</h1>
 			<h2 class="mb-4 text-gray-700 dark:text-gray-200">
-				An opinionated blog starter for <span class="font-semibold"
-					>SvelteKit + Tailwind + Netlify/Vercel.</span
-				> Updated for
-				<a href="https://github.com/sveltejs/kit/"
-					>SvelteKit 1.0</a
-				>!
+				An on-chain voting solution built by <span class="font-semibold">Degens.</span> Made for
+				<a class="text-green-800 dark:text-yellow-50" href="https://monkedao.io">MonkeDAO</a>.
 			</h2>
-			<p class="mb-16 text-gray-600 dark:text-gray-400">
+			<!-- <p class="mb-16 text-gray-600 dark:text-gray-400">
 				<a href={REPO_URL}>View source and feature list here!</a>
-			</p>
+			</p> -->
 		</div>
 		<!-- <div
 				class="w-[80px] h-[80px] rounded-full sm:w-[176px] sm:h-[136px] relative mb-8 sm:mb-0 mr-auto bg-cyan-300 bg-opacity-25"
 			/> -->
 	</div>
 
-	<section class="w-full mb-16">
+	<section class="mb-16 w-full">
 		<h3 class="mb-6 text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl">
-			Featured Posts
+			Featured Proposals
 		</h3>
 		<div class="flex flex-col gap-6 md:flex-row">
-			<FeatureCard title="Welcome to swyxkit 2022!" href="/welcome" stringData="Jan 2022" />
+			{#each items as item (item)}
+				<FeatureCard title={item.title} href="/{item.id}" stringData="Jan 2022" />
+			{/each}
+			<!-- <FeatureCard title="Welcome to swyxkit 2022!" href="/welcome" stringData="Jan 2022" />
 			<FeatureCard
 				title="Moving to a GitHub CMS"
 				href="/moving-to-a-github-cms"
 				stringData="Jan 2022"
 			/>
-			<FeatureCard title="HTML Ipsum demo" href="/moo" stringData="Jan 2022" />
+			<FeatureCard title="HTML Ipsum demo" href="/moo" stringData="Jan 2022" /> -->
 		</div>
 	</section>
 

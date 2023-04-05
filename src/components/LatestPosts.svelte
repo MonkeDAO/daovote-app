@@ -10,22 +10,22 @@
 		id="latest"
 		class="mb-6 text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl"
 	>
-		Latest Posts
+		Latest Proposals
 	</h3>
 	<ul class="space-y-2 text-white">
-		{#each items as item (item.slug)}
+		{#each items as item (item.id)}
 			<li>
-				<a class="font-bold" data-sveltekit-preload-data href={item.slug}>{item.title}</a>
+				<a class="font-bold" data-sveltekit-preload-data href="/{item.id}">{item.title}</a>
 				<span class="hidden text-xs text-black dark:text-gray-400 sm:inline"
-					>{new Date(item.date).toISOString().slice(0, 10)}</span
+					>{new Date().toISOString().slice(0, 10)}</span
 				>
 			</li>
 		{/each}
 	</ul>
 	<a
 		class="mt-2 flex h-6 rounded-lg leading-7 text-gray-600 transition-all dark:text-gray-400 dark:hover:text-gray-200"
-		href="/blog"
-		>Search and see all posts<svg
+		href="#"
+		>See all Proposals<svg
 			xmlns="http://www.w3.org/2000/svg"
 			fill="none"
 			viewBox="0 0 24 24"

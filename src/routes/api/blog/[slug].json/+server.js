@@ -5,6 +5,7 @@ import { error } from '@sveltejs/kit';
  */
 export async function GET({ fetch, params }) {
 	const { slug } = params;
+	console.log("Fetching data for proposal slug", slug);
 	let data;
 	try {
 		data = await getContent(fetch, slug);

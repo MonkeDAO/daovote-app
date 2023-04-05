@@ -1,18 +1,47 @@
+<!-- <script context="module" lang="js">
+	import { Buffer } from 'buffer';
+	// @ts-ignore
+	globalThis.Buffer = Buffer;
+</script> -->
+
 <script>
-	import '../tailwind.css';
+		import '../tailwind.css';
 	import Nav from '../components/Nav.svelte';
 	import { MY_TWITTER_HANDLE, MY_YOUTUBE, REPO_URL, SITE_TITLE } from '$lib/siteConfig';
+	import { clusterApiUrl } from '@solana/web3.js';
+	import { WalletProvider, ConnectionProvider } from '@svelte-on-solana/wallet-adapter-ui';
+	import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+	import { getLocalStorage } from '@svelte-on-solana/wallet-adapter-core';
+	import { browser } from '$app/environment';
+	import {
+		PhantomWalletAdapter,
+		GlowWalletAdapter,
+		BackpackWalletAdapter,
+		SolflareWalletAdapter,
+		SolletExtensionWalletAdapter,
+		SolletWalletAdapter,
+		TorusWalletAdapter,
+	} from '@solana/wallet-adapter-wallets';
+	const localStorageKey = 'walletAdapter';
+	const endpoint = WalletAdapterNetwork.Devnet;
+	const network = clusterApiUrl(WalletAdapterNetwork.Devnet);
+	let wallets = [
+		new PhantomWalletAdapter(),
+		new GlowWalletAdapter(),
+		new BackpackWalletAdapter(),
+		new SolflareWalletAdapter(),
+		new SolletWalletAdapter({ network: endpoint }),
+		new SolletExtensionWalletAdapter({ network: endpoint }),
+		new TorusWalletAdapter(),
+	];
+	$: autoConnect = browser && Boolean(getLocalStorage('autoconnect', false));
 </script>
 
 <svelte:head>
-	<link
-		rel="alternate"
-		type="application/rss+xml"
-		title={'RSS Feed for ' + SITE_TITLE}
-		href="/rss.xml"
-	/>
 </svelte:head>
 
+<WalletProvider {localStorageKey} {wallets} {autoConnect} />
+<ConnectionProvider {network} />
 <div class="flex flex-col justify-center bg-gray-50 px-4 dark:bg-gray-900 sm:px-8">
 	<Nav />
 </div>
@@ -27,9 +56,6 @@
 			<a class="text-gray-500 transition hover:text-gray-300" href="/">Home</a>
 			<a class="text-gray-500 transition hover:text-gray-300" href="/about">About</a>
 			<a class="text-gray-500 transition hover:text-gray-300" href="/#newsletter">Newsletter</a>
-			<a class="text-gray-500 transition hover:text-gray-300" href="/rss.xml" rel="external">
-				RSS
-			</a>
 		</div>
 		<div class="flex flex-col space-y-4">
 			<a
@@ -59,8 +85,8 @@
 		</div>
 	</div>
 	<p class="prose px-4 dark:prose-invert sm:px-8">
-		This blog is based on the
-		<a href="https://swyxkit.netlify.app/">swyxkit</a>
-		template.
+		This app is based on this
+		<a href="https://github.com/MonkeDAO/omcvote">github</a>
+		repo.
 	</p>
 </footer>

@@ -64,8 +64,8 @@
 		</div>
 		{#if isNewsletterOpen}
 			<p class="my-1 text-gray-800 dark:text-gray-200">
-				Get emails from me about <span class="font-bold"
-					>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Libero, ducimus.</span
+				Get emails from MonkeDAO about <span class="font-bold"
+					>all the business.</span
 				>.
 			</p>
 
@@ -91,7 +91,7 @@
 				>
 			</form>
 			<p class="text-sm text-gray-800 dark:text-gray-200">
-				5,432 subscribers including my Mom – <a href="/#newsletter">123 issues</a>
+				5,432 subscribers including Simon's Grandad – <a href="/#newsletter">123 issues</a>
 			</p>
 		{/if}
 	</div>

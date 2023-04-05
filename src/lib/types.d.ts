@@ -1,52 +1,22 @@
 export type ContentItem = {
-	type: 'blog';
-	content: string;
-	frontmatter: {
-		[key: string]: string;
-	};
 	title: string;
-	subtitle: string;
 	description: string;
-	category: string;
-	tags: string[];
-	image: string;
-	canonical: string;
-	slug: string;
-	date: Date;
-	readingTime: string;
-	ghMetadata: GHMetadata;
+	id: number;
+	content?: string;
+	proposalMetadata?: ProposalMetadata;
+	created_at?: Date;
+	closing_date?: Date;
 };
 
-export type GHMetadata = {
-	issueUrl: string;
-	commentsUrl: string;
-	title: string;
-	created_at: Date;
-	updated_at: Date;
-	reactions: GHReactions;
+export type ProposalMetadata = {
+	quorum_needed: number;
+	winning_options: number;
+	total_options: number;
+	votes: Vote;
 };
 
-export type GHReactions = {
+export type Vote = {
 	total_count: number;
-	'+1': number;
-	'-1': number;
-	laugh: number;
-	hooray: number;
-	confused: number;
-	heart: number;
-	rocket: number;
-	eyes: number;
-};
-
-export type GHComment = {
-	body: string;
-	user: GHUser;
-	created_at: Date;
-	updated_at: Date;
-	html_url: string;
-	issue_url: string;
-	author_association: string;
-	reactions: GHReactions;
 };
 
 export type GHUser = {
@@ -83,4 +53,9 @@ export type GithubIssue = {
 	html_url: string;
 	comments_url: string;
 	reactions: GHReactions;
+};
+
+// Solana types
+export type BalanceStore = {
+    balance: number;
 };

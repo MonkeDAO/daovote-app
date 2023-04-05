@@ -8,3 +8,6 @@ declare namespace App {
 	// interface PageData {}
 	// interface Platform {}
 }
+declare namespace globalThis {
+	const signin: () => string[];
+}
