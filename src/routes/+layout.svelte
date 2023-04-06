@@ -43,7 +43,6 @@
 </svelte:head>
 
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
-<ConnectionProvider {network} />
 <AnchorConnectionProvider {network} {idl} />
 <div class="flex flex-col justify-center bg-gray-50 px-4 dark:bg-gray-900 sm:px-8">
 	<Nav />

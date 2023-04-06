@@ -12,6 +12,9 @@ const config = {
 		include: ['@project-serum/anchor', '@solana/web3.js', 'buffer'],
 		// ... use the same implementation from the SvelteKit ui
 	},
+	define: {
+		'process.env': {}
+	  },
 	server: {
 		fs: {
 			// https://vitejs.dev/config/server-options.html#server-fs-allow
