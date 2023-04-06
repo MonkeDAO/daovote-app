@@ -2,8 +2,8 @@
 	import { MY_TWITTER_HANDLE, SITE_URL } from '$lib/siteConfig';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import Newsletter from '../../components/Newsletter.svelte';
-	import { page } from '$app/stores';
 	import Vote from '../../components/Vote.svelte';
+	import { page } from '$app/stores';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -43,10 +43,10 @@
 	<div class="prose mb-12 max-w-full border-t border-b border-blue-800 p-4 dark:prose-invert">
 		<h1>Voting Component Here</h1>
 		<h1>Fetch Votes</h1>
+		<Vote />
 	</div>
 
 	<Newsletter />
-	<Vote />
 </div>
 
 <style>

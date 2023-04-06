@@ -58,7 +58,7 @@
     }
   </script>
 
-  <div class="wrapper-app">
+  <div>
     <div class="title">
       <h1>Solana Svelte Anchor Vote</h1>
     </div>
@@ -88,24 +88,11 @@
   </div>
 
   <style>
-    :global(body) {
-      padding: 100px;
-      margin: 0;
-      background-color: #333333;
-    }
-    .wrapper-app {
-      height: 100vh;
-      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
-        sans-serif;
-    }
     .title {
       text-align: center;
       color: white;
       font-size: 20px;
       margin-bottom: 40px;
-    }
-    a {
-      color: #676796;
     }
     .address {
       position: absolute;
