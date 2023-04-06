@@ -3,6 +3,7 @@
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import Newsletter from '../../components/Newsletter.svelte';
 	import { page } from '$app/stores';
+	import Vote from '../../components/Vote.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -45,6 +46,7 @@
 	</div>
 
 	<Newsletter />
+	<Vote />
 </div>
 
 <style>
