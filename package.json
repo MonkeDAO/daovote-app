@@ -23,6 +23,7 @@
 		"@tailwindcss/typography": "^0.5.9",
 		"@typescript-eslint/eslint-plugin": "^5.54.1",
 		"@typescript-eslint/parser": "^5.54.1",
+		"@zerodevx/svelte-toast": "^0.9.3",
 		"autoprefixer": "^10.4.13",
 		"concurrently": "^7.6.0",
 		"eslint": "^8.35.0",

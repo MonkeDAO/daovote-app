@@ -15,6 +15,7 @@
 	import { AnchorConnectionProvider } from '@svelte-on-solana/wallet-adapter-anchor';
 	import idl from '../anchor/vote_test.json'
 	import { browser } from '$app/environment';
+	import { SvelteToast } from '@zerodevx/svelte-toast'
 	import {
 		PhantomWalletAdapter,
 		GlowWalletAdapter,
@@ -37,6 +38,10 @@
 		new TorusWalletAdapter(),
 	];
 	$: autoConnect = browser && Boolean(getLocalStorage('autoconnect', false));
+	const options = {
+			
+  	};
+
 </script>
 
 <svelte:head>
@@ -44,6 +49,7 @@
 
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
 <AnchorConnectionProvider {network} {idl} />
+<SvelteToast {options} />
 <div class="flex flex-col justify-center bg-gray-50 px-4 dark:bg-gray-900 sm:px-8">
 	<Nav />
 </div>

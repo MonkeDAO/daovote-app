@@ -2,6 +2,7 @@
     import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
     import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { PublicKey, Transaction } from '@solana/web3.js';
+    import { toast } from '@zerodevx/svelte-toast'
     let value: any;
     $: console.log('value: ', value);
     async function createVote() {
@@ -27,6 +28,10 @@
             voteBank: JSON.stringify(voteBank),
             address: $workSpace.baseAccount?.publicKey.toBase58()
         }
+        toast.push(`VoteBank created ${$workSpace.baseAccount?.publicKey.toBase58()}`, {
+            duration: 3000,
+            pausable: true, 
+        });
       } catch (err) {
         console.log('Transaction error: ', err);
       }
@@ -50,6 +55,9 @@
         const txn = new Transaction().add(ix!);
         const tx = await $walletStore.sendTransaction(txn, connection, {
             skipPreflight: true,
+        });
+        toast.push(`Voted for ${vote}`, {
+            duration: 3000,
         });
         console.log('txn', tx)
       } catch (err) {
