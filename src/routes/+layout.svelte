@@ -5,7 +5,7 @@
 </script> -->
 
 <script>
-		import '../tailwind.css';
+	import '../tailwind.css';
 	import Nav from '../components/Nav.svelte';
 	import { MY_TWITTER_HANDLE, MY_YOUTUBE, REPO_URL, SITE_TITLE } from '$lib/siteConfig';
 	import { clusterApiUrl } from '@solana/web3.js';
@@ -27,7 +27,7 @@
 	} from '@solana/wallet-adapter-wallets';
 	const localStorageKey = 'walletAdapter';
 	const endpoint = WalletAdapterNetwork.Devnet;
-	const network = clusterApiUrl(WalletAdapterNetwork.Devnet);
+	const network = "https://silent-ultra-frost.solana-devnet.quiknode.pro/8b6a2a9f4d311c9588d17bd0b2ff7ce7b83cb5d5/";
 	let wallets = [
 		new PhantomWalletAdapter(),
 		new GlowWalletAdapter(),

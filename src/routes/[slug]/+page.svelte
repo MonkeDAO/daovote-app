@@ -3,7 +3,9 @@
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import Newsletter from '../../components/Newsletter.svelte';
 	import Vote from '../../components/Vote.svelte';
+	import ShadowDrive from '../../components/ShadowDrive.svelte';
 	import { page } from '$app/stores';
+	import ProposalForm from '../../components/Proposal/ProposalForm.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -44,6 +46,8 @@
 		<h1>Voting Component Here</h1>
 		<h1>Fetch Votes</h1>
 		<Vote />
+		<ProposalForm />
+		<ShadowDrive />
 	</div>
 
 	<Newsletter />
