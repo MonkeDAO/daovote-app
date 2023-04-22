@@ -9,6 +9,9 @@ function declareBalanceStore() {
         subscribe,
         // @ts-ignore
         getUserSOLBalance: async (publicKey, connection) => {
+            if (!connection) {
+                return 0;
+            }
             let balance = 0;
             try {
                 balance = await connection.getBalance(publicKey, 'confirmed');

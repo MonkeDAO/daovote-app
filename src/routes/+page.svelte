@@ -19,7 +19,7 @@
 	/** @type {import('$lib/types').ContentItem[]} */
 	$: items = data.items;
 	$: $walletStore.connected &&
-		balanceStore.getUserSOLBalance($walletStore.publicKey, $workSpace.connection);
+		balanceStore.getUserSOLBalance($walletStore.publicKey, $workSpace?.connection);
 </script>
 
 <svelte:head>
