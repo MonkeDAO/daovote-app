@@ -27,7 +27,7 @@
 	} from '@solana/wallet-adapter-wallets';
 	const localStorageKey = 'walletAdapter';
 	const endpoint = WalletAdapterNetwork.Devnet;
-	const network = "https://silent-ultra-frost.solana-devnet.quiknode.pro/8b6a2a9f4d311c9588d17bd0b2ff7ce7b83cb5d5/";
+	const network = clusterApiUrl(endpoint);
 	let wallets = [
 		new PhantomWalletAdapter(),
 		new GlowWalletAdapter(),
