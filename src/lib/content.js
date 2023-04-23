@@ -144,3 +144,17 @@ export async function getContent(providedFetch, slug) {
 		throw new Error('Blogpost not found for slug: ' + slug);
 	}
 }
+
+export async function getCreateContent(providedFetch, slug) {
+	// get all blogposts if not already done - or in development
+	console.log("\n\t---getCreateContent Mark #1---\t\n");
+	if (slug && slug === 'proposal') {
+		return {
+			title: 'Create Proposals',
+			description: 'Create Proposals',
+		}
+	}
+	else {
+		throw new Error('Not found for slug: ' + slug);
+	}
+}
