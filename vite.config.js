@@ -1,10 +1,11 @@
 // vite.config.js
 import { sveltekit } from '@sveltejs/kit/vite';
 import { ssp } from "sveltekit-search-params/plugin";
+import { NgmiPolyfill } from "vite-plugin-ngmi-polyfill";
 
 /** @type {import('vite').UserConfig} */
 const config = {
-	plugins: [ssp(), sveltekit()],
+	plugins: [ssp(), sveltekit(), NgmiPolyfill()],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
 	},
