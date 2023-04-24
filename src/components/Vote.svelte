@@ -67,10 +67,6 @@
   </script>
 
   <div>
-    <div class="title">
-      <h1>Solana Svelte Anchor Vote</h1>
-    </div>
-    {#if $walletStore?.connected}
     <div class="wrapper-content">
       {#if value}
         <button on:click={() => vote('gm')}>Vote GM</button>
@@ -90,9 +86,6 @@
         <button on:click={createVote}>Create vote</button>
       {/if}
     </div>
-  {:else}
-    <p class="warning">You are not connected...</p>
-  {/if}
   </div>
 
   <style>
