@@ -51,6 +51,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@esbuild-plugins/node-globals-polyfill": "^0.2.3",
 		"@leeoniya/ufuzzy": "^1.0.5",
 		"@project-serum/anchor": "0.24.2",
 		"@shadow-drive/sdk": "^3.3.0",
@@ -71,13 +72,13 @@
 		"buffer": "^6.0.3",
 		"date-fns": "^2.29.3",
 		"prism-themes": "^1.9.0",
+		"rollup-plugin-node-polyfills": "^0.2.1",
 		"shiki": "^0.14.1",
 		"snarkdown": "^2.0.0",
 		"svelte-action-balancer": "^1.0.4",
 		"svelte-tiptap": "^0.7.0",
 		"sveltekit-search-params": "^1.0.10",
 		"tweetnacl": "^1.0.3",
-		"uuid": "^8.3.2",
-		"vite-plugin-ngmi-polyfill": "^0.0.2"
+		"uuid": "^8.3.2"
 	}
 }

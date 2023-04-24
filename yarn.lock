@@ -45,18 +45,10 @@
     "@chainsafe/persistent-merkle-tree" "^0.4.2"
     case "^1.6.3"
 
-"@esbuild-plugins/node-globals-polyfill@^0":
+"@esbuild-plugins/node-globals-polyfill@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@esbuild-plugins/node-globals-polyfill/-/node-globals-polyfill-0.2.3.tgz#0e4497a2b53c9e9485e149bc92ddb228438d6bcf"
   integrity sha512-r3MIryXDeXDOZh7ih1l/yE9ZLORCd5e8vWg02azWRGj5SPTuoh69A2AIyn0Z31V/kHBfZ4HgWJ+OK3GTTwLmnw==
-
-"@esbuild-plugins/node-modules-polyfill@^0":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@esbuild-plugins/node-modules-polyfill/-/node-modules-polyfill-0.2.2.tgz#cefa3dc0bd1c16277a8338b52833420c94987327"
-  integrity sha512-LXV7QsWJxRuMYvKbiznh+U1ilIop3g2TeKRzUxOG5X3YITc8JyyTa90BmLwqqv0YnX4v32CSlG+vsziZp9dMvA==
-  dependencies:
-    escape-string-regexp "^4.0.0"
-    rollup-plugin-node-polyfills "^0.2.1"
 
 "@esbuild/android-arm64@0.16.17":
   version "0.16.17"
@@ -1768,9 +1760,9 @@
     form-data "^3.0.0"
 
 "@types/node@*":
-  version "18.15.13"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.15.13.tgz#f64277c341150c979e42b00e4ac289290c9df469"
-  integrity sha512-N+0kuo9KgrUQ1Sn/ifDXsvg0TTleP7rIy4zOBGECxAljqvqfqpTfzx0Q1NUedOixRMBfe2Whhb056a42cWs26Q==
+  version "18.16.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.0.tgz#4668bc392bb6938637b47e98b1f2ed5426f33316"
+  integrity sha512-BsAaKhB+7X+H4GnSjGhJG9Qi8Tw+inU9nJDwmD5CgOmBLEI6ArdhikpLX7DjbjDRDTbqZzU2LSQNZg8WGPiSZQ==
 
 "@types/node@^12.12.54":
   version "12.20.55"
@@ -4852,9 +4844,9 @@ prettier-plugin-tailwindcss@^0.2.4:
   integrity sha512-jQopIOgjLpX+y8HeD56XZw7onupRTC0cw7eKKUimI7vhjkPF5/1ltW5LyqaPtSyc8HvEpvNZsvvsGFa2qpa59w==
 
 prettier@~2.8.4:
-  version "2.8.7"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.7.tgz#bb79fc8729308549d28fe3a98fce73d2c0656450"
-  integrity sha512-yPngTo3aXUUmyuTjeTUT75txrf+aMh9FiD7q9ZE/i6r0bPb22g4FsE6Y338PQX1bmfy08i9QQCB7/rcUAVntfw==
+  version "2.8.8"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
+  integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
 
 prism-svelte@^0.4.7:
   version "0.4.7"
@@ -5289,7 +5281,7 @@ rollup-plugin-inject@^3.0.0:
     magic-string "^0.25.3"
     rollup-pluginutils "^2.8.1"
 
-rollup-plugin-node-polyfills@^0, rollup-plugin-node-polyfills@^0.2.1:
+rollup-plugin-node-polyfills@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/rollup-plugin-node-polyfills/-/rollup-plugin-node-polyfills-0.2.1.tgz#53092a2744837164d5b8a28812ba5f3ff61109fd"
   integrity sha512-4kCrKPTJ6sK4/gLL/U5QzVT8cxJcofO0OU74tnB19F40cmuAKSzH5/siithxlofFEjwvw1YAhPmbvGNA6jEroA==
@@ -5304,9 +5296,9 @@ rollup-pluginutils@^2.8.1:
     estree-walker "^0.6.1"
 
 rollup@^3.20.2:
-  version "3.20.7"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.20.7.tgz#4f045dfb388abe08dd159f8cd286dcaca1e80b28"
-  integrity sha512-P7E2zezKSLhWnTz46XxjSmInrbOCiul1yf+kJccMxT56vxjHwCbDfoLbiqFgu+WQoo9ij2PkraYaBstgB2prBA==
+  version "3.21.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.21.0.tgz#0a71517db56e150222670f88e5e7acfa4fede7c8"
+  integrity sha512-ANPhVcyeHvYdQMUyCbczy33nbLzI7RzrBje4uvNiTDJGIMtlKoOStmympwr9OtS1LZxiDmE2wvxHyVhoLtf1KQ==
   optionalDependencies:
     fsevents "~2.3.2"
 
@@ -6116,15 +6108,6 @@ vfile@^5.0.0, vfile@^5.3.7:
     is-buffer "^2.0.0"
     unist-util-stringify-position "^3.0.0"
     vfile-message "^3.0.0"
-
-vite-plugin-ngmi-polyfill@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/vite-plugin-ngmi-polyfill/-/vite-plugin-ngmi-polyfill-0.0.2.tgz#2830b310a3e8433bc29ab2c1ecc130500ead50e7"
-  integrity sha512-1oT7X3wW2AxgFBPgDfnTyOp+/DLXA4PSDMHZLib3R0ZP98Y3mVjiETvkl0imoM1n7Qyj3g4peH8Y2xz0BgiRzw==
-  dependencies:
-    "@esbuild-plugins/node-globals-polyfill" "^0"
-    "@esbuild-plugins/node-modules-polyfill" "^0"
-    rollup-plugin-node-polyfills "^0"
 
 vite@^4.1.4:
   version "4.3.1"
