@@ -41,8 +41,8 @@
 	{@html json.content}
 </article>
 
-<div class="mx-auto max-w-2xl">
-	<div class="prose mb-12 max-w-full border-t border-b border-blue-800 p-4 dark:prose-invert">
+<div class="mx-auto">
+	<div class="w-full max-w-5xl mb-12 border-t border-b border-blue-800 p-4 dark:prose-invert">
 		<h1>Voting Component Here</h1>
 		<h1>Fetch Votes</h1>
 		<Vote />
