@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import { Editor, EditorContent, FloatingMenu, BubbleMenu, createEditor } from 'svelte-tiptap';
 	import Fa from 'svelte-fa';
@@ -12,22 +12,42 @@
 		faFileCode,
 		faListOl,
 		faListUl,
-    faQuoteLeft
+    faQuoteLeft,
+    faSave,
 	} from '@fortawesome/free-solid-svg-icons';
 	//using tiptap https://tiptap.dev/api/introduction to create a rich text editor
 	import StarterKit from '@tiptap/starter-kit';
 
 	let editor: Readable<Editor>;
+  let saveEnabled = false;
+
+  const handleSaveToggle = () => {
+    saveEnabled = !saveEnabled;
+    localStorage.setItem('editorContent', $editor.getHTML());
+  };
 
 	onMount(() => {
 		editor = createEditor({
 			extensions: [StarterKit],
-			content: `
+			content: localStorage.getItem('editorContent') || `
         <p>Proposal info goes here. Format like a normal text editor.</p>
       `
 		});
+    const unsubscribe = $editor.on('update', () => {
+      if (saveEnabled) {
+        saveContent();
+      }
+    });
+
+    // Unsubscribe when the component is destroyed
+    onDestroy(() => {
+      $editor.off('update');
+    });
 	});
 
+  function saveContent() {
+  localStorage.setItem('editorContent', $editor.getHTML());
+  }
 	const toggleHeading = (level: any) => {
 		return () => {
 			$editor.chain().focus().toggleHeading({ level }).run();
@@ -69,58 +89,72 @@
 <div class="editor-container bg-white dark:bg-gray-800">
 	{#if editor}
 		<div class="menu flex space-x-2 bg-gray-200 p-2 dark:bg-gray-700">
-			<button on:click="{toggleHeading(1)}" class="btn btn-sm btn-outline mr-2 flex items-center" class:active={isActive('heading', { level: 1 })}>
+			<button title="Heading 1" on:click="{toggleHeading(1)}" class="btn btn-sm btn-outline mr-2 flex items-center" class:active={isActive('heading', { level: 1 })}>
         <Fa icon="{faHeading}" class="text-sm mr-1" />
         <span class="align-middle">1</span>
       </button>
-			<button on:click="{toggleHeading(2)}" class="btn btn-sm btn-outline mr-2 flex items-center" class:active={isActive('heading', { level: 2 })}>
+			<button title="Heading 2" on:click="{toggleHeading(2)}" class="btn btn-sm btn-outline mr-2 flex items-center" class:active={isActive('heading', { level: 2 })}>
         <Fa icon="{faHeading}" class="text-sm mr-1" />
         <span class="align-middle">2</span>
       </button>
-      <button on:click="{toggleHeading(3)}" class="btn btn-sm btn-outline mr-2 flex items-center" class:active={isActive('heading', { level: 3 })}>
+      <button title="Heading 3" on:click="{toggleHeading(3)}" class="btn btn-sm btn-outline mr-2 flex items-center" class:active={isActive('heading', { level: 3 })}>
         <Fa icon="{faHeading}" class="text-sm mr-1" />
         <span class="align-middle">3</span>
       </button>
 			<button
+        title="Bold"
 				on:click={toggleBold}
 				class:active={isActive('bold')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faBold} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faBold} /></button
 			>
 			<button
+        title="Italic"
 				on:click={toggleItalic}
 				class:active={isActive('italic')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faItalic} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faItalic} /></button
 			>
 			<button
+        title="Paragraph"
 				on:click={setParagraph}
 				class:active={isActive('paragraph')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faParagraph} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faParagraph} /></button
 			>
 			<button
+        title="Code"
 				on:click={toggleCode}
 				class:active={isActive('code')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faCode} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faCode} /></button
 			>
 			<button
+        title="Code block"
 				on:click={toggleCodeBlock}
 				class:active={isActive('codeblock')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faFileCode} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faFileCode} /></button
 			>
 			<button
+        title="Numbered list"
 				on:click={toggleNumberedList}
 				class:active={isActive('orderedList')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faListOl} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faListOl} /></button
 			>
 			<button
+        title="Bulleted list"
 				on:click={toggleBulletedList}
 				class:active={isActive('bulletList')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faListUl} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faListUl} /></button
 			>
       <button
+        title="Blockquote"
 				on:click={toggleBlockquote}
 				class:active={isActive('blockquote')}
-				class="btn btn-sm btn-square btn-outline btn-primary"><Fa icon={faQuoteLeft} /></button
+				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faQuoteLeft} /></button
 			>
+      <button
+        title="Auto-save"
+        on:click={handleSaveToggle}
+        class="btn btn-sm btn-outline mr-2 flex items-center {saveEnabled ? 'bg-green-500 text-white' : ''}">
+        <Fa icon={faSave} />
+      </button>
 		</div>
 	{/if}
 
@@ -158,7 +192,6 @@
     padding: 0.5rem;
 		min-height: 300px;
 	}
-
 	@media screen and (min-width: 768px) {
 		:global(.ProseMirror) {
 			min-width: 600px;
@@ -174,22 +207,6 @@
 		margin-bottom: 1rem;
 		border-radius: 4px;
 	}
-
-	.btn-square {
-		width: 32px;
-		height: 32px;
-	}
-  .menu button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu span.align-middle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 
 	button {
 		padding: 2px 6px;
