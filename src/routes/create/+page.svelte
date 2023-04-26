@@ -8,7 +8,7 @@
 	import { getStorageAccounts, uploadToShadowDrive } from '../../lib/drive';
 	import { shdwBalanceStore } from '$lib/shdwbalance';
 	import { onDestroy } from 'svelte';
-	import { SYSTEM_PROGRAM_ID, TREASURY_ADDRESS, postDataToBuffer, proposalAccountPda, votebankAccountPda } from '$lib/utils/solana';
+	import { SYSTEM_PROGRAM_ID, TREASURY_ADDRESS, getExplorerUrl, postDataToBuffer, proposalAccountPda, votebankAccountPda } from '$lib/utils/solana';
 	let file: any;
 	let proposal: any;
 	let connection: Connection;
@@ -124,9 +124,17 @@
             tx.serialize()
           );
 		  console.log('Signature', signature);
-		const proposalCreatedAccount = await $workSpace.program.account.proposal.fetch(proposalAccount);
+		const latestBlockhash = await $workSpace.connection.getLatestBlockhash();
+		const confirmTx = await $workSpace.connection.confirmTransaction({
+			signature: signature,
+			lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+			blockhash: latestBlockhash.blockhash,
+		}, 'confirmed');
+		const proposalCreatedAccount = await $workSpace.program.account.proposal.fetch(proposalAccount, 'confirmed');
 		console.log('Proposal created data', proposalCreatedAccount);
-        toast.push(`Proposal created ${proposalAccount.toBase58()}`, {
+		const explorerUrl = `${getExplorerUrl('devnet', 'transaction', signature)}`;
+        toast.push(`Proposal created <a href="${explorerUrl}" target="_blank">${proposalAccount.toBase58()}</a>`, {
+			target: 'new',
             duration: 3000,
             pausable: true, 
         });
@@ -136,7 +144,7 @@
       }
     }
 
-	async function uploadFile(file: File) {
+	async function uploadFile(file: File): Promise<boolean> {
 		if (connection && wallet) {
 			try {
 				console.log('connection', connection);
@@ -148,9 +156,11 @@
 					console.log('Upload response', test);
 					if (test.finalized_locations.length > 0) {
 						shadowDriveUrl = test.finalized_locations[0];
+						return true;
 					}
 					else {
 						toast.push('Error uploading file to shadow drive!', { target: 'new' });
+						return false;
 					}
 				}
 				else {
@@ -160,26 +170,31 @@
 					console.log('Upload response', test);
 					if (test.finalized_locations.length > 0) {
 						shadowDriveUrl = test.finalized_locations[0];
+						return true;
 					}
 					else {
 						toast.push('Error uploading file to shadow drive!', { target: 'new' });
+						return false;
 					}
 				}
 			} catch (error) {
 				console.error('Error uploading file:', error);
+				return false;
 			}
 		}
+		return false;
 	}
 	async function handleProposalSubmitted(event: any) {
 		console.log('filegenerated', event);
 		file = event.detail.file;
 		proposal = event.detail.proposal;
-		
-		await uploadFile(file).then(() => {
+		//TODO: Figure a way to combine two methods so its atomic?
+		await uploadFile(file).then(async (res) => {
 			toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, { target: 'new' });
-		}).then(async () => {
-			await createProposal();
-		});
+			if (res) {
+				await createProposal();
+			}
+		})
 
 	}
 	onDestroy(unsubscribe);

@@ -108,3 +108,18 @@ export function postDataToBuffer(proposalData: any): Buffer {
       programId
     );
   }
+
+  export function getExplorerUrl(network: string, path: 'address' | 'transaction', hash?: string): string {
+    const baseUrl = "https://explorer.solana.com";
+    const fullUrl = `${baseUrl}${path && hash ? `/${path}/${hash}` : ''}`;
+    switch (network) {
+      case "devnet":
+        return `${fullUrl}?cluster=devnet`;
+      case "testnet":
+        return `${fullUrl}/?cluster=testnet`;
+      case "mainnet-beta":
+        return `${fullUrl}`;
+      default:
+        throw new Error(`Unsupported network: ${network}`);
+    }
+  }
