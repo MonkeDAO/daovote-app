@@ -13,12 +13,14 @@
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-ui';
 	import { balanceStore } from '$lib/balance';
+	import { shdwBalanceStore } from '$lib/shdwbalance';
+	import { forcedConnection } from '$lib/drive';
 	/** @type {import('./$types').PageData} */
 	export let data;
 	// technically this is a slighlty different type because doesnt have 'content' but we'll let it slide
 	/** @type {import('$lib/types').ContentItem[]} */
 	$: items = data.items;
-	$: $walletStore.connected &&
+	$: $walletStore.connected && $walletStore.publicKey &&
 		balanceStore.getUserSOLBalance($walletStore.publicKey, $workSpace?.connection);
 </script>
 

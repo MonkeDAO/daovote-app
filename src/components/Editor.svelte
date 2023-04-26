@@ -102,11 +102,11 @@
 
 <div class="editor-container bg-white dark:bg-gray-800">
 	{#if editor}
-		<div class="menu flex space-x-2 bg-gray-200 p-2 dark:bg-gray-700">
+		<div class="flex flex-wrap gap-1 space-x-2 bg-gray-200 p-2 dark:bg-gray-700">
 			<button
 				title="Heading 1"
 				on:click={toggleHeading(1)}
-				class="btn btn-sm btn-outline mr-2 flex items-center"
+				class="btn-square btn-sm btn-outline mr-2 flex items-center"
 				class:active={isActive('heading', { level: 1 })}
 			>
 				<Fa icon={faHeading} class="mr-1 text-sm" />
@@ -115,7 +115,7 @@
 			<button
 				title="Heading 2"
 				on:click={toggleHeading(2)}
-				class="btn btn-sm btn-outline mr-2 flex items-center"
+				class="btn-square btn-sm btn-outline mr-2 flex items-center"
 				class:active={isActive('heading', { level: 2 })}
 			>
 				<Fa icon={faHeading} class="mr-1 text-sm" />
@@ -124,7 +124,7 @@
 			<button
 				title="Heading 3"
 				on:click={toggleHeading(3)}
-				class="btn btn-sm btn-outline mr-2 flex items-center"
+				class="btn-square btn-sm btn-outline mr-2 flex items-center"
 				class:active={isActive('heading', { level: 3 })}
 			>
 				<Fa icon={faHeading} class="mr-1 text-sm" />
@@ -134,60 +134,60 @@
 				title="Bold"
 				on:click={toggleBold}
 				class:active={isActive('bold')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faBold} /></button
+				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faBold} /></button
 			>
 			<button
 				title="Italic"
 				on:click={toggleItalic}
 				class:active={isActive('italic')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faItalic} /></button
+				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faItalic} /></button
 			>
 			<button
 				title="Paragraph"
 				on:click={setParagraph}
 				class:active={isActive('paragraph')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faParagraph} /></button
+				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faParagraph} /></button
 			>
 			<button
 				title="Code"
 				on:click={toggleCode}
 				class:active={isActive('code')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faCode} /></button
+				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faCode} /></button
 			>
 			<button
 				title="Code block"
 				on:click={toggleCodeBlock}
 				class:active={isActive('codeblock')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faFileCode} /></button
+				class="btn-square btn-sm mr-2 flex items-center"><Fa icon={faFileCode} /></button
 			>
 			<button
 				title="Numbered list"
 				on:click={toggleNumberedList}
 				class:active={isActive('orderedList')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faListOl} /></button
+				class="btn-square btn-sm mr-2 flex items-center"><Fa icon={faListOl} /></button
 			>
 			<button
 				title="Bulleted list"
 				on:click={toggleBulletedList}
 				class:active={isActive('bulletList')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faListUl} /></button
+				class="btn-square btn-sm mr-2 flex items-center"><Fa icon={faListUl} /></button
 			>
 			<button
 				title="Blockquote"
 				on:click={toggleBlockquote}
 				class:active={isActive('blockquote')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faQuoteLeft} /></button
+				class="btn-square btn-sm mr-2 flex items-center"><Fa icon={faQuoteLeft} /></button
 			>
 			<button
 				title="Convert to file for upload"
 				on:click={handleClick}
 				class:active={isActive('upload')}
-				class="btn btn-sm btn-outline mr-2 flex items-center"><Fa icon={faUpload} /></button
+				class="btn-square btn-sm mr-2 flex items-center"><Fa icon={faUpload} /></button
 			>
 			<button
 				title="Auto-save"
 				on:click={handleSaveToggle}
-				class="btn btn-sm btn-outline mr-2 flex items-center {saveEnabled
+				class="btn-square btn-sm mr-2 flex items-center {saveEnabled
 					? 'bg-green-500 text-white'
 					: ''}"
 			>
@@ -215,45 +215,36 @@
 
 <style>
 	.editor-container {
-		border: 1px solid #e5e7eb; /* Light gray border */
-		border-radius: 4px;
-		width: 100%;
-		overflow: hidden; /* Hide any overflow */
-		margin-top: 16px;
-		margin-bottom: 16px;
-	}
-	:global(.ProseMirror:focus) {
-		outline: none;
-	}
-	:global(.ProseMirror) {
-		padding: 0.5rem;
-		min-height: 300px;
-	}
-	@media screen and (min-width: 768px) {
-		:global(.ProseMirror) {
-			min-width: 600px;
-		}
-	}
+  border: 1px solid #e5e7eb; /* Light gray border */
+  border-radius: 4px;
+  width: 100%;
+  max-width: 800px;
+  margin: 16px auto;
+  overflow: hidden; /* Hide any overflow */
+}
 
-	@media screen and (max-width: 767px) {
-		:global(.ProseMirror) {
-			min-width: 100%;
-		}
-	}
-	.menu {
-		margin-bottom: 1rem;
-		border-radius: 4px;
-	}
+:global(.ProseMirror:focus) {
+  outline: none;
+}
 
-	button {
-		padding: 2px 6px;
-		border-radius: 4px;
-		margin: 0;
-		border: 1px solid black;
-	}
+:global(.ProseMirror) {
+  padding: 0.5rem;
+  min-height: 300px;
+  width: 100%;
+}
 
-	button.active {
-		background: black;
-		color: white;
-	}
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin: 0;
+  border: 1px solid black;
+}
+
+button.active {
+  background: black;
+  color: white;
+}
 </style>

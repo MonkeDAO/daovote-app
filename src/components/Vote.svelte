@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
     import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
     import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { PublicKey, Transaction } from '@solana/web3.js';
@@ -130,4 +130,4 @@
       padding: 40px;
       font-size: 20px;
     }
-  </style>
+  </style> -->

@@ -43,11 +43,9 @@
 
 <div class="mx-auto">
 	<div class="w-full max-w-5xl mb-12 border-t border-b border-blue-800 p-4 dark:prose-invert">
-		<h1>Voting Component Here</h1>
-		<h1>Fetch Votes</h1>
-		<Vote />
-		<ProposalForm />
-		<ShadowDrive />
+		<h1 class="text-black dark:text-white">Voting Component Here</h1>
+		<h1 class="text-black dark:text-white">Fetch Votes</h1>
+		<!-- <Vote /> -->
 	</div>
 
 	<Newsletter />

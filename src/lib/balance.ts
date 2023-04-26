@@ -1,6 +1,6 @@
 
 import { writable } from 'svelte/store';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 
 function declareBalanceStore() {
     const { subscribe, set } = writable({ balance: 0 });
@@ -8,7 +8,7 @@ function declareBalanceStore() {
     return {
         subscribe,
         // @ts-ignore
-        getUserSOLBalance: async (publicKey, connection) => {
+        getUserSOLBalance: async (publicKey: PublicKey, connection: Connection) => {
             if (!connection) {
                 return 0;
             }

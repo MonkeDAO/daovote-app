@@ -1,6 +1,16 @@
 import { PublicKey } from '@solana/web3.js';
 import * as anchor from "@project-serum/anchor";
 
+export const CREATOR_SEED: string = "monkedevs";
+export const VOTEBANK_SEED: string = "votebank";
+export const PROPOSAL_SEED: string = "proposal";
+export const VOTE_SEED: string = "votes";
+export const VOTE_PROGRAM_ID: anchor.web3.PublicKey = new anchor.web3.PublicKey("mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu");
+export const SYSTEM_PROGRAM_ID: anchor.web3.PublicKey = new anchor.web3.PublicKey("11111111111111111111111111111111");
+
+export const TREASURY_ADDRESS = new anchor.web3.PublicKey(
+    "C9AYHDRn2GEhFjdNRZgHF2Ld7yCbJsGSE7RzUqyRiueC"
+  );
 export function isValidSolAddress(key: string): boolean {
 	try {
 		new PublicKey(key);
@@ -53,4 +63,48 @@ export function postDataToBuffer(proposalData: any): Buffer {
   ): anchor.Program<T> {
     const program = anchor.workspace[key] as anchor.Program<T>;
     return program;
+  }
+
+  export function votebankAccountPda(
+    programId: anchor.web3.PublicKey,
+    title: string
+  ) {
+    return findProgramAddress(
+      [Buffer.from(CREATOR_SEED), Buffer.from(VOTEBANK_SEED), Buffer.from(title)],
+      programId
+    );
+  }
+  
+  export function proposalAccountPda(
+    programId: anchor.web3.PublicKey,
+    votebank: anchor.web3.PublicKey,
+    proposalId: number
+  ) {
+    return findProgramAddress(
+      [
+        Buffer.from(CREATOR_SEED),
+        Buffer.from(PROPOSAL_SEED),
+        votebank.toBuffer(),
+        toLittleEndianUint32(proposalId),
+      ],
+      programId
+    );
+  }
+  
+  // VOTE_SEED.as_bytes(), votebank.key().as_ref(), nft_vote_mint.key().as_ref(), &proposal_id.to_le_bytes()],
+  export function voteAccountPda(
+    programId: anchor.web3.PublicKey,
+    votebank: anchor.web3.PublicKey,
+    nft: anchor.web3.PublicKey,
+    proposalId: number
+  ) {
+    return findProgramAddress(
+      [
+        Buffer.from(VOTE_SEED),
+        votebank.toBuffer(),
+        nft.toBuffer(),
+        toLittleEndianUint32(proposalId),
+      ],
+      programId
+    );
   }

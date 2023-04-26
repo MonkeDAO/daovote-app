@@ -1,19 +1,141 @@
 <script lang="ts">
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import ProposalForm from '../../components/Proposal/ProposalForm.svelte';
-	import type { Connection } from '@solana/web3.js';
+	import { PublicKey, type Connection, Transaction } from '@solana/web3.js';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast'
 	import { getStorageAccounts, uploadToShadowDrive } from '../../lib/drive';
+	import { shdwBalanceStore } from '$lib/shdwbalance';
+	import { onDestroy } from 'svelte';
+	import { SYSTEM_PROGRAM_ID, TREASURY_ADDRESS, postDataToBuffer, proposalAccountPda, votebankAccountPda } from '$lib/utils/solana';
 	let file: any;
+	let proposal: any;
 	let connection: Connection;
 	let shadowDriveUrl: string;
 	let wallet: any;
+	let shdwBalance: number;
 	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
 		connection = $workSpace.provider.connection;
 		wallet = $walletStore.wallet;
 	}
+	const unsubscribe = shdwBalanceStore.subscribe(value => {
+    	shdwBalance = value.balance;
+  	});
+
+	async function createProposal() {
+      try {
+		if ($workSpace.program && $walletStore.publicKey && $walletStore.signTransaction) {
+		toast.push('Creating proposal...', { target: 'new' })
+        /* interact with the program via rpc */
+        console.log('Vote', $workSpace.baseAccount?.publicKey.toBase58());
+		const [votebankAccount, _] = votebankAccountPda($workSpace.program.programId, 'MonkeDAO Voting');
+		const voteBank = await $workSpace.program?.account.votebank.fetch(votebankAccount);
+			
+		let proposalId = 1;
+		
+		if (voteBank) {
+			proposalId = voteBank.maxChildId as number;
+		}
+		const [proposalAccount, __] = proposalAccountPda(
+        	$workSpace.program.programId,
+        	votebankAccount,
+        	proposalId
+      	);
+		console.log('Proposal account', proposalAccount.toBase58(), proposalId, JSON.stringify(voteBank.settings));
+
+		//TODO figure out how to get the token mint from settings and use that instead of hardcoding
+		const voteRestriction = (voteBank.settings as any[])?.find(obj => obj.hasOwnProperty('voteRestriction'));
+		let tokenMint = new PublicKey('EDiRA7Xn4ZVN4wHDG4cyJh91avpRsPAY2nuLqKVBZ2Gt');
+		let fetchMetadataAccounts = false;
+		if (voteRestriction) {
+			console.log('Vote restriction', voteRestriction);
+			if (voteRestriction.voteRestriction.tokenOwnership) {
+				tokenMint = new PublicKey(voteRestriction.voteRestriction.tokenOwnership.mint);
+			}
+			else if (voteRestriction.voteRestriction.nftOwnership) {
+				tokenMint = new PublicKey(voteRestriction.voteRestriction.nftOwnership.collectionId);
+				fetchMetadataAccounts = true;
+			}
+			//TODO: handle other types of restrictions
+		}
+		const splAccount = await $workSpace.provider?.connection.getParsedTokenAccountsByOwner($walletStore.publicKey, {
+			mint: tokenMint
+		});
+		if (!splAccount) {
+			toast.push('You need to have this token EDiRA7Xn4ZVN4wHDG4cyJh91avpRsPAY2nuLqKVBZ2Gt to create a proposal', { target: 'new' })
+			return;
+		}
+		//TODO: validate there are tokenAccounts
+		const splAccountInfo = splAccount.value[0].pubkey;
+		const options = proposal.options.map((option: any) => {
+			return { id: option.id, title: option.name };
+		})
+		/**
+		 * Other type
+		  {
+		  	nftOwnership: {
+				token_idx: 0,
+				meta_idx: 1,
+				collection_idx: 2,
+
+		 	}
+		*/
+		const additionalAccountOffsets = [
+        {
+          tokenOwnership: {
+            token_idx: 0,
+          },
+        },
+      ];
+      const tokenToAccountMetaFormat = {
+        pubkey: splAccountInfo,
+        isSigner: false,
+        isWritable: true,
+      };
+		const postData = {
+			title: proposal.title,
+			summary: proposal.description,
+			url: shadowDriveUrl,
+		}
+		console.log('Post data', postData);
+        const ix = await $workSpace.program.methods
+        .createProposal(
+			options,
+			Number(proposal.maxOptions),
+			postDataToBuffer(postData),
+			proposalId,
+			[],
+			additionalAccountOffsets,
+		).accounts({
+          proposal: proposalAccount,
+          votebank: votebankAccount,
+          poster: $walletStore.publicKey,
+          treasury: TREASURY_ADDRESS,
+          systemProgram: SYSTEM_PROGRAM_ID
+        }).remainingAccounts([tokenToAccountMetaFormat]).instruction();
+		const tx = new Transaction().add(ix);
+		tx.feePayer = $walletStore.publicKey;
+		tx.recentBlockhash = (await $workSpace.connection.getLatestBlockhash()).blockhash;
+		var sig = await $walletStore.signTransaction(tx);
+
+          sig?.verifySignatures();
+          const signature = await $workSpace.connection.sendRawTransaction(
+            tx.serialize()
+          );
+		  console.log('Signature', signature);
+		const proposalCreatedAccount = await $workSpace.program.account.proposal.fetch(proposalAccount);
+		console.log('Proposal created data', proposalCreatedAccount);
+        toast.push(`Proposal created ${proposalAccount.toBase58()}`, {
+            duration: 3000,
+            pausable: true, 
+        });
+		}
+      } catch (err) {
+        console.log('Transaction error: ', err);
+      }
+    }
+
 	async function uploadFile(file: File) {
 		if (connection && wallet) {
 			try {
@@ -51,21 +173,32 @@
 	async function handleProposalSubmitted(event: any) {
 		console.log('filegenerated', event);
 		file = event.detail.file;
+		proposal = event.detail.proposal;
 		
 		await uploadFile(file).then(() => {
 			toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, { target: 'new' });
+		}).then(async () => {
+			await createProposal();
 		});
 
 	}
+	onDestroy(unsubscribe);
 </script>
 <div class="wrap">
 	<SvelteToast target="new" options={{ intro: { y: -64 } }} />
   </div>
   
-<div class="mx-auto max-w-2xl">
-	<div class="prose mb-12 max-w-full border-b border-t border-blue-800 p-4 dark:prose-invert">
+<div class="mx-auto flex max-w-2xl">
+	<div class="prose mb-8 max-w-full border-b border-t border-blue-800 p-4 dark:prose-invert">
 		<ProposalForm on:submit-event={handleProposalSubmitted} />
 	</div>
+	<div class="toast toast-end">
+		<div class="alert alert-info">
+		  <div>
+			<span>$SHDW Balance: {shdwBalance.toFixed(2)}</span>
+		  </div>
+		</div>
+	  </div>
 </div>
 
 <style>

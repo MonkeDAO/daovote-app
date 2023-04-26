@@ -3,7 +3,7 @@ import { ShdwDrive, type StorageAccountResponse, type CreateStorageResponse, typ
 import { Connection, PublicKey } from "@solana/web3.js";
 
 export const driveStore: Writable<ShdwDrive | null> = writable(null);
-const forcedConnection = new Connection("https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/", "confirmed");
+export const forcedConnection = new Connection("https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/", "confirmed"); //shadow drive only works on mainnet
 export async function uploadToShadowDrive(connection: any, wallet: any, shadowDrivePublicKey: PublicKey, file: any): Promise<ShadowUploadResponse> {
   const drive = await new ShdwDrive(forcedConnection, wallet).init();
   const response = await drive.uploadFile(shadowDrivePublicKey, file);
