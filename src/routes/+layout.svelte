@@ -27,7 +27,7 @@
 	} from '@solana/wallet-adapter-wallets';
 	const localStorageKey = 'walletAdapter';
 	const endpoint = WalletAdapterNetwork.Devnet;
-	const network = clusterApiUrl(endpoint);
+	const network = clusterApiUrl(endpoint) //'https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/' ;
 	let wallets = [
 		new PhantomWalletAdapter(),
 		new GlowWalletAdapter(),

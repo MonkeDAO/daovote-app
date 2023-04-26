@@ -5,7 +5,8 @@
     import { walletStore } from "@svelte-on-solana/wallet-adapter-core";
     import { workSpace } from "@svelte-on-solana/wallet-adapter-anchor";
     import { driveStore } from "../lib/drive";
-  
+    
+    export let file: File;
     let connection: Connection;
     let wallet: any;
     let fileInput;
@@ -28,7 +29,12 @@
     if ($driveStore) {
       try {
         console.log('connection', connection)
-        const response = await $driveStore.createStorageAccount("testStorage", '1MB', "v2");
+        const response = await $driveStore.getStorageAccounts('v2');
+        if (response.length > 0) {
+          const storage = response[0];
+          const test = await $driveStore.uploadFile(storage.publicKey, file);
+          console.log('test', test)
+        }
         console.log("File uploaded successfully:", response);
       } catch (error) {
         console.error("Error uploading file:", error);
