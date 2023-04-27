@@ -123,3 +123,16 @@ export function postDataToBuffer(proposalData: any): Buffer {
         throw new Error(`Unsupported network: ${network}`);
     }
   }
+  export function trimAddress(str: string): string {
+    const maxLength = 10; //needs to be atleast 10 characters
+  
+    if (str.length <= maxLength) {
+      return str;
+    }
+  
+    const ellipsis = '...';
+    const start = str.slice(0, 5);
+    const end = str.slice(-4);
+  
+    return `${start}${ellipsis}${end}`;
+  }
