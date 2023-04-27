@@ -46,12 +46,12 @@
 			file: generatedFile
 		});
 		localStorage.removeItem('editorContent');
-    title = '';
-    description = '';
-    settingsType = '';
-    settingsValue = '';
-    options = [{ id: 0, name: '' }];
-    maxOptions = 1;
+		title = '';
+		description = '';
+		settingsType = '';
+		settingsValue = '';
+		options = [{ id: 0, name: '' }];
+		maxOptions = 1;
 	}
 	function addOption() {
 		const newOptionID = options.length;
@@ -76,125 +76,137 @@
 	}
 </script>
 
-<div class="rounded-md bg-gray-300 p-4 shadow-lg dark:bg-gray-800">
-	<form on:submit|preventDefault={submitForm} class="space-y-4">
-		<div>
-			<label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Title</label
-			>
-			<input
-				type="text"
-				id="title"
-				bind:value={title}
-				class="form-input mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-				placeholder=" Title"
-				required
-			/>
-		</div>
-		<div>
-			<label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Description</label
-			>
-			<textarea
-				id="description"
-				bind:value={description}
-				class="form-textarea mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-				rows="3"
-				placeholder=" Description"
-			/>
-		</div>
-		<div>
-			<label for="settingsType" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Settings Type</label
-			>
-			<select
-				id="settingsType"
-				bind:value={settingsType}
-				class="form-select mt-1 block w-full rounded bg-gray-400 text-gray-700 dark:bg-gray-700 dark:text-gray-100"
-			>
-				<option value="">Select a type</option>
-				<option value="option1">Option 1</option>
-				<option value="option2">Option 2</option>
-				<option value="option3">Option 3</option>
-			</select>
-		</div>
-		{#if settingsType}
-			<div>
-				<label
-					for="settingsValue"
-					class="block text-sm font-medium text-gray-700 dark:text-gray-300">Settings Value</label
-				>
-				<input
-					type="text"
-					id="settingsValue"
-					bind:value={settingsValue}
-					class="form-input mt-1 block w-full rounded dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-					placeholder="Settings Value"
-					required
-				/>
-			</div>
-		{/if}
-		<div>
-			<label for="options" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-				>Options</label
-			>
-			{#each options as option (option.id)}
-				<div class="flex items-center space-x-2">
+<div>
+	<div class="divide-y divide-gray-200">
+		<div class="space-y-4 py-8 text-base leading-6 text-gray-700 sm:text-lg sm:leading-7">
+			<form on:submit|preventDefault={submitForm} class="space-y-4">
+				<div class="flex flex-col">
+					<label for="title" class="leading-loose">Title</label>
 					<input
 						type="text"
-						bind:value={option.name}
-						class="form-input mt-1 block w-full max-w-xs rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-						placeholder="Option"
+						id="title"
+						bind:value={title}
+						class="form-input mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						placeholder=" Proposal Title"
 						required
 					/>
-					<button class="btn-square btn-sm btn" on:click={() => removeOption(option.id)}>
-						<Fa icon={faCancel} />
-					</button>
 				</div>
-			{/each}
-			<button type="button" class="btn-primary btn-sm btn mt-2" on:click={addOption}
-				>Add Option</button
-			>
+				<div class="flex flex-col">
+					<label for="description" class="leading-loose">Description</label>
+					<textarea
+						id="description"
+						bind:value={description}
+						class="form-textarea mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						rows="3"
+						placeholder=" This proposal is to vote on whether..."
+					/>
+				</div>
+				<div class="flex flex-col">
+					<label for="end" class="leading-loose">End Date</label>
+					<div class="relative focus-within:text-gray-600 text-gray-400">
+					  <input id="end" type="text" class="pr-4 pl-10 py-2 rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm focus:outline-none" placeholder="26/02/2020">
+					  <div class="absolute left-3 top-2">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+					  </div>
+					</div>
+				  </div>
+				<div class="flex flex-col">
+					<label for="settingsType" class="leading-loose">Settings Type</label>
+					<select
+						id="settingsType"
+						bind:value={settingsType}
+						class="form-select mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+					>
+						<option value="">Select a type</option>
+						<option value="option1">Option 1</option>
+						<option value="option2">Option 2</option>
+						<option value="option3">Option 3</option>
+					</select>
+				</div>
+				{#if settingsType}
+					<div class="flex flex-col">
+						<label for="settingsValue" class="leading-loose">Settings Value</label>
+						<input
+							type="text"
+							id="settingsValue"
+							bind:value={settingsValue}
+							class="form-input mt-1 block w-full rounded dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+							placeholder="Settings Value"
+							required
+						/>
+					</div>
+				{/if}
+				<div class="flex flex-col">
+					<label for="options" class="leading-loose">Options</label>
+					{#each options as option (option.id)}
+						<div class="flex items-center space-x-2">
+							<input
+								type="text"
+								bind:value={option.name}
+								class="form-input mt-1 block w-full max-w-xs rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+								placeholder=" Option"
+								required
+							/>
+							<button class="btn-square btn-sm btn" on:click={() => removeOption(option.id)}>
+								<Fa icon={faCancel} />
+							</button>
+						</div>
+					{/each}
+					<button type="button" class="btn-primary btn-sm btn mt-2" on:click={addOption}
+						>Add Option</button
+					>
+				</div>
+				<div class="flex flex-col">
+					<label class="input-group input-group-vertical">
+						<span>Max options voter can pick</span>
+						<input
+							type="number"
+							bind:value={maxOptions}
+							placeholder="1"
+							class="input-bordered input"
+							required
+						/>
+					</label>
+				</div>
+				{#if !useEditor}
+					<div class="flex flex-col">
+						<label for="file" class="leading-loose">Upload File</label>
+						<input
+							type="file"
+							id="file"
+							on:change={handleFileSelected}
+							accept=".pdf,.docx,.txt,.json,.xlsx,.xls,.jpg,.png"
+							class="file-input-primary file-input file-input-sm mt-1 w-full max-w-xs rounded bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+							required={!generatedFile}
+						/>
+					</div>
+				{/if}
+				<div class="flex items-center space-x-4 pt-4">
+					<button
+						class="flex w-full items-center justify-center rounded-md px-4 py-3 text-gray-900 focus:outline-none"
+					>
+					Cancel
+					</button>
+					<button
+						type="submit"
+						class="flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-3 text-white focus:outline-none"
+						>Submit</button
+					>
+				</div>
+			</form>
 		</div>
-		<div>
-			<label class="input-group input-group-vertical">
-				<span>Max options voter can pick</span>
-				<input
-					type="number"
-					bind:value={maxOptions}
-					placeholder="1"
-					class="input-bordered input"
-					required
-				/>
-			</label>
-		</div>
-		{#if !useEditor}
-			<div>
-				<label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-					>Upload File</label
-				>
-				<input
-					type="file"
-					id="file"
-					on:change={handleFileSelected}
-					accept=".pdf,.docx,.txt,.json,.xlsx,.xls,.jpg,.png"
-					class="file-input-primary file-input file-input-sm mt-1 w-full max-w-xs rounded bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-					required={!generatedFile}
-				/>
+
+		{#if useEditor}
+			<div class="mx-auto w-full max-w-5xl">
+				<button class="btn-primary btn mb-1 mt-1" on:click={toggleEditor}>Upload a File</button>
+				<Editor on:file-generated={handleFileGenerated} />
+			</div>
+		{:else}
+			<div class="mx-auto w-full max-w-5xl">
+				<button class="btn-primary btn mt-1" on:click={toggleEditor}>Use the Editor</button>
 			</div>
 		{/if}
-		<button type="submit" class="btn-primary btn">Submit</button>
-	</form>
-	{#if useEditor}
-		<div class="mx-auto w-full max-w-5xl">
-			<button class="btn-primary btn mb-1 mt-1" on:click={toggleEditor}>Upload a File</button>
-			<Editor on:file-generated={handleFileGenerated} />
-		</div>
-	{:else}
-		<div class="mx-auto w-full max-w-5xl">
-			<button class="btn-primary btn mt-1" on:click={toggleEditor}>Use the Editor</button>
-		</div>
-	{/if}
+	</div>
 </div>
 
 <style>
