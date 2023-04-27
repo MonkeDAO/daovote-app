@@ -45,8 +45,8 @@
     console.log('data', data)
   </script>
   
-  <div class="mx-auto flex max-w-2xl">
-    <div class="max-w-2xl">
+  <div class="mx-auto flex max-w-2xl mb-16">
+    <div class="max-w-2xl mb-2">
     {#if loading}
             <h1 class="text-5xl font-bold text-gray-900 dark:text-gray-100">{loadingMessage}</h1>
             <progress class="progress progress-primary w-56"></progress>

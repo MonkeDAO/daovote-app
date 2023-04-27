@@ -58,15 +58,15 @@
 <div>
 	{#if voteData}
 		<div class="card-container">
-			<div class="custom-card card bg-base-100 shadow-xl">
+			<div class="custom-card card bg-gray-200 dark:bg-gray-700 shadow-xl">
 				<div class="card-content card-body">
-					<h2 class="card-title text-gray-100 dark:text-gray-100">{voteBankInfo.name}</h2>
-					<h3 class="text-gray-100 dark:text-gray-100">{voteBankInfo.description}</h3>
+					<h2 class="card-title text-gray-900 dark:text-gray-100">{voteBankInfo.name}</h2>
+					<h3 class="text-gray-900 dark:text-gray-100">{voteBankInfo.description}</h3>
 					<div class="divider" />
-					<p class="text-gray-100 dark:text-gray-100">
+					<p class="text-gray-900 dark:text-gray-100">
 						Proposals:<span class="badge badge-lg ml-2">{currentProposals}</span>
 					</p>
-					<p class="text-gray-100 dark:text-gray-100">
+					<p class="text-gray-900 dark:text-gray-100">
 						Address: <a
 							href={getExplorerUrl('devnet', 'address', voteBankInfo.address)}
 							target="_blank">{trimAddress(voteBankInfo.address)}</a
@@ -86,16 +86,16 @@
 								Gated
 							</div>
 							<div class="collapse-content">
-								<p class="text-gray-100 dark:text-gray-100">
+								<p class="text-gray-900 dark:text-gray-100">
 									Gate type: {restriction.restrictionType}
 								</p>
-								<p class="text-gray-100 dark:text-gray-100">
+								<p class="text-gray-900 dark:text-gray-100">
 									Gate value: <a
 										href={getExplorerUrl('devnet', 'address', restriction.restrictionValue.address)}
 										target="_blank">{trimAddress(restriction.restrictionValue.address)}</a
 									>
 								</p>
-								<p class="text-gray-100 dark:text-gray-100">
+								<p class="text-gray-900 dark:text-gray-100">
 									Gate amount: {restriction.restrictionValue.amount}
 								</p>
 							</div>
