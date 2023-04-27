@@ -2,6 +2,8 @@ export type VoteBank = {
     maxChildId?:    number;
     moderatorMint?: string;
     settings?:      Setting[];
+    openProposals?:  number[];
+    closedProposals?: number[];
 }
 
 export type Setting = {

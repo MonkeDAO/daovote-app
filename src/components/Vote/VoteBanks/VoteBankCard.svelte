@@ -25,7 +25,7 @@
 			address: voteData.address
 		};
 		owners = voteData.voteBank.settings?.find((x) => x.ownerInfo)?.ownerInfo?.owners || [];
-		currentProposals = voteData.voteBank?.maxChildId ? voteData.voteBank?.maxChildId : 0; //0 indexed
+		currentProposals = voteData.voteBank.openProposals?.length ?? 0;
 		restriction = {
 			restrictionType: voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
 				?.voteRestriction?.tokenOwnership

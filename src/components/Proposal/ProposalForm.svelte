@@ -130,7 +130,7 @@
 							type="text"
 							id="settingsValue"
 							bind:value={settingsValue}
-							class="form-input mt-1 block w-full rounded dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+							class="form-input mt-1 block w-full rounded dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-100"
 							placeholder="Settings Value"
 							required
 						/>
@@ -157,7 +157,7 @@
 					>
 				</div>
 				<div class="flex flex-col">
-					<label class="input-group input-group-vertical">
+					<label class="input-group input-group-vertical text-gray-100">
 						<span>Max options voter can pick</span>
 						<input
 							type="number"

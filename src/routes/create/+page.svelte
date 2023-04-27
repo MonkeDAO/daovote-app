@@ -38,7 +38,7 @@
 				console.log('Vote', $workSpace.baseAccount?.publicKey.toBase58());
 				const [votebankAccount, _] = votebankAccountPda(
 					$workSpace.program.programId,
-					'MonkeDAO Voting'
+					'MonkeDAO Votebank'
 				);
 				const voteBank = await $workSpace.program?.account.votebank.fetch(votebankAccount);
 

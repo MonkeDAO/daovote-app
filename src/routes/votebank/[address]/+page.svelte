@@ -26,7 +26,8 @@
         loading = true;
         try {
             const voteBank = await program.account.votebank.fetch(new PublicKey(data.address));
-            voteBankData = ConvertVotebank.toVoteBank(JSON.stringify(voteBank));
+            //Ensure typing is correct
+            voteBankData = ConvertVotebank.toVoteBank(JSON.stringify(voteBank)); 
             voteBankInfo = {
                 name: voteBankData.settings?.find((x: any) => x.description)?.description?.title || '',
                 description: voteBankData.settings?.find((x: any) => x.description)?.description?.desc || '',
