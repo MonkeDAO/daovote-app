@@ -141,3 +141,7 @@ article.prose h4::before {
 	margin-top: -0.219em;
 	display: table;
 }
+
+.wallet-adapter-button-start-icon img {
+	background-color: transparent !important;
+}
