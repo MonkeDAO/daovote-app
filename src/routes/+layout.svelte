@@ -40,7 +40,7 @@
 		new SolletExtensionWalletAdapter({ network: endpoint }),
 		new TorusWalletAdapter(),
 	];
-	$: autoConnect = browser && Boolean(getLocalStorage('autoconnect', false));
+	$: autoConnect = browser && Boolean(getLocalStorage('autoconnect', true));
 	const options = {
 			
   	};
