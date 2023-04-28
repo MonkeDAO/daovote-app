@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import Editor from '../Editor.svelte';
+	import type { SvelteComponent } from 'svelte';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import type { Connection } from '@solana/web3.js';
@@ -23,6 +23,11 @@
 		connection = $workSpace.provider.connection;
 		wallet = $walletStore.wallet;
 	}
+	let Editor: any;
+	async function loadEditor() {
+    const module = await import('../Editor.svelte');
+    Editor = module.default;
+  }
 
 	function submitForm() {
 		if (!wallet || !connection) {
@@ -63,6 +68,9 @@
 	}
 	function toggleEditor() {
 		useEditor = !useEditor;
+		if (useEditor) {
+      loadEditor();
+    }
 	}
 	function handleFileSelected(event: any) {
 		const selectedFile = event.target.files[0];
@@ -199,7 +207,9 @@
 		{#if useEditor}
 			<div class="mx-auto w-full max-w-5xl">
 				<button class="btn-primary btn mb-1 mt-1" on:click={toggleEditor}>Upload a File</button>
-				<Editor on:file-generated={handleFileGenerated} />
+				{#if Editor}
+      					<svelte:component this={Editor} on:file-generated={handleFileGenerated} />
+    			{/if}
 			</div>
 		{:else}
 			<div class="mx-auto w-full max-w-5xl">
