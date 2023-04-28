@@ -32,6 +32,7 @@ const config = {
 		},
 	  },
 	  optimizeDeps: {
+		include: ['svelte-pdf'],
 		esbuildOptions: {
 		  plugins: [
 			NodeGlobalsPolyfillPlugin({ buffer: true }),
