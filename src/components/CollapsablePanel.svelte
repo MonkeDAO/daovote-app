@@ -4,9 +4,9 @@
     let contentVisible = expanded;
   </script>
   
-  <div class="w-full">
+  <div class="w-full flex flex-col items-center">
     <button
-      class="btn btn-primary w-full"
+      class="btn btn-primary w-1/4 justify-center"
       on:click={() => (contentVisible = !contentVisible)}
     >
       {title}
