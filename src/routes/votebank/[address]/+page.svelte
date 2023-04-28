@@ -3,11 +3,11 @@
 	import type { Program, Idl } from '@project-serum/anchor';
 	import { Connection, PublicKey } from '@solana/web3.js';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+    import VoteBankCard from '../../../components/Vote/VoteBanks/VoteBankCard.svelte';
 	import { ConvertVotebank, type VoteBank } from '../../../anchor/omcvote/types';
 	/** @type {import('./$types').PageData} */
 	export let data: any;
 	let voteBankData: VoteBank;
-	let VoteBankCard: any;
 	let program: Program<Idl>;
 	let connection: Connection;
 	let voteBankInfo: {
@@ -22,10 +22,6 @@
 		connection = $workSpace.provider.connection;
 	}
 
-	async function loadVoteBankCard() {
-		const module = await import('../../../components/Vote/VoteBanks/VoteBankCard.svelte');
-		VoteBankCard = module.default;
-	}
 	async function fetchVoteBank() {
 		loading = true;
 		try {
@@ -45,7 +41,6 @@
 		}
 	}
 	$: if (program) {
-		loadVoteBankCard();
 		fetchVoteBank();
 	}
 	console.log('data', data);
