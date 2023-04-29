@@ -5,7 +5,7 @@
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
-	import { getStorageAccounts, uploadToShadowDrive } from '$lib/drive';
+	import { createStorageAccount, getStorageAccounts, uploadToShadowDrive } from '$lib/drive';
 	import { shdwBalanceStore } from '$lib/shdwbalance';
 	import { onDestroy } from 'svelte';
 	import {
@@ -196,13 +196,33 @@
 				} else {
 					toast.push('Creating a storage account first...', { target: 'new' });
 					const response = await getStorageAccounts(connection, wallet);
-					const test = await uploadToShadowDrive(connection, wallet, response[0].publicKey, file);
-					console.log('Upload response', test);
-					if (test.finalized_locations.length > 0) {
-						shadowDriveUrl = test.finalized_locations[0];
-						return true;
+					if (response.length > 0) {
+						const storage = response[0];
+						const test = await uploadToShadowDrive(connection, wallet, storage.publicKey, file);
+						console.log('Upload response', test);
+						if (test.finalized_locations.length > 0) {
+							shadowDriveUrl = test.finalized_locations[0];
+							return true;
+						} else {
+							toast.push('Error uploading file to shadow drive!', { target: 'new' });
+							return false;
+						}
 					} else {
-						toast.push('Error uploading file to shadow drive!', { target: 'new' });
+						const createResponse = await createStorageAccount(connection, wallet);
+						const getResponse = await getStorageAccounts(connection, wallet);
+						if (getResponse.length > 0) {
+						const storage = response[0];
+						const test = await uploadToShadowDrive(connection, wallet, storage.publicKey, file);
+						console.log('Upload response', test);
+						if (test.finalized_locations.length > 0) {
+							shadowDriveUrl = test.finalized_locations[0];
+							return true;
+						} else {
+							toast.push('Error uploading file to shadow drive!', { target: 'new' });
+							return false;
+						}
+						}
+						console.log('Create response', createResponse);
 						return false;
 					}
 				}
