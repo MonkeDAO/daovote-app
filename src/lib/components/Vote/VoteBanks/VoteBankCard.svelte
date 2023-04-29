@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { getExplorerUrl, trimAddress } from '$lib/utils/solana';
-	import type { VoteBank } from '../../../anchor/omcvote/types';
+	import type { VoteBank } from '$lib/anchor/omcvote/types';
 	import * as anchor from '@project-serum/anchor';
+	import type { VoteBankProposals } from '$lib/types';
+	import { goto } from '$app/navigation';
 
 	export let voteData: { voteBank: VoteBank; address: string };
 	let voteBankInfo: {
@@ -53,6 +55,9 @@
 			}
 		};
 	}
+	async function viewProposals() {
+		await goto(`/votebank/${voteData.address}/proposals`);
+  	}
 </script>
 
 <div>
@@ -127,7 +132,7 @@
 						</div>
 					{/if}
 					<div class="card-actions justify-end">
-						<button class="btn-primary btn">View proposals</button>
+						<button class="btn-primary btn" on:click={viewProposals}>View proposals</button>
 					</div>
 				</div>
 			</div>

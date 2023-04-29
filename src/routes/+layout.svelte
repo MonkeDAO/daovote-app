@@ -6,14 +6,14 @@
 
 <script>
 	import '../tailwind.css';
-	import Nav from '../components/Nav.svelte';
+	import Nav from '$lib/components/Nav.svelte';
 	import { MY_TWITTER_HANDLE, MY_YOUTUBE, REPO_URL, SITE_TITLE } from '$lib/siteConfig';
 	import { clusterApiUrl } from '@solana/web3.js';
 	import { WalletProvider, ConnectionProvider } from '@svelte-on-solana/wallet-adapter-ui';
 	import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 	import { getLocalStorage, walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { AnchorConnectionProvider, workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
-	import idl from '../anchor/omcvote/omcvote.json'
+	import idl from '$lib/anchor/omcvote/omcvote.json'
 	import { browser } from '$app/environment';
 	import { SvelteToast } from '@zerodevx/svelte-toast'
 	import {
@@ -30,7 +30,7 @@
 	import { forcedConnection } from '$lib/drive';
 	const localStorageKey = 'walletAdapter';
 	const endpoint = WalletAdapterNetwork.Devnet;
-	const network = clusterApiUrl(endpoint) //'https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/' ;
+	const network = 'https://silent-ultra-frost.solana-devnet.quiknode.pro/8b6a2a9f4d311c9588d17bd0b2ff7ce7b83cb5d5/' //clusterApiUrl(endpoint) //'https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/' ;
 	let wallets = [
 		new PhantomWalletAdapter(),
 		new GlowWalletAdapter(),

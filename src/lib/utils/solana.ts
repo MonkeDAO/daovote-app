@@ -1,5 +1,7 @@
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Connection } from '@solana/web3.js';
 import * as anchor from "@project-serum/anchor";
+import { Proposal } from '$lib/anchor/accounts';
+import type { ProposalItem } from '$lib/types';
 
 export const CREATOR_SEED: string = "monkedevs";
 export const VOTEBANK_SEED: string = "votebank";
@@ -39,6 +41,42 @@ export function toAccountMetadata(key: PublicKey): { pubkey: PublicKey; isWritab
     };
 }
 
+export async function fetchProposalById(connection: Connection, votebank: PublicKey, proposalId: number): Promise<ProposalItem | null> {
+    try {
+      const [proposalAddress] = proposalAccountPda(votebank, proposalId);
+      const proposalAccount = await Proposal.fromAccountAddress(connection, proposalAddress);
+      console.log('test', proposalAccount)
+      //const proposalData = bufferToPostData(proposalAccount.data);
+      // eslint-disable-next-line no-unused-vars
+      const { data, poster, ...rest } = proposalAccount;
+      const decode = new TextDecoder();
+      const dataDecoded = decode.decode(data);
+      const obj = JSON.parse(dataDecoded);
+      const proposalItem: ProposalItem = {
+          votebank: votebank.toBase58(),
+          poster: poster.toBase58(),
+          data: obj,
+          ...rest
+      }
+      console.log('returning proposalItem', proposalItem)
+      return proposalItem;
+  } catch (err) {
+    console.log('fetchProposalById', err);
+      return null;
+  }
+}
+export async function fetchProposals(connection: Connection, votebank: PublicKey, proposalIds: number[]): Promise<ProposalItem[]> {
+  const proposals: ProposalItem[] = [];
+  await Promise.all(proposalIds.map(async (proposalId) => {
+      const proposal = await fetchProposalById(connection, votebank, proposalId);
+      if (proposal) {
+          proposals.push(proposal)
+      }
+  })); 
+  console.log('returning proposals', proposals) 
+  return proposals;
+}
+
 export function postDataToBuffer(proposalData: any): Buffer {
     const proposal = {
       title: proposalData.title,
@@ -48,6 +86,14 @@ export function postDataToBuffer(proposalData: any): Buffer {
     };
     const dataString = JSON.stringify(proposal);
     return Buffer.from(dataString);
+  }
+
+  export function bufferToPostData(buffer: Buffer | unknown): any {
+    if (!buffer) {
+      return null;
+    }
+    const jsonString = buffer.toString();
+    return JSON.parse(jsonString);
   }
   
   export function findProgramAddress(
@@ -66,8 +112,8 @@ export function postDataToBuffer(proposalData: any): Buffer {
   }
 
   export function votebankAccountPda(
-    programId: anchor.web3.PublicKey,
-    title: string
+    title: string,
+    programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID,
   ) {
     return findProgramAddress(
       [Buffer.from(CREATOR_SEED), Buffer.from(VOTEBANK_SEED), Buffer.from(title)],
@@ -76,9 +122,9 @@ export function postDataToBuffer(proposalData: any): Buffer {
   }
   
   export function proposalAccountPda(
-    programId: anchor.web3.PublicKey,
     votebank: anchor.web3.PublicKey,
-    proposalId: number
+    proposalId: number,
+    programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID,
   ) {
     return findProgramAddress(
       [
@@ -93,10 +139,10 @@ export function postDataToBuffer(proposalData: any): Buffer {
   
   // VOTE_SEED.as_bytes(), votebank.key().as_ref(), nft_vote_mint.key().as_ref(), &proposal_id.to_le_bytes()],
   export function voteAccountPda(
-    programId: anchor.web3.PublicKey,
     votebank: anchor.web3.PublicKey,
     nft: anchor.web3.PublicKey,
-    proposalId: number
+    proposalId: number,
+    programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID,
   ) {
     return findProgramAddress(
       [
@@ -108,6 +154,8 @@ export function postDataToBuffer(proposalData: any): Buffer {
       programId
     );
   }
+
+
 
   export function getExplorerUrl(network: string, path: 'address' | 'transaction', hash?: string): string {
     const baseUrl = "https://explorer.solana.com";

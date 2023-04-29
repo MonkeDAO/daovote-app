@@ -1,7 +1,7 @@
 <script>
-	import Newsletter from '../components/Newsletter.svelte';
-	import FeatureCard from '../components/FeatureCard.svelte';
-	import LatestPosts from '../components/LatestPosts.svelte';
+	import Newsletter from '$lib/components/Newsletter.svelte';
+	import FeatureCard from '$lib/components/FeatureCard.svelte';
+	import LatestPosts from '$lib/components/LatestPosts.svelte';
 	import {
 		SITE_URL,
 		REPO_URL,

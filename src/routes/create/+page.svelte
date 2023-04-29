@@ -1,11 +1,11 @@
 <script lang="ts">
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import ProposalForm from '../../components/Proposal/ProposalForm.svelte';
+	import ProposalForm from '../../lib/components/Proposal/ProposalForm.svelte';
 	import { PublicKey, type Connection, Transaction } from '@solana/web3.js';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
-	import { getStorageAccounts, uploadToShadowDrive } from '../../lib/drive';
+	import { getStorageAccounts, uploadToShadowDrive } from '$lib/drive';
 	import { shdwBalanceStore } from '$lib/shdwbalance';
 	import { onDestroy } from 'svelte';
 	import {
@@ -37,8 +37,8 @@
 				/* interact with the program via rpc */
 				console.log('Vote', $workSpace.baseAccount?.publicKey.toBase58());
 				const [votebankAccount, _] = votebankAccountPda(
+					'MonkeDAO Votebank',
 					$workSpace.program.programId,
-					'MonkeDAO Votebank'
 				);
 				const voteBank = await $workSpace.program?.account.votebank.fetch(votebankAccount);
 
@@ -48,9 +48,9 @@
 					proposalId = voteBank.maxChildId as number;
 				}
 				const [proposalAccount, __] = proposalAccountPda(
-					$workSpace.program.programId,
 					votebankAccount,
-					proposalId
+					proposalId,
+					$workSpace.program.programId,
 				);
 				console.log(
 					'Proposal account',
