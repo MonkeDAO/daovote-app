@@ -1,15 +1,16 @@
 import { Votebank } from '$lib/anchor/accounts';
-import type { VoteBankProposals } from '$lib/types';
+import type { VoteBankProposalsNumeric } from '$lib/types';
 import { web3 } from '@project-serum/anchor';
 import { error } from '@sveltejs/kit';
 /**
  * @type {import('@sveltejs/kit').RequestHandler}
  */
-export async function GET({ params }) {
+export async function GET({ params }: any) {
+	console.log("Fetching data for votebank address", params);
 	const { address } = params;
     console.log("Fetching data for votebank address", address);
 	let data: Votebank;
-    let responseData: VoteBankProposals;
+    let responseData: VoteBankProposalsNumeric;
 	try {
         const connection = new web3.Connection(web3.clusterApiUrl('devnet'));
 		data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(address));
@@ -26,6 +27,6 @@ export async function GET({ params }) {
 	} catch (err) {
 		console.log("didn't find ", address)
 		console.error(err);
-		throw error(404, err?.message);
+		throw error(404, 'votebank not found');
 	}
 }

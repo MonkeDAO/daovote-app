@@ -45,7 +45,7 @@
 		</li>
 		{#if $walletStore?.connected}
 		<li>
-			<NavLink href="/create">Create Proposal</NavLink>
+			<NavLink href="/votebanks">Votebanks</NavLink>
 		</li>
 		{/if}
 	</ul>

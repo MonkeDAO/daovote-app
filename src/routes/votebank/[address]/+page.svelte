@@ -37,6 +37,7 @@
 			loading = false;
 		} catch (err) {
 			loadingMessage = 'VoteBank not found';
+			loading = false;
 			console.log('err', err);
 		}
 	}

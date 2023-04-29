@@ -1,6 +1,6 @@
 <script lang="ts">
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import ProposalForm from '../../lib/components/Proposal/ProposalForm.svelte';
+	import ProposalForm from '../../../../lib/components/Proposal/ProposalForm.svelte';
 	import { PublicKey, type Connection, Transaction } from '@solana/web3.js';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
@@ -16,7 +16,9 @@
 		proposalAccountPda,
 		votebankAccountPda
 	} from '$lib/utils/solana';
+	export let data: any;
 	let file: any;
+	let votebankAddress: PublicKey;
 	let proposal: any;
 	let connection: Connection;
 	let shadowDriveUrl: string;
@@ -26,22 +28,27 @@
 		connection = $workSpace.provider.connection;
 		wallet = $walletStore.wallet;
 	}
+	$: if (data.address) {
+		votebankAddress = new PublicKey(data.address)
+	};
 	const unsubscribe = shdwBalanceStore.subscribe((value) => {
 		shdwBalance = value.balance;
 	});
 
 	async function createProposal() {
 		try {
-			if ($workSpace.program && $walletStore.publicKey && $walletStore.signTransaction) {
+			if ($workSpace.program && $walletStore.publicKey && $walletStore.signTransaction && votebankAddress) {
 				toast.push('Creating proposal...', { target: 'new' });
 				/* interact with the program via rpc */
 				console.log('Vote', $workSpace.baseAccount?.publicKey.toBase58());
+				
+				const voteBank = await $workSpace.program?.account.votebank.fetch(votebankAddress);
+				//@ts-ignore
+				const title = voteBank.settings.find(x => x.description)?.description?.title;
 				const [votebankAccount, _] = votebankAccountPda(
-					'MonkeDAO Votebank',
+					title,
 					$workSpace.program.programId
 				);
-				const voteBank = await $workSpace.program?.account.votebank.fetch(votebankAccount);
-
 				let proposalId = 1;
 
 				if (voteBank) {

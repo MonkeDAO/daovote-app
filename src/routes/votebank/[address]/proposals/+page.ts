@@ -2,7 +2,7 @@ import { Votebank } from "$lib/anchor/accounts";
 import type { VoteBankProposals } from "$lib/types";
 import { fetchProposals } from "$lib/utils/solana";
 import { web3 } from "@project-serum/anchor";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { error } from "@sveltejs/kit";
 
 export async function load({ params, setHeaders }: any) {
@@ -13,7 +13,8 @@ export async function load({ params, setHeaders }: any) {
 	let data: Votebank;
     let responseData: VoteBankProposals;
 	try {
-        const connection = new web3.Connection('https://silent-ultra-frost.solana-devnet.quiknode.pro/8b6a2a9f4d311c9588d17bd0b2ff7ce7b83cb5d5/');
+        //TODO: Configurable/env variable
+        const connection = new web3.Connection(clusterApiUrl('devnet'));
 		data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(address));
         let open_proposals: any[] = [];
         let closed_proposals: any[] = [];

@@ -29,8 +29,9 @@
 	import { shdwBalanceStore } from '$lib/shdwbalance';
 	import { forcedConnection } from '$lib/drive';
 	const localStorageKey = 'walletAdapter';
+	//TODO: Configurable or env variable
 	const endpoint = WalletAdapterNetwork.Devnet;
-	const network = 'https://silent-ultra-frost.solana-devnet.quiknode.pro/8b6a2a9f4d311c9588d17bd0b2ff7ce7b83cb5d5/' //clusterApiUrl(endpoint) //'https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/' ;
+	const network =  clusterApiUrl(endpoint) //'https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/' ;
 	let wallets = [
 		new PhantomWalletAdapter(),
 		new GlowWalletAdapter(),

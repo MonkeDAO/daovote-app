@@ -89,3 +89,9 @@ export type VoteBankProposals = {
 	open_proposals?: ProposalItem[];
 	closed_proposals?: ProposalItem[];
 };
+
+export type VoteBankItem = {
+	votebank: string;
+	title: string;
+	description: string;
+}
