@@ -1,4 +1,4 @@
-import { PublicKey, Connection } from '@solana/web3.js';
+import { PublicKey, Connection, type AccountMeta } from '@solana/web3.js';
 import * as anchor from "@project-serum/anchor";
 import { Proposal } from '$lib/anchor/accounts';
 import type { ProposalItem } from '$lib/types';
@@ -33,7 +33,15 @@ export function toLittleEndianUint32(number: number): Uint8Array {
 	return new Uint8Array(buffer);
 }
 
-export function toAccountMetadata(key: PublicKey): { pubkey: PublicKey; isWritable: boolean; isSigner: boolean } {
+export function getDefaultPublicKey(): PublicKey {
+  return new PublicKey('11111111111111111111111111111111');
+}
+
+export function isDefaultPublicKey(key: PublicKey): boolean {
+  return key.equals(getDefaultPublicKey());
+}
+
+export function toAccountMetadata(key: PublicKey): AccountMeta {
     return {
         pubkey: key,
         isWritable: true,

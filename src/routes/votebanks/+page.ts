@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 
-export async function load({ setHeaders, fetch }) {
+export async function load({ setHeaders, fetch }: any) {
     const res = await fetch(`/api/votebanks.json`);
     //const res2 = await fetch(`/api/votebank/${"4BFs2t7H8LeFEq8LNVPoXmNWHat3zqZmaoYW8uZYB5tg"}/proposals.json`);
     // const t = await res2.json();

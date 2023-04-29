@@ -46,10 +46,11 @@
 				amount: voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
 					?.voteRestriction?.tokenOwnership?.amount
 					? new anchor.BN(
-							voteData.voteBank.settings?.find(
+							voteData.voteBank.settings.find(
 								(x) => x.voteRestriction
-							)?.voteRestriction?.voteRestriction?.tokenOwnership?.amount
-					  ).toNumber()
+							)?.voteRestriction?.voteRestriction?.tokenOwnership?.amount as string
+					  )
+					  ?.toNumber()
 					: 1
 			}
 		};
