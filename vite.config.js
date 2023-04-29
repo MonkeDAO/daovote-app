@@ -1,9 +1,8 @@
 // vite.config.js
 import { sveltekit } from '@sveltejs/kit/vite';
 import { ssp } from "sveltekit-search-params/plugin";
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import nodePolyfills from 'rollup-plugin-node-polyfills';
-
+import inject from "@rollup/plugin-inject";
 
 /** @type {import('vite').UserConfig} */
 const config = {
@@ -28,15 +27,19 @@ const config = {
 		rollupOptions: {
 		  plugins: [
 			nodePolyfills({ crypto: true }),
+			inject({ modules: { Buffer: ["buffer", "Buffer"] },}),
 		  ],
 		},
 	  },
 	  optimizeDeps: {
 		include: ['svelte-pdf'],
 		esbuildOptions: {
-		  plugins: [
-			NodeGlobalsPolyfillPlugin({ buffer: true }),
-		  ],
+		define: {
+			global: "globalThis",
+		},
+		//   plugins: [
+		// 	NodeGlobalsPolyfillPlugin({ buffer: true }),
+		//   ],
 		}
 	  },
 	// optimizeDeps: {
