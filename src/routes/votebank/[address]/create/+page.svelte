@@ -1,11 +1,11 @@
 <script lang="ts">
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import ProposalForm from '../../components/Proposal/ProposalForm.svelte';
+	import ProposalForm from '../../../../lib/components/Proposal/ProposalForm.svelte';
 	import { PublicKey, type Connection, Transaction } from '@solana/web3.js';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
-	import { getStorageAccounts, uploadToShadowDrive } from '../../lib/drive';
+	import { createStorageAccount, getStorageAccounts, uploadToShadowDrive } from '$lib/drive';
 	import { shdwBalanceStore } from '$lib/shdwbalance';
 	import { onDestroy } from 'svelte';
 	import {
@@ -16,7 +16,9 @@
 		proposalAccountPda,
 		votebankAccountPda
 	} from '$lib/utils/solana';
+	export let data: any;
 	let file: any;
+	let votebankAddress: PublicKey;
 	let proposal: any;
 	let connection: Connection;
 	let shadowDriveUrl: string;
@@ -26,31 +28,36 @@
 		connection = $workSpace.provider.connection;
 		wallet = $walletStore.wallet;
 	}
+	$: if (data.address) {
+		votebankAddress = new PublicKey(data.address)
+	};
 	const unsubscribe = shdwBalanceStore.subscribe((value) => {
 		shdwBalance = value.balance;
 	});
 
 	async function createProposal() {
 		try {
-			if ($workSpace.program && $walletStore.publicKey && $walletStore.signTransaction) {
+			if ($workSpace.program && $walletStore.publicKey && $walletStore.signTransaction && votebankAddress) {
 				toast.push('Creating proposal...', { target: 'new' });
 				/* interact with the program via rpc */
 				console.log('Vote', $workSpace.baseAccount?.publicKey.toBase58());
+				
+				const voteBank = await $workSpace.program?.account.votebank.fetch(votebankAddress);
+				//@ts-ignore
+				const title = voteBank.settings.find(x => x.description)?.description?.title;
 				const [votebankAccount, _] = votebankAccountPda(
-					$workSpace.program.programId,
-					'MonkeDAO Votebank'
+					title,
+					$workSpace.program.programId
 				);
-				const voteBank = await $workSpace.program?.account.votebank.fetch(votebankAccount);
-
 				let proposalId = 1;
 
 				if (voteBank) {
 					proposalId = voteBank.maxChildId as number;
 				}
 				const [proposalAccount, __] = proposalAccountPda(
-					$workSpace.program.programId,
 					votebankAccount,
-					proposalId
+					proposalId,
+					$workSpace.program.programId
 				);
 				console.log(
 					'Proposal account',
@@ -194,9 +201,17 @@
 						return false;
 					}
 				} else {
-					toast.push('Creating a storage account first...', { target: 'new' });
-					const response = await getStorageAccounts(connection, wallet);
-					const test = await uploadToShadowDrive(connection, wallet, response[0].publicKey, file);
+					const createResponse = await createStorageAccount(connection, wallet);
+					if (!createResponse.shdw_bucket) {
+						toast.push('Error creating storage account!', { target: 'new' });
+						return false;
+					}
+					const test = await uploadToShadowDrive(
+						connection,
+						wallet,
+						new PublicKey(createResponse.shdw_bucket),
+						file
+					);
 					console.log('Upload response', test);
 					if (test.finalized_locations.length > 0) {
 						shadowDriveUrl = test.finalized_locations[0];
@@ -233,9 +248,11 @@
 <div class="wrap">
 	<SvelteToast target="new" options={{ intro: { y: -64 } }} />
 </div>
-<div class="flex min-h-screen flex-col justify-center dark:prose-invert py-6 sm:py-12">
+<div class="flex min-h-screen flex-col justify-center py-6 dark:prose-invert sm:py-12">
 	<div class="relative py-3 sm:mx-auto sm:max-w-xl">
-		<div class="relative mx-8 rounded-3xl dark:bg-white bg-gray-0 px-4 py-10 shadow sm:p-10 md:mx-0">
+		<div
+			class="bg-gray-0 relative mx-8 rounded-3xl px-4 py-10 shadow dark:bg-white sm:p-10 md:mx-0"
+		>
 			<div class="mx-auto max-w-md">
 				<div class="flex items-center space-x-5">
 					<div

@@ -59,3 +59,39 @@ export type GithubIssue = {
 export type BalanceStore = {
     balance: number;
 };
+
+export type ProposalItem = {
+	votebank: string,
+	poster: string,
+    data: ProposalData,
+    options: {id: number, title: string}[],
+    maxOptionsSelectable: number,
+    settings: any[],
+    voterCount: number,
+    voteOpen: boolean,
+    proposalId: number
+};
+
+export type ProposalData = {
+	title: string,
+	summary: string,
+	url: string
+}
+
+export type VoteBankProposalsNumeric = {
+	votebank: string;
+	open_proposals?: number[];
+	closed_proposals?: number[];
+};
+
+export type VoteBankProposals = {
+	votebank: string;
+	open_proposals?: ProposalItem[];
+	closed_proposals?: ProposalItem[];
+};
+
+export type VoteBankItem = {
+	votebank: string;
+	title: string;
+	description: string;
+}

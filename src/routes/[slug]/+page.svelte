@@ -1,7 +1,7 @@
 <script>
 	import { MY_TWITTER_HANDLE, SITE_URL } from '$lib/siteConfig';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import Newsletter from '../../components/Newsletter.svelte';
+	import Newsletter from '$lib/components/Newsletter.svelte';
 	import { page } from '$app/stores';
 
 	/** @type {import('./$types').PageData} */

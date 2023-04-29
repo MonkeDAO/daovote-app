@@ -1,31 +1,79 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import CollapsablePanel from '../CollapsablePanel.svelte';
-	import PdfViewer from '../PDFViewer.svelte';
+	import CollapsablePanel from '$lib/components/CollapsablePanel.svelte';
+	import VoteConfirmationModal from '$lib/components//Vote/Voting/VoteConfirmationModal.svelte';
+	import PdfViewer from '$lib/components/PDFViewer.svelte';
+	import { createEventDispatcher } from 'svelte';
+	import { toast } from '@zerodevx/svelte-toast';
 	export let proposal: any;
 	let showPdf = false;
 	let showImg = false;
 	let notSupported = false;
+	let options: any[];
+	let voteConfirmationModal: any;
 
-	onMount(() => {
-		if (proposal.data.url.endsWith('.pdf')) {
-			showPdf = true;
-		} else if (
-			proposal.data.url.endsWith('.png') ||
-			proposal.data.url.endsWith('.jpg') ||
-			proposal.data.url.endsWith('.jpeg')
-		) {
-			showImg = true;
-		} else {
-			notSupported = true;
+	const dispatch = createEventDispatcher();
+	console.log('proposal view', proposal);
+
+	$: proposal = proposal;
+
+	if (proposal?.data?.url?.endsWith('.pdf')) {
+		showPdf = true;
+	} else if (
+		proposal?.data?.url.endsWith('.png') ||
+		proposal?.data?.url.endsWith('.jpg') ||
+		proposal?.data?.url.endsWith('.jpeg')
+	) {
+		showImg = true;
+	} else {
+		notSupported = true;
+	}
+	if (proposal?.options) {
+		options = proposal.options.map((option: any) => {
+			return {
+				id: option.id,
+				title: option.title,
+				checked: false
+			};
+		});
+	}
+	function handleVote() {
+		const checkedOptions = options.filter((option) => option.checked);
+		if (checkedOptions.length >= 1 && checkedOptions.length <= proposal.maxOptionsSelectable) {
+			voteConfirmationModal.openModal();
 		}
-	});
+		else if (checkedOptions.length > proposal.maxOptionsSelectable) {
+			toast.push(`You can only select ${proposal.maxOptionsSelectable} options`, {
+				duration: 3000,
+			});
+		}
+		else {
+			toast.push('You must select at least one option', {
+				duration: 3000,
+			});
+		}
+	}
 
+	function handleVoteConfirmed(event: any) {
+		const dispatchedOptions = event.detail;
+		console.log('selectedOptions', dispatchedOptions);
+		voteConfirmationModal.closeModal();
+		dispatch('vote', dispatchedOptions);
+		options = options.map((option: any) => {
+			return {
+				...option,
+				checked: false
+			};
+		});
+	}
 	function getBadgeClass(isOpen: boolean) {
 		return isOpen ? 'bg-green-500' : 'bg-red-500';
 	}
 </script>
-
+<VoteConfirmationModal
+bind:this={voteConfirmationModal}
+  options={options}
+  on:voteConfirmed={handleVoteConfirmed}
+  />
 <article
 	class="votecontent prose mx-auto mb-5 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
 >
@@ -41,12 +89,9 @@
 		<p class="flex items-center text-sm text-gray-700 dark:text-gray-300">
 			Created Date: {new Date().toISOString().slice(0, 10)}
 		</p>
-		<p class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-			<!-- <span class="mr-4 font-mono text-xs text-gray-700 text-opacity-70 dark:text-gray-300"
-					>{json.ghMetadata.reactions.total_count} reactions</span
-				> -->
+		<div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
 			Status: {proposal.voteOpen ? 'Open' : 'Closed'}
-		</p>
+			</div>
 	</div>
 	<div
 		class="-mx-4 my-2 flex h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
@@ -92,7 +137,7 @@
 			</p>
 		</div>
 		<div class="list">
-			{#each proposal.options as option}
+			{#each options as option (option)}
 				<!-- <div class="mx-8 list-item text-gray-900 dark:text-gray-100">
 					<div>
 						<span class="list-item-title">{option.title}</span>
@@ -101,13 +146,18 @@
 				<div class="form-control">
 					<label class="label cursor-pointer">
 						<span class="label-text text-black dark:text-gray-200">{option.title}</span>
-						<input type="checkbox" checked="checked" class="checkbox-primary checkbox" />
+						<input
+							type="checkbox"
+							bind:checked={option.checked}
+							class="checkbox-primary checkbox"
+						/>
 					</label>
 				</div>
 			{/each}
 		</div>
 		<button
 			class="right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded bg-gray-100 px-4 pt-1 font-medium text-gray-900 dark:bg-gray-700 dark:text-gray-100"
+			on:click={handleVote}
 			>Vote
 		</button>
 	</div>

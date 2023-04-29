@@ -49,3 +49,4 @@ export class ConvertVotebank {
         return JSON.stringify(value);
     }
 }
+

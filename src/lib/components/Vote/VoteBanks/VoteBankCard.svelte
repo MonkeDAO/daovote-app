@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { getExplorerUrl, trimAddress } from '$lib/utils/solana';
-	import type { VoteBank } from '../../../anchor/omcvote/types';
+	import type { VoteBank } from '$lib/anchor/omcvote/types';
 	import * as anchor from '@project-serum/anchor';
+	import { goto } from '$app/navigation';
 
 	export let voteData: { voteBank: VoteBank; address: string };
 	let voteBankInfo: {
@@ -53,10 +54,20 @@
 			}
 		};
 	}
+	async function createProposal() {
+        // Your create proposal logic
+		await goto(`/votebank/${voteData.address}/create`);
+    }
+	async function viewProposals() {
+		await goto(`/votebank/${voteData.address}/proposals`);
+  	}
 </script>
 
 <div>
 	{#if voteData}
+	<div class="flex justify-center my-4">
+		<button class="btn-primary btn" on:click={createProposal}>Create a Proposal</button>
+	</div>
 		<div class="card-container">
 			<div class="custom-card card bg-gray-200 dark:bg-gray-700 shadow-xl">
 				<div class="card-content card-body">
@@ -127,7 +138,7 @@
 						</div>
 					{/if}
 					<div class="card-actions justify-end">
-						<button class="btn-primary btn">View proposals</button>
+						<button class="btn-primary btn" on:click={viewProposals}>View proposals</button>
 					</div>
 				</div>
 			</div>
