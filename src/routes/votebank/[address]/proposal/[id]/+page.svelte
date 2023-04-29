@@ -36,7 +36,9 @@
 		wallet = $walletStore.wallet;
 	}
 
-	$: if (data) {
+	$: data = data;
+	
+	if (data) {
 		proposalItem = data.proposal;
 		loading = false;
 	}

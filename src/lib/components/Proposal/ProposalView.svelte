@@ -14,7 +14,9 @@
 	const dispatch = createEventDispatcher();
 	console.log('proposal view', proposal);
 
-	$: if (proposal?.data?.url?.endsWith('.pdf')) {
+	$: proposal = proposal;
+
+	if (proposal?.data?.url?.endsWith('.pdf')) {
 		showPdf = true;
 	} else if (
 		proposal?.data?.url.endsWith('.png') ||
@@ -25,7 +27,7 @@
 	} else {
 		notSupported = true;
 	}
-	$: if (proposal?.options) {
+	if (proposal?.options) {
 		options = proposal.options.map((option: any) => {
 			return {
 				id: option.id,
