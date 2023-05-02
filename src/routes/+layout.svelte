@@ -7,9 +7,9 @@
 <script>
 	import '../tailwind.css';
 	import Nav from '$lib/components/Nav.svelte';
-	import { MY_TWITTER_HANDLE, MY_YOUTUBE, REPO_URL, SITE_TITLE } from '$lib/siteConfig';
+	import { MY_TWITTER_HANDLE, REPO_URL } from '$lib/siteConfig';
 	import { clusterApiUrl } from '@solana/web3.js';
-	import { WalletProvider, ConnectionProvider } from '@svelte-on-solana/wallet-adapter-ui';
+	import { WalletProvider } from '@svelte-on-solana/wallet-adapter-ui';
 	import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 	import { getLocalStorage, walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { AnchorConnectionProvider, workSpace } from '@svelte-on-solana/wallet-adapter-anchor';

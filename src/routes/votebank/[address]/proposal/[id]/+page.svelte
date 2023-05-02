@@ -1,22 +1,18 @@
 <script lang="ts">
 	import ProposalView from '$lib/components/Proposal/ProposalView.svelte';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import type { ProposalItem, VoteBankProposals } from '$lib/types';
+	import type { ProposalItem } from '$lib/types';
 	import {
 		TREASURY_ADDRESS,
-		fetchProposalById,
 		getDefaultPublicKey,
 		getExplorerUrl,
 		isDefaultPublicKey,
 		proposalAccountPda,
 		toAccountMetadata,
-		voteAccountPda,
-		votebankAccountPda
-	} from '$lib/utils/solana';
+		voteAccountPda	} from '$lib/utils/solana';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import { onMount } from 'svelte';
 	import { PublicKey, type Connection, type AccountMeta, Transaction } from '@solana/web3.js';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { Metaplex } from '@metaplex-foundation/js';
@@ -25,18 +21,16 @@
 	import type {
 		SettingsData,
 		VoteRestrictionRule,
-		VoteEntry,
-		AdditionalAccountIndices
-	} from '$lib/anchor/types';
-	import type { VoteInstructionArgs } from '$lib/anchor/instructions/vote';
+		VoteEntry	} from '$lib/anchor/types';
 	import { toast } from '@zerodevx/svelte-toast';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
+	import type { Adapter } from '@solana/wallet-adapter-base';
 
 	export let data: any;
 	console.log('proposal page', data);
 	let connection: Connection;
 	let proposalItem: ProposalItem;
-	let wallet: any;
+	let wallet: Adapter;
 	let loading = true;
 	let text = 'Loading...';
 	let error = false;
@@ -101,7 +95,7 @@
 				votebankAccountAddress
 			);
 			const votebank = voteBankAccountRaw?.pretty();
-			const [proposalAccount, __] = proposalAccountPda(
+			const [proposalAccount] = proposalAccountPda(
 				votebankAccountAddress,
 				proposalItem.proposalId,
 				program.programId
@@ -223,7 +217,7 @@
 			const ix = await program.methods
 				.vote(proposalItem.proposalId, votedFor, additionalAccountOffsets)
 				.accounts({
-					voter: wallet.publicKey,
+					voter: currentUser,
 					votebank: votebankAccountAddress,
 					proposal: proposalAccount,
 					votes: vote,
@@ -235,14 +229,15 @@
 				.instruction();
 			const tx = new Transaction().add(ix);
 			tx.feePayer = currentUser;
-			tx.recentBlockhash = (await $workSpace.connection.getLatestBlockhash()).blockhash;
+			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 			var sig = await $walletStore.signTransaction(tx);
 
 			sig?.verifySignatures();
-			const signature = await $workSpace.connection.sendRawTransaction(tx.serialize());
+			const signature = await connection.sendRawTransaction(tx.serialize());
 			console.log('Signature', signature);
-			const latestBlockhash = await $workSpace.connection.getLatestBlockhash();
-			const confirmTx = await $workSpace.connection.confirmTransaction(
+			const latestBlockhash = await connection.getLatestBlockhash();
+			
+			await connection.confirmTransaction(
 				{
 					signature: signature,
 					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,

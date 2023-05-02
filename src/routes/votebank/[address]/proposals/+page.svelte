@@ -2,8 +2,7 @@
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
 	import type { CardItem, ProposalItem } from '$lib/types';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import { onMount } from 'svelte';
-
+	
 	export let data: any;
 	let open_proposals: ProposalItem[] = [];
 	let closed_proposals: ProposalItem[] = [];

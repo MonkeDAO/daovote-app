@@ -18,9 +18,7 @@
 		isDefaultPublicKey,
 		postDataToBuffer,
 		proposalAccountPda,
-		toAccountMetadata,
-		votebankAccountPda
-	} from '$lib/utils/solana';
+		toAccountMetadata	} from '$lib/utils/solana';
 	import type { Program } from '@project-serum/anchor';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import { Votebank } from '$lib/anchor/accounts';
@@ -91,7 +89,7 @@
 				);
 				let title = '';
 				if (description) {
-					const { title: settingsTitle, desc } = description as any;
+					const { title: settingsTitle } = description as any;
 					title = settingsTitle;
 				}
 				let proposalId = 1;
@@ -99,7 +97,7 @@
 				if (voteBankAccountRaw) {
 					proposalId = voteBankAccountRaw.maxChildId as number;
 				}
-				const [proposalAccount, __] = proposalAccountPda(
+				const [proposalAccount] = proposalAccountPda(
 					votebankAddress,
 					proposalId,
 					program.programId
@@ -242,7 +240,8 @@
 					duration: 5000,
 					pausable: true
 				});
-				const confirmTx = await connection.confirmTransaction(
+				
+				await connection.confirmTransaction(
 					{
 						signature: signature,
 						lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,

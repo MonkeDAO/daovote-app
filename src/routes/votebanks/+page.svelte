@@ -3,7 +3,6 @@
 	import { PublicKey, type Connection } from '@solana/web3.js';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
-	import { onMount } from 'svelte';
 	import type { VoteBankItem } from '$lib/types';
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
 	export let data: any;

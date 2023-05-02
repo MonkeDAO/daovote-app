@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	// import  * as pdfjs from 'pdfjs-dist';
 	import PdfViewer from 'svelte-pdf';
 	export let pdfUrl = '';
