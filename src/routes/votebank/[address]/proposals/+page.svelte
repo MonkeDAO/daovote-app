@@ -25,14 +25,6 @@
 
 </script>
 <!-- ... -->
-
-<style>
-    @media (min-width: 640px) {
-      .cards-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-  </style>
   
   <div class="container mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
     <h3 class="text-center mb-6 text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl">
