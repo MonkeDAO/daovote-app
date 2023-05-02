@@ -25,9 +25,9 @@
 	}
 	let Editor: any;
 	async function loadEditor() {
-    const module = await import('../Editor.svelte');
-    Editor = module.default;
-  }
+		const module = await import('../Editor.svelte');
+		Editor = module.default;
+	}
 
 	function submitForm() {
 		if (!wallet || !connection) {
@@ -69,8 +69,8 @@
 	function toggleEditor() {
 		useEditor = !useEditor;
 		if (useEditor) {
-      loadEditor();
-    }
+			loadEditor();
+		}
 	}
 	function handleFileSelected(event: any) {
 		const selectedFile = event.target.files[0];
@@ -111,13 +111,30 @@
 				</div>
 				<div class="flex flex-col">
 					<label for="end" class="leading-loose">End Date</label>
-					<div class="relative focus-within:text-gray-600 text-gray-400">
-					  <input id="end" type="text" class="pr-4 pl-10 py-2 rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 border focus:ring-gray-500 focus:border-gray-900 w-full sm:text-sm focus:outline-none" placeholder="26/02/2020">
-					  <div class="absolute left-3 top-2">
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-					  </div>
+					<div class="relative text-gray-400 focus-within:text-gray-600">
+						<input
+							id="end"
+							type="text"
+							class="w-full rounded border bg-gray-400 py-2 pl-10 pr-4 placeholder-gray-700 focus:border-gray-900 focus:outline-none focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 sm:text-sm"
+							placeholder="26/02/2020"
+						/>
+						<div class="absolute left-3 top-2">
+							<svg
+								class="h-6 w-6"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+								/></svg
+							>
+						</div>
 					</div>
-				  </div>
+				</div>
 				<div class="flex flex-col">
 					<label for="settingsType" class="leading-loose">Settings Type</label>
 					<select
@@ -193,7 +210,7 @@
 					<button
 						class="flex w-full items-center justify-center rounded-md px-4 py-3 text-gray-900 focus:outline-none"
 					>
-					Cancel
+						Cancel
 					</button>
 					<button
 						type="submit"
@@ -208,8 +225,8 @@
 			<div class="mx-auto w-full max-w-5xl">
 				<button class="btn-primary btn mb-1 mt-1" on:click={toggleEditor}>Upload a File</button>
 				{#if Editor}
-      					<svelte:component this={Editor} on:file-generated={handleFileGenerated} />
-    			{/if}
+					<svelte:component this={Editor} on:file-generated={handleFileGenerated} />
+				{/if}
 			</div>
 		{:else}
 			<div class="mx-auto w-full max-w-5xl">

@@ -18,17 +18,17 @@
 	$: if (data) {
 		banks = data.vbanks;
 	}
-    $: if (wallet && connection && banks) {
-        fetchAllBanks();
-    }
+	$: if (wallet && connection && banks) {
+		fetchAllBanks();
+	}
 
-    function mapItemToCardItem(item: VoteBankItem) {
-        return {
-            title: item.title,
-            description: item.description,
-            url: `/votebank/${item.votebank}`,
-        }
-    }
+	function mapItemToCardItem(item: VoteBankItem) {
+		return {
+			title: item.title,
+			description: item.description,
+			url: `/votebank/${item.votebank}`
+		};
+	}
 
 	async function fetchAllBanks() {
 		if (wallet && connection && $workSpace.program && banks) {
@@ -111,7 +111,7 @@
 		</div>
 	</div>
 	{#if votebankItems}
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#each votebankItems as votebankItem}
 				<GeneralCard item={mapItemToCardItem(votebankItem)} />
 			{/each}

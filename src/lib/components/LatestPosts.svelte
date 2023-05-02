@@ -1,7 +1,7 @@
 <script>
-  /**
-   * @type {import('$lib/types').ContentItem[]}
-   */
+	/**
+	 * @type {import('$lib/types').ContentItem[]}
+	 */
 	export let items;
 </script>
 

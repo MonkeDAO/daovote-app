@@ -11,35 +11,41 @@
 </script>
 
 <a
-	class="w-full text-gray-900 hover:text-yellow-600 dark:text-gray-100 dark:hover:text-yellow-100 hover:no-underline"
+	class="w-full text-gray-900 hover:text-yellow-600 hover:no-underline dark:text-gray-100 dark:hover:text-yellow-100"
 	{href}
 	><div class="w-full">
 		<div class="flex flex-col justify-between md:flex-row">
-			<h4 class="flex-auto w-full mb-2 text-lg font-bold md:text-xl">
+			<h4 class="mb-2 w-full flex-auto text-lg font-bold md:text-xl">
 				{title}
 			</h4>
 		</div>
-		<p class="text-gray-600 mb-2 break-all sm:break-words dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-100">
+		<p
+			class="mb-2 break-all text-gray-600 hover:text-yellow-600 dark:text-gray-400 dark:hover:text-yellow-100 sm:break-words"
+		>
 			<slot />
 		</p>
-		<div class="flex justify-between items-center gap-1 text-left text-gray-500 sm:justify-start sm:flex-row sm:gap-4 md:mb-0 md:text-sm">
+		<div
+			class="flex items-center justify-between gap-1 text-left text-gray-500 sm:flex-row sm:justify-start sm:gap-4 md:mb-0 md:text-sm"
+		>
 			<!-- {JSON.stringify(item.readingTime)} -->
 			<p>{stringData}</p>
 			{#if item?.readingTime}
 				<p class="hidden sm:inline-block">{item?.readingTime}</p>
 			{/if}
 			<!-- comment this in if you have multiple categories -->
-			<span class="px-4 max-h-6 flex items-center capitalize bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-400">
+			<span
+				class="flex max-h-6 items-center rounded-md bg-gray-200 px-4 capitalize dark:bg-gray-700 dark:text-gray-400"
+			>
 				{item?.category || 'note'}
 			</span>
 			{#if item?.tags?.length}
-			<div class="hidden md:block flex-1">
-				{#each item.tags as tag}
-					<span class="px-1">
-						#{tag}
-					</span>
-				{/each}
-			</div>
+				<div class="hidden flex-1 md:block">
+					{#each item.tags as tag}
+						<span class="px-1">
+							#{tag}
+						</span>
+					{/each}
+				</div>
 			{/if}
 			{#if ghMetadata && ghMetadata.reactions.total_count}
 				<p class="">{ghMetadata.reactions.total_count} ♥</p>

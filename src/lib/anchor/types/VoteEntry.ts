@@ -5,20 +5,20 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
+import * as beet from '@metaplex-foundation/beet';
 export type VoteEntry = {
-  proposalId: number
-  votedFor: number
-}
+	proposalId: number;
+	votedFor: number;
+};
 
 /**
  * @category userTypes
  * @category generated
  */
 export const voteEntryBeet = new beet.BeetArgsStruct<VoteEntry>(
-  [
-    ['proposalId', beet.u32],
-    ['votedFor', beet.u32],
-  ],
-  'VoteEntry'
-)
+	[
+		['proposalId', beet.u32],
+		['votedFor', beet.u32]
+	],
+	'VoteEntry'
+);

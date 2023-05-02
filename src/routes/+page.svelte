@@ -20,7 +20,8 @@
 	// technically this is a slighlty different type because doesnt have 'content' but we'll let it slide
 	/** @type {import('$lib/types').ContentItem[]} */
 	$: items = data.items;
-	$: $walletStore.connected && $walletStore.publicKey &&
+	$: $walletStore.connected &&
+		$walletStore.publicKey &&
 		balanceStore.getUserSOLBalance($walletStore.publicKey, $workSpace?.connection);
 </script>
 

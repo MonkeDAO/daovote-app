@@ -5,10 +5,10 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
-import * as web3 from '@solana/web3.js'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
-import { type VoteEntry, voteEntryBeet } from '../types/VoteEntry'
+import * as beet from '@metaplex-foundation/beet';
+import * as web3 from '@solana/web3.js';
+import * as beetSolana from '@metaplex-foundation/beet-solana';
+import { type VoteEntry, voteEntryBeet } from '../types/VoteEntry';
 
 /**
  * Arguments used to create {@link VoteAccount}
@@ -16,10 +16,10 @@ import { type VoteEntry, voteEntryBeet } from '../types/VoteEntry'
  * @category generated
  */
 export type VoteAccountArgs = {
-  votes: VoteEntry[]
-}
+	votes: VoteEntry[];
+};
 
-export const voteAccountDiscriminator = [203, 238, 154, 106, 200, 131, 0, 41]
+export const voteAccountDiscriminator = [203, 238, 154, 106, 200, 131, 0, 41];
 /**
  * Holds the data for the {@link VoteAccount} Account and provides de/serialization
  * functionality for that data
@@ -28,123 +28,112 @@ export const voteAccountDiscriminator = [203, 238, 154, 106, 200, 131, 0, 41]
  * @category generated
  */
 export class VoteAccount implements VoteAccountArgs {
-  private constructor(readonly votes: VoteEntry[]) {}
+	private constructor(readonly votes: VoteEntry[]) {}
 
-  /**
-   * Creates a {@link VoteAccount} instance from the provided args.
-   */
-  static fromArgs(args: VoteAccountArgs) {
-    return new VoteAccount(args.votes)
-  }
+	/**
+	 * Creates a {@link VoteAccount} instance from the provided args.
+	 */
+	static fromArgs(args: VoteAccountArgs) {
+		return new VoteAccount(args.votes);
+	}
 
-  /**
-   * Deserializes the {@link VoteAccount} from the data of the provided {@link web3.AccountInfo}.
-   * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
-   */
-  static fromAccountInfo(
-    accountInfo: web3.AccountInfo<Buffer>,
-    offset = 0
-  ): [VoteAccount, number] {
-    return VoteAccount.deserialize(accountInfo.data, offset)
-  }
+	/**
+	 * Deserializes the {@link VoteAccount} from the data of the provided {@link web3.AccountInfo}.
+	 * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
+	 */
+	static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset = 0): [VoteAccount, number] {
+		return VoteAccount.deserialize(accountInfo.data, offset);
+	}
 
-  /**
-   * Retrieves the account info from the provided address and deserializes
-   * the {@link VoteAccount} from its data.
-   *
-   * @throws Error if no account info is found at the address or if deserialization fails
-   */
-  static async fromAccountAddress(
-    connection: web3.Connection,
-    address: web3.PublicKey,
-    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
-  ): Promise<VoteAccount> {
-    const accountInfo = await connection.getAccountInfo(
-      address,
-      commitmentOrConfig
-    )
-    if (accountInfo == null) {
-      throw new Error(`Unable to find VoteAccount account at ${address}`)
-    }
-    return VoteAccount.fromAccountInfo(accountInfo, 0)[0]
-  }
+	/**
+	 * Retrieves the account info from the provided address and deserializes
+	 * the {@link VoteAccount} from its data.
+	 *
+	 * @throws Error if no account info is found at the address or if deserialization fails
+	 */
+	static async fromAccountAddress(
+		connection: web3.Connection,
+		address: web3.PublicKey,
+		commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
+	): Promise<VoteAccount> {
+		const accountInfo = await connection.getAccountInfo(address, commitmentOrConfig);
+		if (accountInfo == null) {
+			throw new Error(`Unable to find VoteAccount account at ${address}`);
+		}
+		return VoteAccount.fromAccountInfo(accountInfo, 0)[0];
+	}
 
-  /**
-   * Provides a {@link web3.Connection.getProgramAccounts} config builder,
-   * to fetch accounts matching filters that can be specified via that builder.
-   *
-   * @param programId - the program that owns the accounts we are filtering
-   */
-  static gpaBuilder(
-    programId: web3.PublicKey = new web3.PublicKey(
-      'mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu'
-    )
-  ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, voteAccountBeet)
-  }
+	/**
+	 * Provides a {@link web3.Connection.getProgramAccounts} config builder,
+	 * to fetch accounts matching filters that can be specified via that builder.
+	 *
+	 * @param programId - the program that owns the accounts we are filtering
+	 */
+	static gpaBuilder(
+		programId: web3.PublicKey = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
+	) {
+		return beetSolana.GpaBuilder.fromStruct(programId, voteAccountBeet);
+	}
 
-  /**
-   * Deserializes the {@link VoteAccount} from the provided data Buffer.
-   * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
-   */
-  static deserialize(buf: Buffer, offset = 0): [VoteAccount, number] {
-    return voteAccountBeet.deserialize(buf, offset)
-  }
+	/**
+	 * Deserializes the {@link VoteAccount} from the provided data Buffer.
+	 * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
+	 */
+	static deserialize(buf: Buffer, offset = 0): [VoteAccount, number] {
+		return voteAccountBeet.deserialize(buf, offset);
+	}
 
-  /**
-   * Serializes the {@link VoteAccount} into a Buffer.
-   * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
-   */
-  serialize(): [Buffer, number] {
-    return voteAccountBeet.serialize({
-      accountDiscriminator: voteAccountDiscriminator,
-      ...this,
-    })
-  }
+	/**
+	 * Serializes the {@link VoteAccount} into a Buffer.
+	 * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
+	 */
+	serialize(): [Buffer, number] {
+		return voteAccountBeet.serialize({
+			accountDiscriminator: voteAccountDiscriminator,
+			...this
+		});
+	}
 
-  /**
-   * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link VoteAccount} for the provided args.
-   *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
-   */
-  static byteSize(args: VoteAccountArgs) {
-    const instance = VoteAccount.fromArgs(args)
-    return voteAccountBeet.toFixedFromValue({
-      accountDiscriminator: voteAccountDiscriminator,
-      ...instance,
-    }).byteSize
-  }
+	/**
+	 * Returns the byteSize of a {@link Buffer} holding the serialized data of
+	 * {@link VoteAccount} for the provided args.
+	 *
+	 * @param args need to be provided since the byte size for this account
+	 * depends on them
+	 */
+	static byteSize(args: VoteAccountArgs) {
+		const instance = VoteAccount.fromArgs(args);
+		return voteAccountBeet.toFixedFromValue({
+			accountDiscriminator: voteAccountDiscriminator,
+			...instance
+		}).byteSize;
+	}
 
-  /**
-   * Fetches the minimum balance needed to exempt an account holding
-   * {@link VoteAccount} data from rent
-   *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
-   * @param connection used to retrieve the rent exemption information
-   */
-  static async getMinimumBalanceForRentExemption(
-    args: VoteAccountArgs,
-    connection: web3.Connection,
-    commitment?: web3.Commitment
-  ): Promise<number> {
-    return connection.getMinimumBalanceForRentExemption(
-      VoteAccount.byteSize(args),
-      commitment
-    )
-  }
+	/**
+	 * Fetches the minimum balance needed to exempt an account holding
+	 * {@link VoteAccount} data from rent
+	 *
+	 * @param args need to be provided since the byte size for this account
+	 * depends on them
+	 * @param connection used to retrieve the rent exemption information
+	 */
+	static async getMinimumBalanceForRentExemption(
+		args: VoteAccountArgs,
+		connection: web3.Connection,
+		commitment?: web3.Commitment
+	): Promise<number> {
+		return connection.getMinimumBalanceForRentExemption(VoteAccount.byteSize(args), commitment);
+	}
 
-  /**
-   * Returns a readable version of {@link VoteAccount} properties
-   * and can be used to convert to JSON and/or logging
-   */
-  pretty() {
-    return {
-      votes: this.votes,
-    }
-  }
+	/**
+	 * Returns a readable version of {@link VoteAccount} properties
+	 * and can be used to convert to JSON and/or logging
+	 */
+	pretty() {
+		return {
+			votes: this.votes
+		};
+	}
 }
 
 /**
@@ -152,15 +141,15 @@ export class VoteAccount implements VoteAccountArgs {
  * @category generated
  */
 export const voteAccountBeet = new beet.FixableBeetStruct<
-  VoteAccount,
-  VoteAccountArgs & {
-    accountDiscriminator: number[] /* size: 8 */
-  }
+	VoteAccount,
+	VoteAccountArgs & {
+		accountDiscriminator: number[] /* size: 8 */;
+	}
 >(
-  [
-    ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['votes', beet.array(voteEntryBeet)],
-  ],
-  VoteAccount.fromArgs,
-  'VoteAccount'
-)
+	[
+		['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+		['votes', beet.array(voteEntryBeet)]
+	],
+	VoteAccount.fromArgs,
+	'VoteAccount'
+);

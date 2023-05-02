@@ -1,8 +1,8 @@
 // vite.config.js
 import { sveltekit } from '@sveltejs/kit/vite';
-import { ssp } from "sveltekit-search-params/plugin";
+import { ssp } from 'sveltekit-search-params/plugin';
 import nodePolyfills from 'rollup-plugin-node-polyfills';
-import inject from "@rollup/plugin-inject";
+import inject from '@rollup/plugin-inject';
 
 /** @type {import('vite').UserConfig} */
 const config = {
@@ -12,36 +12,36 @@ const config = {
 	},
 	resolve: {
 		alias: {
-		  stream: 'rollup-plugin-node-polyfills/polyfills/stream',
-		  events: 'rollup-plugin-node-polyfills/polyfills/events',
-		  assert: 'assert',
-		  crypto: 'crypto-browserify',
-		  util: 'util/',
-		},
-	  },
-	  define: {
-		'process.env': process.env ?? {},
-	  },
-	  build: {
+			stream: 'rollup-plugin-node-polyfills/polyfills/stream',
+			events: 'rollup-plugin-node-polyfills/polyfills/events',
+			assert: 'assert',
+			crypto: 'crypto-browserify',
+			util: 'util/'
+		}
+	},
+	define: {
+		'process.env': process.env ?? {}
+	},
+	build: {
 		target: 'esnext',
 		rollupOptions: {
-		  plugins: [
-			nodePolyfills({ crypto: true }),
-			inject({ modules: { Buffer: ["buffer", "Buffer"] },}),
-		  ],
-		},
-	  },
-	  optimizeDeps: {
+			plugins: [
+				nodePolyfills({ crypto: true }),
+				inject({ modules: { Buffer: ['buffer', 'Buffer'] } })
+			]
+		}
+	},
+	optimizeDeps: {
 		include: ['svelte-pdf'],
 		esbuildOptions: {
-		define: {
-			global: "globalThis",
-		},
-		//   plugins: [
-		// 	NodeGlobalsPolyfillPlugin({ buffer: true }),
-		//   ],
+			define: {
+				global: 'globalThis'
+			}
+			//   plugins: [
+			// 	NodeGlobalsPolyfillPlugin({ buffer: true }),
+			//   ],
 		}
-	  },
+	},
 	// optimizeDeps: {
 	// 	include: ['@project-serum/anchor', '@solana/web3.js', 'buffer'],
 	// 	// ... use the same implementation from the SvelteKit ui

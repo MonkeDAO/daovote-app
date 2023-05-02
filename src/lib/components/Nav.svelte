@@ -44,9 +44,9 @@
 			<NavLink href="/about">About</NavLink>
 		</li>
 		{#if $walletStore?.connected}
-		<li>
-			<NavLink href="/votebanks">Votebanks</NavLink>
-		</li>
+			<li>
+				<NavLink href="/votebanks">Votebanks</NavLink>
+			</li>
 		{/if}
 	</ul>
 	<div class="flex items-center space-x-4">

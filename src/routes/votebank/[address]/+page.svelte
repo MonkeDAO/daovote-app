@@ -3,7 +3,7 @@
 	import type { Program, Idl } from '@project-serum/anchor';
 	import { Connection, PublicKey } from '@solana/web3.js';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
-    import VoteBankCard from '$lib/components/Vote/VoteBanks/VoteBankCard.svelte';
+	import VoteBankCard from '$lib/components/Vote/VoteBanks/VoteBankCard.svelte';
 	import { ConvertVotebank, type VoteBank } from '$lib/anchor/omcvote/types';
 	/** @type {import('./$types').PageData} */
 	export let data: any;

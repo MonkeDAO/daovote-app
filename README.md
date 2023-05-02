@@ -14,10 +14,9 @@ A lightly opinionated starter for [SvelteKit](https://kit.svelte.dev/) blogs:
     <bold>Good Perf Baseline</bold>: 100's across the board on Lighthouse scores
     </summary>
 
-    ![image](https://user-images.githubusercontent.com/6764957/207693633-8e85630b-5717-42d9-b5ff-8b69d2cbda30.png)
-    
-  </details>  
+  ![image](https://user-images.githubusercontent.com/6764957/207693633-8e85630b-5717-42d9-b5ff-8b69d2cbda30.png)
 
+  </details>
 
 Feel free to rip out these opinions as you see fit of course.
 
@@ -45,7 +44,7 @@ See https://swyxkit.netlify.app/ (see [Deploy Logs](https://app.netlify.com/site
 
 **Features**
 
-*All the basic things I think a developer website should have.*
+_All the basic things I think a developer website should have._
 
 - Light+Dark mode (manual-toggle-driven as a matter of personal preference but feel free to change ofc)
 - [GitHub-Issues-driven](https://swyxkit.netlify.app/moving-to-a-github-cms) blog with index
@@ -58,25 +57,25 @@ See https://swyxkit.netlify.app/ (see [Deploy Logs](https://app.netlify.com/site
 
 **Performance/Security touches**
 
-*Fast (check the lighthouse scores) and secure.*
+_Fast (check the lighthouse scores) and secure._
 
-  - Set [`s-maxage`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#s-maxage) (not `max-age`) to 1 minute to cache (consider making it 1-7 days on older posts)
-    - For API endpoints as well as pages
-  - Security headers in `netlify.toml`
-    - [X-Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options)
-    - [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)
-    - [X-XSS-Protection](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)
-    - [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP): SvelteKit [recently added this](https://kit.svelte.dev/docs/configuration#csp)!
-  - [Builds and deploys in ~40 seconds on Netlify](https://app.netlify.com/sites/swyxkit/deploys)
-  - You can see how seriously we take performance [on our updates](https://swyxkit.netlify.app/blog?filter=hashtag-performance), but also I'm not an expert and PRs to improve are always welcome.
+- Set [`s-maxage`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#s-maxage) (not `max-age`) to 1 minute to cache (consider making it 1-7 days on older posts)
+  - For API endpoints as well as pages
+- Security headers in `netlify.toml`
+  - [X-Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options)
+  - [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)
+  - [X-XSS-Protection](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)
+  - [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP): SvelteKit [recently added this](https://kit.svelte.dev/docs/configuration#csp)!
+- [Builds and deploys in ~40 seconds on Netlify](https://app.netlify.com/sites/swyxkit/deploys)
+- You can see how seriously we take performance [on our updates](https://swyxkit.netlify.app/blog?filter=hashtag-performance), but also I'm not an expert and PRs to improve are always welcome.
 
 **Minor design/UX touches**
 
-*The devil is in the details.*
+_The devil is in the details._
 
 - Blog Index features (`/blog`)
   - Blog index supports categories (singletons), and [tags](https://swyxkit.netlify.app/tags-in-swyxkit) (freeform, list of strings)
-  - Blog index facets serialize to URLs for easy copy paste 
+  - Blog index facets serialize to URLs for easy copy paste
     - previously [done by @Ak4zh](https://github.com/sw-yx/swyxkit/pull/97)
     - but since moved to [`sveltekit-search-params`](https://github.com/paoloricciuti/sveltekit-search-params) [by @paoloricciuti](https://github.com/sw-yx/swyxkit/pull/140)
   - Blog index search is [fuzzy and highlights matches](https://swyxkit.netlify.app/ufuzzy-search)
@@ -85,8 +84,8 @@ See https://swyxkit.netlify.app/ (see [Deploy Logs](https://app.netlify.com/site
     - The 404 page includes a link you can click that sends you back to the search index with the search terms ([blog post](https://github.com/sw-yx/swyxkit/issues/90))
 - Individual Blogpost features (`/[post_slug]`)
   - 2 options for comments:
-      - (default) [Utterances](https://utteranc.es/), drawing from GitHub Issues that match your post assuming you use the "github issues CMS" workflow we have. We lazy load this for perf.
-      - (available but commented out) a custom Svelte [`<Comments />` component that are rendered and sanitized](https://github.com/developit/snarkdown/issues/70)
+    - (default) [Utterances](https://utteranc.es/), drawing from GitHub Issues that match your post assuming you use the "github issues CMS" workflow we have. We lazy load this for perf.
+    - (available but commented out) a custom Svelte [`<Comments />` component that are rendered and sanitized](https://github.com/developit/snarkdown/issues/70)
   - `full`, `feature`, and `popout` [bleed layout](https://ryanmulligan.dev/blog/layout-breakouts/) classes on desktop - `feature` enabled by default for code samples! ([details and code samples here](https://swyxkit.netlify.app/layout-breakouts-in-swyxkit))
   - Top level blog URLs (`/myblog` instead of `/blog/myblog` - [why?](https://www.swyx.io/namespacing-sites/))
   - Autogenerated (overridable) og:images via an external service https://github.com/sw-yx/swyxkit/pull/161
@@ -95,22 +94,22 @@ See https://swyxkit.netlify.app/ (see [Deploy Logs](https://app.netlify.com/site
   - Newsletter signup box - defaulted to [Buttondown.email](https://buttondown.email/) but easy to customize to whatever
   - Navlink hover effect
   - [Mobile/Responsive styling](https://swyxkit.netlify.app/mobileresponsive-styling-with-tailwind)
-      - Mobile menu with animation
+    - Mobile menu with animation
   - Og:image and meta tags for social unfurls (image generated via https://tailgraph.com/)
   - Accessibility
-      - SVG Icons https://github.com/sw-yx/spark-joy/blob/master/README.md#general--misc
-      - [Tap targets](https://web.dev/tap-targets/?utm_source=lighthouse&utm_medium=lr)
+    - SVG Icons https://github.com/sw-yx/spark-joy/blob/master/README.md#general--misc
+    - [Tap targets](https://web.dev/tap-targets/?utm_source=lighthouse&utm_medium=lr)
   - Custom scrollbar https://css-tricks.com/strut-your-stuff-with-a-custom-scrollbar/
   - Defensive CSS touches https://ishadeed.com/article/defensive-css
 
 **Developer Experience**
 
-*Making this easier to maintain and focus on writing not coding.*
+_Making this easier to maintain and focus on writing not coding._
 
-  - [JSDoc Typechecking](https://swyxkit.netlify.app/how-to-add-jsdoc-typechecking-to-sveltekit)
-  - ESLint + Prettier
-  - [Nightly lockfile upgrades](https://mobile.twitter.com/FredKSchott/status/1489287560387956736)
-  - Design system sandbox/"Storybook" setup with [Histoire](https://swyxkit.netlify.app/adding-a-histoire-storybook-to-swyxkit). `npm run story:dev` to view it on http://localhost:6006/. 
+- [JSDoc Typechecking](https://swyxkit.netlify.app/how-to-add-jsdoc-typechecking-to-sveltekit)
+- ESLint + Prettier
+- [Nightly lockfile upgrades](https://mobile.twitter.com/FredKSchott/status/1489287560387956736)
+- Design system sandbox/"Storybook" setup with [Histoire](https://swyxkit.netlify.app/adding-a-histoire-storybook-to-swyxkit). `npm run story:dev` to view it on http://localhost:6006/.
 
 Overall, this is a partial implementation of https://www.swyx.io/the-surprisingly-high-table-stakes-of-modern-blogs/
 
@@ -122,7 +121,7 @@ Overall, this is a partial implementation of https://www.swyx.io/the-surprisingl
 npx degit https://github.com/sw-yx/swyxkit
 export GH_TOKEN=your_gh_token_here # Can be skipped if just trying out this repo casually
 npm install
-npm run start # Launches site locally at http://localhost:5173/ 
+npm run start # Launches site locally at http://localhost:5173/
 # you can also npm run dev to spin up histoire at http://localhost:6006/
 ```
 
@@ -174,7 +173,7 @@ This blog uses GitHub as a CMS - if you are doing any serious development at all
 - A really basic personal access token should be enough and can be created [here](https://github.com/settings/tokens/new).
   https://docs.github.com/en/rest/overview/resources-in-the-rest-api#rate-limiting
 - For local dev: run `export GH_TOKEN=MY_PERSONAL_ACCESS_TOKEN_FROM_GITHUB` before you run `npm run start`
-- For cloud deployment: [Set the env variables in Netlify](https://docs.netlify.com/configure-builds/environment-variables/#declare-variables) (basically go to  https://app.netlify.com/sites/YOUR_SITE/settings/deploys#environment )
+- For cloud deployment: [Set the env variables in Netlify](https://docs.netlify.com/configure-builds/environment-variables/#declare-variables) (basically go to https://app.netlify.com/sites/YOUR_SITE/settings/deploys#environment )
 
 ### Step 2: Make your first post
 
@@ -201,7 +200,7 @@ my great intro
 
 ## my subtitle
 
-lorem ipsum 
+lorem ipsum
 ```
 
 If your `Published` post (any post with one of the labels set in `GH_PUBLISHED_TAGS`) doesn't show up, you may have forgotten to set `APPROVED_POSTERS_GH_USERNAME` to your GitHub username in `siteConfig`.

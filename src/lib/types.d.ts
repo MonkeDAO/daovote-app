@@ -57,26 +57,26 @@ export type GithubIssue = {
 
 // Solana types
 export type BalanceStore = {
-    balance: number;
+	balance: number;
 };
 
 export type ProposalItem = {
-	votebank: string,
-	poster: string,
-    data: ProposalData,
-    options: {id: number, title: string}[],
-    maxOptionsSelectable: number,
-    settings: any[],
-    voterCount: number,
-    voteOpen: boolean,
-    proposalId: number
+	votebank: string;
+	poster: string;
+	data: ProposalData;
+	options: { id: number; title: string }[];
+	maxOptionsSelectable: number;
+	settings: any[];
+	voterCount: number;
+	voteOpen: boolean;
+	proposalId: number;
 };
 
 export type ProposalData = {
-	title: string,
-	summary: string,
-	url: string
-}
+	title: string;
+	summary: string;
+	url: string;
+};
 
 export type VoteBankProposalsNumeric = {
 	votebank: string;
@@ -94,10 +94,10 @@ export type VoteBankItem = {
 	votebank: string;
 	title: string;
 	description: string;
-}
+};
 
 export type CardItem = {
 	title: string;
 	description: string;
 	url: string;
-}
+};

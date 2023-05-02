@@ -5,7 +5,7 @@ import { fetchBanks } from '$lib/votebanks';
 export async function GET({ setHeaders }: any) {
 	let list = await fetchBanks();
 	list = list.map((item) => {
-		return item
+		return item;
 	});
 	setHeaders({
 		'Cache-Control': `public, max-age=3600` // 1 hour
@@ -16,4 +16,3 @@ export async function GET({ setHeaders }: any) {
 		}
 	});
 }
-

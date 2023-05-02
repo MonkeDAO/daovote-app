@@ -16,20 +16,26 @@
 	<title>{json.title}</title>
 </svelte:head>
 
-<article class="items-start justify-center w-full mx-auto mt-16 mb-32 prose votecontent dark:prose-invert max-w-none">
-	<h1 class="md:text-center mb-8 text-3xl font-bold tracking-tight text-black dark:text-white md:text-5xl ">
+<article
+	class="votecontent prose mx-auto mb-32 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
+>
+	<h1
+		class="mb-8 text-3xl font-bold tracking-tight text-black dark:text-white md:text-center md:text-5xl"
+	>
 		{json.title}
 	</h1>
 	<h4>{json.description}</h4>
 	<div
-		class="flex justify-between w-full mt-2 bg border-red sm:items-start md:flex-row md:items-center"
+		class="bg border-red mt-2 flex w-full justify-between sm:items-start md:flex-row md:items-center"
 	>
-		<p class="flex items-center text-sm text-gray-700 dark:text-gray-300">Created Date: {new Date().toISOString().slice(0, 10)}</p>
+		<p class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+			Created Date: {new Date().toISOString().slice(0, 10)}
+		</p>
 		<p class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-				<!-- <span class="mr-4 font-mono text-xs text-gray-700 text-opacity-70 dark:text-gray-300"
+			<!-- <span class="mr-4 font-mono text-xs text-gray-700 text-opacity-70 dark:text-gray-300"
 					>{json.ghMetadata.reactions.total_count} reactions</span
 				> -->
-				Close Date: {new Date().toISOString().slice(0, 10)}
+			Close Date: {new Date().toISOString().slice(0, 10)}
 		</p>
 	</div>
 	<div
@@ -39,7 +45,7 @@
 </article>
 
 <div class="mx-auto">
-	<div class="w-full max-w-5xl mb-12 border-t border-b border-blue-800 p-4 dark:prose-invert">
+	<div class="mb-12 w-full max-w-5xl border-b border-t border-blue-800 p-4 dark:prose-invert">
 		<h1 class="text-black dark:text-white">Voting Component Here</h1>
 		<h1 class="text-black dark:text-white">Fetch Votes</h1>
 		<!-- <Vote /> -->

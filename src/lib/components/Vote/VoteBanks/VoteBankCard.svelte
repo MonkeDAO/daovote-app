@@ -46,31 +46,29 @@
 				amount: voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
 					?.voteRestriction?.tokenOwnership?.amount
 					? new anchor.BN(
-							voteData.voteBank.settings.find(
-								(x) => x.voteRestriction
-							)?.voteRestriction?.voteRestriction?.tokenOwnership?.amount as string
-					  )
-					  ?.toNumber()
+							voteData.voteBank.settings.find((x) => x.voteRestriction)?.voteRestriction
+								?.voteRestriction?.tokenOwnership?.amount as string
+					  )?.toNumber()
 					: 1
 			}
 		};
 	}
 	async function createProposal() {
-        // Your create proposal logic
+		// Your create proposal logic
 		await goto(`/votebank/${voteData.address}/create`);
-    }
+	}
 	async function viewProposals() {
 		await goto(`/votebank/${voteData.address}/proposals`);
-  	}
+	}
 </script>
 
 <div>
 	{#if voteData}
-	<div class="flex justify-center my-4">
-		<button class="btn-primary btn" on:click={createProposal}>Create a Proposal</button>
-	</div>
+		<div class="my-4 flex justify-center">
+			<button class="btn-primary btn" on:click={createProposal}>Create a Proposal</button>
+		</div>
 		<div class="card-container">
-			<div class="custom-card card bg-gray-200 dark:bg-gray-700 shadow-xl">
+			<div class="custom-card card bg-gray-200 shadow-xl dark:bg-gray-700">
 				<div class="card-content card-body">
 					<h2 class="card-title text-gray-900 dark:text-gray-100">{voteBankInfo.name}</h2>
 					<h3 class="text-gray-900 dark:text-gray-100">{voteBankInfo.description}</h3>

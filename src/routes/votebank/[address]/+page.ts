@@ -1,8 +1,8 @@
-// src/routes/votebank/[address]/+page.ts 
+// src/routes/votebank/[address]/+page.ts
 /** @type {import('./$types').PageLoad} */
 export async function load({ params }: any) {
-  const { address } = params;
-  return {
-    address
-  }
+	const { address } = params;
+	return {
+		address
+	};
 }

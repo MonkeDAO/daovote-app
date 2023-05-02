@@ -35,7 +35,7 @@ module.exports = {
 							borderColor: 'rgba(0,0,0,0.1)'
 						},
 						pre: {
-							'border-radius': '0rem',
+							'border-radius': '0rem'
 						},
 						'a:hover': {
 							color: '#31cdce !important',
@@ -66,16 +66,13 @@ module.exports = {
 						},
 						'ul > li > p': {
 							marginTop: 0,
-							marginBottom: 0,
-						},
+							marginBottom: 0
+						}
 					}
 				}
 			})
 		}
 	},
 	variants: {},
-	plugins: [
-		require('@tailwindcss/typography'),
-		require('daisyui'),
-	]
+	plugins: [require('@tailwindcss/typography'), require('daisyui')]
 };

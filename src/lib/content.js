@@ -7,13 +7,12 @@ import {
 	REPO_OWNER
 } from './siteConfig';
 
-
 /** @type {import('./types').ContentItem[]} */
 let allBlogposts = [];
 /**
  * @type {import("./types").ContentItem[]}
  */
-let allProposals = []
+let allProposals = [];
 // let etag = null // todo - implmement etag header
 
 const MOCK_MD_FROM_SHADOW_DRIVE = `
@@ -34,13 +33,13 @@ Instructions on how to use them in your application are linked below.
  */
 function slugify(text) {
 	return text
-		.toString()                 // Cast to string (optional)
-		.normalize('NFKD')          // The normalize() using NFKD method returns the Unicode Normalization Form of a given string.
-		.toLowerCase()              // Convert the string to lowercase letters
-		.trim()                     // Remove whitespace from both sides of a string (optional)
-		.replace(/\s+/g, '-')       // Replace spaces with hyphen
-		.replace(/[^\w-]+/g, '')   // Remove all non-word chars
-		.replace(/--+/g, '-')     // Replace multiple hyphen with single hyphen
+		.toString() // Cast to string (optional)
+		.normalize('NFKD') // The normalize() using NFKD method returns the Unicode Normalization Form of a given string.
+		.toLowerCase() // Convert the string to lowercase letters
+		.trim() // Remove whitespace from both sides of a string (optional)
+		.replace(/\s+/g, '-') // Replace spaces with hyphen
+		.replace(/[^\w-]+/g, '') // Remove all non-word chars
+		.replace(/--+/g, '-') // Replace multiple hyphen with single hyphen
 		.replace(/(^-|-$)/g, ''); // Remove leading or trailing hyphen
 }
 
@@ -53,7 +52,6 @@ function readingTime(text) {
 	return minutes > 1 ? `${minutes} minutes` : `${minutes} minute`;
 }
 
-
 /**
  * @param {Function} providedFetch from sveltekit
  * @returns {Promise<import('./types').ContentItem[]>}
@@ -64,10 +62,25 @@ export async function listContent(providedFetch) {
 
 	/** @type {import('./types').ContentItem[]} */
 	let _allProposals = [
-		{ id: 1, title: 'Should MonkeDAO acquire SMB IP?', description: 'Vote is lorem ipsum ok now thats great', content: MOCK_MD_FROM_SHADOW_DRIVE },
-		{ id: 2, title: 'Should HADES be bought in bulk?', description: 'Vote is lorem ipsum ok now thats great', content: MOCK_MD_FROM_SHADOW_DRIVE },
-		{ id: 3, title: 'Vote out the Dev Experts', description: 'Vote is lorem ipsum ok now thats great', content: MOCK_MD_FROM_SHADOW_DRIVE },
-	];;
+		{
+			id: 1,
+			title: 'Should MonkeDAO acquire SMB IP?',
+			description: 'Vote is lorem ipsum ok now thats great',
+			content: MOCK_MD_FROM_SHADOW_DRIVE
+		},
+		{
+			id: 2,
+			title: 'Should HADES be bought in bulk?',
+			description: 'Vote is lorem ipsum ok now thats great',
+			content: MOCK_MD_FROM_SHADOW_DRIVE
+		},
+		{
+			id: 3,
+			title: 'Vote out the Dev Experts',
+			description: 'Vote is lorem ipsum ok now thats great',
+			content: MOCK_MD_FROM_SHADOW_DRIVE
+		}
+	];
 	let next = null;
 	let limit = 0; // just a failsafe against infinite loop - feel free to remove
 	// const authheader = process.env.GH_TOKEN && {
@@ -123,21 +136,18 @@ export async function getContent(providedFetch, slug) {
 		console.log('loading allProposals');
 		allBlogposts = await listContent(providedFetch);
 		console.log('loaded ' + allProposals.length + ' proposals');
-		if (!allProposals.length)
-			throw new Error(
-				'failed to load proposals for some reason. check'
-			);
+		if (!allProposals.length) throw new Error('failed to load proposals for some reason. check');
 	}
 	if (!allProposals.length) throw new Error('no proposals');
 	// find the blogpost that matches this slug
-	console.log("\n\t---getContent Mark #1---\t\n");
+	console.log('\n\t---getContent Mark #1---\t\n');
 	const proposal = allProposals.find((proposal) => `${proposal.id}` === slug);
 	// const blogpost = allBlogposts.find((post) => post.slug === slug);
 	if (proposal) {
 		const compiledResponse = await compile(MOCK_MD_FROM_SHADOW_DRIVE);
 		proposal.content = compiledResponse?.code;
 
-		console.log("\n\t---getContent Mark #2---\t\n", compiledResponse?.code);
+		console.log('\n\t---getContent Mark #2---\t\n', compiledResponse?.code);
 
 		return proposal;
 	} else {
@@ -147,14 +157,13 @@ export async function getContent(providedFetch, slug) {
 
 export async function getCreateContent(providedFetch, slug) {
 	// get all blogposts if not already done - or in development
-	console.log("\n\t---getCreateContent Mark #1---\t\n");
+	console.log('\n\t---getCreateContent Mark #1---\t\n');
 	if (slug && slug === 'proposal') {
 		return {
 			title: 'Create Proposals',
-			description: 'Create Proposals',
-		}
-	}
-	else {
+			description: 'Create Proposals'
+		};
+	} else {
 		throw new Error('Not found for slug: ' + slug);
 	}
 }

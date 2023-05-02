@@ -5,11 +5,11 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as web3 from '@solana/web3.js'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
-import * as beet from '@metaplex-foundation/beet'
-import { type VoteOption, voteOptionBeet } from '../types/VoteOption'
-import { type SettingsData, settingsDataBeet } from '../types/SettingsData'
+import * as web3 from '@solana/web3.js';
+import * as beetSolana from '@metaplex-foundation/beet-solana';
+import * as beet from '@metaplex-foundation/beet';
+import { type VoteOption, voteOptionBeet } from '../types/VoteOption';
+import { type SettingsData, settingsDataBeet } from '../types/SettingsData';
 
 /**
  * Arguments used to create {@link Proposal}
@@ -17,17 +17,17 @@ import { type SettingsData, settingsDataBeet } from '../types/SettingsData'
  * @category generated
  */
 export type ProposalArgs = {
-  poster: web3.PublicKey
-  data: Uint8Array
-  options: VoteOption[]
-  maxOptionsSelectable: number
-  settings: SettingsData[]
-  voterCount: number
-  voteOpen: boolean
-  proposalId: number
-}
+	poster: web3.PublicKey;
+	data: Uint8Array;
+	options: VoteOption[];
+	maxOptionsSelectable: number;
+	settings: SettingsData[];
+	voterCount: number;
+	voteOpen: boolean;
+	proposalId: number;
+};
 
-export const proposalDiscriminator = [26, 94, 189, 187, 116, 136, 53, 33]
+export const proposalDiscriminator = [26, 94, 189, 187, 116, 136, 53, 33];
 /**
  * Holds the data for the {@link Proposal} Account and provides de/serialization
  * functionality for that data
@@ -36,148 +36,137 @@ export const proposalDiscriminator = [26, 94, 189, 187, 116, 136, 53, 33]
  * @category generated
  */
 export class Proposal implements ProposalArgs {
-  private constructor(
-    readonly poster: web3.PublicKey,
-    readonly data: Uint8Array,
-    readonly options: VoteOption[],
-    readonly maxOptionsSelectable: number,
-    readonly settings: SettingsData[],
-    readonly voterCount: number,
-    readonly voteOpen: boolean,
-    readonly proposalId: number
-  ) {}
+	private constructor(
+		readonly poster: web3.PublicKey,
+		readonly data: Uint8Array,
+		readonly options: VoteOption[],
+		readonly maxOptionsSelectable: number,
+		readonly settings: SettingsData[],
+		readonly voterCount: number,
+		readonly voteOpen: boolean,
+		readonly proposalId: number
+	) {}
 
-  /**
-   * Creates a {@link Proposal} instance from the provided args.
-   */
-  static fromArgs(args: ProposalArgs) {
-    return new Proposal(
-      args.poster,
-      args.data,
-      args.options,
-      args.maxOptionsSelectable,
-      args.settings,
-      args.voterCount,
-      args.voteOpen,
-      args.proposalId
-    )
-  }
+	/**
+	 * Creates a {@link Proposal} instance from the provided args.
+	 */
+	static fromArgs(args: ProposalArgs) {
+		return new Proposal(
+			args.poster,
+			args.data,
+			args.options,
+			args.maxOptionsSelectable,
+			args.settings,
+			args.voterCount,
+			args.voteOpen,
+			args.proposalId
+		);
+	}
 
-  /**
-   * Deserializes the {@link Proposal} from the data of the provided {@link web3.AccountInfo}.
-   * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
-   */
-  static fromAccountInfo(
-    accountInfo: web3.AccountInfo<Buffer>,
-    offset = 0
-  ): [Proposal, number] {
-    return Proposal.deserialize(accountInfo.data, offset)
-  }
+	/**
+	 * Deserializes the {@link Proposal} from the data of the provided {@link web3.AccountInfo}.
+	 * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
+	 */
+	static fromAccountInfo(accountInfo: web3.AccountInfo<Buffer>, offset = 0): [Proposal, number] {
+		return Proposal.deserialize(accountInfo.data, offset);
+	}
 
-  /**
-   * Retrieves the account info from the provided address and deserializes
-   * the {@link Proposal} from its data.
-   *
-   * @throws Error if no account info is found at the address or if deserialization fails
-   */
-  static async fromAccountAddress(
-    connection: web3.Connection,
-    address: web3.PublicKey,
-    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
-  ): Promise<Proposal> {
-    const accountInfo = await connection.getAccountInfo(
-      address,
-      commitmentOrConfig
-    )
-    if (accountInfo == null) {
-      throw new Error(`Unable to find Proposal account at ${address}`)
-    }
-    return Proposal.fromAccountInfo(accountInfo, 0)[0]
-  }
+	/**
+	 * Retrieves the account info from the provided address and deserializes
+	 * the {@link Proposal} from its data.
+	 *
+	 * @throws Error if no account info is found at the address or if deserialization fails
+	 */
+	static async fromAccountAddress(
+		connection: web3.Connection,
+		address: web3.PublicKey,
+		commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
+	): Promise<Proposal> {
+		const accountInfo = await connection.getAccountInfo(address, commitmentOrConfig);
+		if (accountInfo == null) {
+			throw new Error(`Unable to find Proposal account at ${address}`);
+		}
+		return Proposal.fromAccountInfo(accountInfo, 0)[0];
+	}
 
-  /**
-   * Provides a {@link web3.Connection.getProgramAccounts} config builder,
-   * to fetch accounts matching filters that can be specified via that builder.
-   *
-   * @param programId - the program that owns the accounts we are filtering
-   */
-  static gpaBuilder(
-    programId: web3.PublicKey = new web3.PublicKey(
-      'mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu'
-    )
-  ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, proposalBeet)
-  }
+	/**
+	 * Provides a {@link web3.Connection.getProgramAccounts} config builder,
+	 * to fetch accounts matching filters that can be specified via that builder.
+	 *
+	 * @param programId - the program that owns the accounts we are filtering
+	 */
+	static gpaBuilder(
+		programId: web3.PublicKey = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
+	) {
+		return beetSolana.GpaBuilder.fromStruct(programId, proposalBeet);
+	}
 
-  /**
-   * Deserializes the {@link Proposal} from the provided data Buffer.
-   * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
-   */
-  static deserialize(buf: Buffer, offset = 0): [Proposal, number] {
-    return proposalBeet.deserialize(buf, offset)
-  }
+	/**
+	 * Deserializes the {@link Proposal} from the provided data Buffer.
+	 * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
+	 */
+	static deserialize(buf: Buffer, offset = 0): [Proposal, number] {
+		return proposalBeet.deserialize(buf, offset);
+	}
 
-  /**
-   * Serializes the {@link Proposal} into a Buffer.
-   * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
-   */
-  serialize(): [Buffer, number] {
-    return proposalBeet.serialize({
-      accountDiscriminator: proposalDiscriminator,
-      ...this,
-    })
-  }
+	/**
+	 * Serializes the {@link Proposal} into a Buffer.
+	 * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
+	 */
+	serialize(): [Buffer, number] {
+		return proposalBeet.serialize({
+			accountDiscriminator: proposalDiscriminator,
+			...this
+		});
+	}
 
-  /**
-   * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link Proposal} for the provided args.
-   *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
-   */
-  static byteSize(args: ProposalArgs) {
-    const instance = Proposal.fromArgs(args)
-    return proposalBeet.toFixedFromValue({
-      accountDiscriminator: proposalDiscriminator,
-      ...instance,
-    }).byteSize
-  }
+	/**
+	 * Returns the byteSize of a {@link Buffer} holding the serialized data of
+	 * {@link Proposal} for the provided args.
+	 *
+	 * @param args need to be provided since the byte size for this account
+	 * depends on them
+	 */
+	static byteSize(args: ProposalArgs) {
+		const instance = Proposal.fromArgs(args);
+		return proposalBeet.toFixedFromValue({
+			accountDiscriminator: proposalDiscriminator,
+			...instance
+		}).byteSize;
+	}
 
-  /**
-   * Fetches the minimum balance needed to exempt an account holding
-   * {@link Proposal} data from rent
-   *
-   * @param args need to be provided since the byte size for this account
-   * depends on them
-   * @param connection used to retrieve the rent exemption information
-   */
-  static async getMinimumBalanceForRentExemption(
-    args: ProposalArgs,
-    connection: web3.Connection,
-    commitment?: web3.Commitment
-  ): Promise<number> {
-    return connection.getMinimumBalanceForRentExemption(
-      Proposal.byteSize(args),
-      commitment
-    )
-  }
+	/**
+	 * Fetches the minimum balance needed to exempt an account holding
+	 * {@link Proposal} data from rent
+	 *
+	 * @param args need to be provided since the byte size for this account
+	 * depends on them
+	 * @param connection used to retrieve the rent exemption information
+	 */
+	static async getMinimumBalanceForRentExemption(
+		args: ProposalArgs,
+		connection: web3.Connection,
+		commitment?: web3.Commitment
+	): Promise<number> {
+		return connection.getMinimumBalanceForRentExemption(Proposal.byteSize(args), commitment);
+	}
 
-  /**
-   * Returns a readable version of {@link Proposal} properties
-   * and can be used to convert to JSON and/or logging
-   */
-  pretty() {
-    return {
-      poster: this.poster.toBase58(),
-      data: this.data,
-      options: this.options,
-      maxOptionsSelectable: this.maxOptionsSelectable,
-      settings: this.settings,
-      voterCount: this.voterCount,
-      voteOpen: this.voteOpen,
-      proposalId: this.proposalId,
-    }
-  }
+	/**
+	 * Returns a readable version of {@link Proposal} properties
+	 * and can be used to convert to JSON and/or logging
+	 */
+	pretty() {
+		return {
+			poster: this.poster.toBase58(),
+			data: this.data,
+			options: this.options,
+			maxOptionsSelectable: this.maxOptionsSelectable,
+			settings: this.settings,
+			voterCount: this.voterCount,
+			voteOpen: this.voteOpen,
+			proposalId: this.proposalId
+		};
+	}
 }
 
 /**
@@ -185,22 +174,22 @@ export class Proposal implements ProposalArgs {
  * @category generated
  */
 export const proposalBeet = new beet.FixableBeetStruct<
-  Proposal,
-  ProposalArgs & {
-    accountDiscriminator: number[] /* size: 8 */
-  }
+	Proposal,
+	ProposalArgs & {
+		accountDiscriminator: number[] /* size: 8 */;
+	}
 >(
-  [
-    ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['poster', beetSolana.publicKey],
-    ['data', beet.bytes],
-    ['options', beet.array(voteOptionBeet)],
-    ['maxOptionsSelectable', beet.u8],
-    ['settings', beet.array(settingsDataBeet)],
-    ['voterCount', beet.u32],
-    ['voteOpen', beet.bool],
-    ['proposalId', beet.u32],
-  ],
-  Proposal.fromArgs,
-  'Proposal'
-)
+	[
+		['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+		['poster', beetSolana.publicKey],
+		['data', beet.bytes],
+		['options', beet.array(voteOptionBeet)],
+		['maxOptionsSelectable', beet.u8],
+		['settings', beet.array(settingsDataBeet)],
+		['voterCount', beet.u32],
+		['voteOpen', beet.bool],
+		['proposalId', beet.u32]
+	],
+	Proposal.fromArgs,
+	'Proposal'
+);

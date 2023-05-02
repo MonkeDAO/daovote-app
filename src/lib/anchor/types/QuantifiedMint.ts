@@ -11,22 +11,22 @@
  *
  * See: https://github.com/metaplex-foundation/solita
  */
-import type * as web3 from '@solana/web3.js'
-import * as beet from '@metaplex-foundation/beet'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
+import type * as web3 from '@solana/web3.js';
+import * as beet from '@metaplex-foundation/beet';
+import * as beetSolana from '@metaplex-foundation/beet-solana';
 export type QuantifiedMint = {
-  mint: web3.PublicKey
-  amount: beet.bignum
-}
+	mint: web3.PublicKey;
+	amount: beet.bignum;
+};
 
 /**
  * @category userTypes
  * @category generated
  */
 export const quantifiedMintBeet = new beet.BeetArgsStruct<QuantifiedMint>(
-  [
-    ['mint', beetSolana.publicKey],
-    ['amount', beet.u64],
-  ],
-  'QuantifiedMint'
-)
+	[
+		['mint', beetSolana.publicKey],
+		['amount', beet.u64]
+	],
+	'QuantifiedMint'
+);

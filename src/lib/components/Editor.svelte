@@ -15,11 +15,11 @@
 		faListUl,
 		faQuoteLeft,
 		faSave,
-		faUpload,
+		faUpload
 	} from '@fortawesome/free-solid-svg-icons';
 	//using tiptap https://tiptap.dev/api/introduction to create a rich text editor
 	import StarterKit from '@tiptap/starter-kit';
-	import { toast } from '@zerodevx/svelte-toast'
+	import { toast } from '@zerodevx/svelte-toast';
 
 	const dispatch = createEventDispatcher();
 	let editor: Readable<Editor>;
@@ -38,9 +38,11 @@
 		const htmlString = $editor.getHTML();
 		// Create a Blob object from the HTML string
 		const blob = new Blob([htmlString], { type: 'text/html' });
-		const file = new File([blob], `daovote_proposal_${wallet?.publicKey}_${Date.now()}`, { type: 'text/html' });
+		const file = new File([blob], `daovote_proposal_${wallet?.publicKey}_${Date.now()}`, {
+			type: 'text/html'
+		});
 		console.log('file', file);
-		toast.push('File ready to upload!')
+		toast.push('File ready to upload!');
 		dispatch('file-generated', file);
 	}
 	onMount(() => {
@@ -106,7 +108,7 @@
 			<button
 				title="Heading 1"
 				on:click={toggleHeading(1)}
-				class="btn-square btn-sm btn-outline mr-2 flex items-center"
+				class="btn-outline btn-square btn-sm mr-2 flex items-center"
 				class:active={isActive('heading', { level: 1 })}
 			>
 				<Fa icon={faHeading} class="mr-1 text-sm" />
@@ -115,7 +117,7 @@
 			<button
 				title="Heading 2"
 				on:click={toggleHeading(2)}
-				class="btn-square btn-sm btn-outline mr-2 flex items-center"
+				class="btn-outline btn-square btn-sm mr-2 flex items-center"
 				class:active={isActive('heading', { level: 2 })}
 			>
 				<Fa icon={faHeading} class="mr-1 text-sm" />
@@ -124,7 +126,7 @@
 			<button
 				title="Heading 3"
 				on:click={toggleHeading(3)}
-				class="btn-square btn-sm btn-outline mr-2 flex items-center"
+				class="btn-outline btn-square btn-sm mr-2 flex items-center"
 				class:active={isActive('heading', { level: 3 })}
 			>
 				<Fa icon={faHeading} class="mr-1 text-sm" />
@@ -134,25 +136,26 @@
 				title="Bold"
 				on:click={toggleBold}
 				class:active={isActive('bold')}
-				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faBold} /></button
+				class="btn-outline btn-square btn-sm mr-2 flex items-center"><Fa icon={faBold} /></button
 			>
 			<button
 				title="Italic"
 				on:click={toggleItalic}
 				class:active={isActive('italic')}
-				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faItalic} /></button
+				class="btn-outline btn-square btn-sm mr-2 flex items-center"><Fa icon={faItalic} /></button
 			>
 			<button
 				title="Paragraph"
 				on:click={setParagraph}
 				class:active={isActive('paragraph')}
-				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faParagraph} /></button
+				class="btn-outline btn-square btn-sm mr-2 flex items-center"
+				><Fa icon={faParagraph} /></button
 			>
 			<button
 				title="Code"
 				on:click={toggleCode}
 				class:active={isActive('code')}
-				class="btn-square btn-sm btn-outline mr-2 flex items-center"><Fa icon={faCode} /></button
+				class="btn-outline btn-square btn-sm mr-2 flex items-center"><Fa icon={faCode} /></button
 			>
 			<button
 				title="Code block"
@@ -215,36 +218,36 @@
 
 <style>
 	.editor-container {
-  border: 1px solid #e5e7eb; /* Light gray border */
-  border-radius: 4px;
-  width: 100%;
-  max-width: 800px;
-  margin: 16px auto;
-  overflow: hidden; /* Hide any overflow */
-}
+		border: 1px solid #e5e7eb; /* Light gray border */
+		border-radius: 4px;
+		width: 100%;
+		max-width: 800px;
+		margin: 16px auto;
+		overflow: hidden; /* Hide any overflow */
+	}
 
-:global(.ProseMirror:focus) {
-  outline: none;
-}
+	:global(.ProseMirror:focus) {
+		outline: none;
+	}
 
-:global(.ProseMirror) {
-  padding: 0.5rem;
-  min-height: 300px;
-  width: 100%;
-}
+	:global(.ProseMirror) {
+		padding: 0.5rem;
+		min-height: 300px;
+		width: 100%;
+	}
 
-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 4px;
-  border-radius: 4px;
-  margin: 0;
-  border: 1px solid black;
-}
+	button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 2px 4px;
+		border-radius: 4px;
+		margin: 0;
+		border: 1px solid black;
+	}
 
-button.active {
-  background: black;
-  color: white;
-}
+	button.active {
+		background: black;
+		color: white;
+	}
 </style>

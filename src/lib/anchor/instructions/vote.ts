@@ -5,13 +5,13 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
-import * as web3 from '@solana/web3.js'
-import { type VoteEntry, voteEntryBeet } from '../types/VoteEntry'
+import * as beet from '@metaplex-foundation/beet';
+import * as web3 from '@solana/web3.js';
+import { type VoteEntry, voteEntryBeet } from '../types/VoteEntry';
 import {
-  type AdditionalAccountIndices,
-  additionalAccountIndicesBeet,
-} from '../types/AdditionalAccountIndices'
+	type AdditionalAccountIndices,
+	additionalAccountIndicesBeet
+} from '../types/AdditionalAccountIndices';
 
 /**
  * @category Instructions
@@ -19,28 +19,28 @@ import {
  * @category generated
  */
 export type VoteInstructionArgs = {
-  proposalId: number
-  voteEntries: VoteEntry[]
-  additionalAccountOffsets: AdditionalAccountIndices[]
-}
+	proposalId: number;
+	voteEntries: VoteEntry[];
+	additionalAccountOffsets: AdditionalAccountIndices[];
+};
 /**
  * @category Instructions
  * @category Vote
  * @category generated
  */
 export const voteStruct = new beet.FixableBeetArgsStruct<
-  VoteInstructionArgs & {
-    instructionDiscriminator: number[] /* size: 8 */
-  }
+	VoteInstructionArgs & {
+		instructionDiscriminator: number[] /* size: 8 */;
+	}
 >(
-  [
-    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['proposalId', beet.u32],
-    ['voteEntries', beet.array(voteEntryBeet)],
-    ['additionalAccountOffsets', beet.array(additionalAccountIndicesBeet)],
-  ],
-  'VoteInstructionArgs'
-)
+	[
+		['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+		['proposalId', beet.u32],
+		['voteEntries', beet.array(voteEntryBeet)],
+		['additionalAccountOffsets', beet.array(additionalAccountIndicesBeet)]
+	],
+	'VoteInstructionArgs'
+);
 /**
  * Accounts required by the _vote_ instruction
  *
@@ -55,19 +55,17 @@ export const voteStruct = new beet.FixableBeetArgsStruct<
  * @category generated
  */
 export type VoteInstructionAccounts = {
-  voter: web3.PublicKey
-  votebank: web3.PublicKey
-  proposal: web3.PublicKey
-  votes: web3.PublicKey
-  nftVoteMint: web3.PublicKey
-  treasury: web3.PublicKey
-  systemProgram?: web3.PublicKey
-  anchorRemainingAccounts?: web3.AccountMeta[]
-}
+	voter: web3.PublicKey;
+	votebank: web3.PublicKey;
+	proposal: web3.PublicKey;
+	votes: web3.PublicKey;
+	nftVoteMint: web3.PublicKey;
+	treasury: web3.PublicKey;
+	systemProgram?: web3.PublicKey;
+	anchorRemainingAccounts?: web3.AccountMeta[];
+};
 
-export const voteInstructionDiscriminator = [
-  227, 110, 155, 23, 136, 126, 172, 25,
-]
+export const voteInstructionDiscriminator = [227, 110, 155, 23, 136, 126, 172, 25];
 
 /**
  * Creates a _Vote_ instruction.
@@ -80,62 +78,62 @@ export const voteInstructionDiscriminator = [
  * @category generated
  */
 export function createVoteInstruction(
-  accounts: VoteInstructionAccounts,
-  args: VoteInstructionArgs,
-  programId = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
+	accounts: VoteInstructionAccounts,
+	args: VoteInstructionArgs,
+	programId = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
 ) {
-  const [data] = voteStruct.serialize({
-    instructionDiscriminator: voteInstructionDiscriminator,
-    ...args,
-  })
-  const keys: web3.AccountMeta[] = [
-    {
-      pubkey: accounts.voter,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.votebank,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.proposal,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.votes,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nftVoteMint,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.treasury,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-  ]
+	const [data] = voteStruct.serialize({
+		instructionDiscriminator: voteInstructionDiscriminator,
+		...args
+	});
+	const keys: web3.AccountMeta[] = [
+		{
+			pubkey: accounts.voter,
+			isWritable: true,
+			isSigner: true
+		},
+		{
+			pubkey: accounts.votebank,
+			isWritable: true,
+			isSigner: false
+		},
+		{
+			pubkey: accounts.proposal,
+			isWritable: true,
+			isSigner: false
+		},
+		{
+			pubkey: accounts.votes,
+			isWritable: true,
+			isSigner: false
+		},
+		{
+			pubkey: accounts.nftVoteMint,
+			isWritable: false,
+			isSigner: false
+		},
+		{
+			pubkey: accounts.treasury,
+			isWritable: true,
+			isSigner: false
+		},
+		{
+			pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+			isWritable: false,
+			isSigner: false
+		}
+	];
 
-  if (accounts.anchorRemainingAccounts != null) {
-    for (const acc of accounts.anchorRemainingAccounts) {
-      keys.push(acc)
-    }
-  }
+	if (accounts.anchorRemainingAccounts != null) {
+		for (const acc of accounts.anchorRemainingAccounts) {
+			keys.push(acc);
+		}
+	}
 
-  const ix = new web3.TransactionInstruction({
-    programId,
-    keys,
-    data,
-  })
-  return ix
+	const ix = new web3.TransactionInstruction({
+		programId,
+		keys,
+		data
+	});
+	return ix;
 }

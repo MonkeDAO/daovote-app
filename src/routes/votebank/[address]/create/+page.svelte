@@ -84,12 +84,11 @@
 				toast.push('Creating proposal...', { target: 'new' });
 				/* interact with the program via rpc */
 				console.log('Vote', $workSpace.baseAccount?.publicKey.toBase58());
-				const voteBankAccountRaw = await Votebank.fromAccountAddress(
-					connection,
-					votebankAddress
-				);
+				const voteBankAccountRaw = await Votebank.fromAccountAddress(connection, votebankAddress);
 				//@ts-ignore
-				const description = (voteBankAccountRaw.settings as SettingsData[]).find(x => x.__kind == "Description");
+				const description = (voteBankAccountRaw.settings as SettingsData[]).find(
+					(x) => x.__kind == 'Description'
+				);
 				let title = '';
 				if (description) {
 					const { title: settingsTitle, desc } = description as any;
@@ -111,7 +110,7 @@
 					proposalId,
 					votebankAddress.toBase58(),
 					voteBankAccountRaw,
-					title,
+					title
 				);
 
 				//TODO figure out how to get the token mint from settings and use that instead of hardcoding
@@ -123,20 +122,21 @@
 				if (voteRestriction) {
 					console.log('Vote restriction', voteRestriction);
 					const voteRestrictionValue = (voteRestriction as any)[
-					'voteRestriction'
+						'voteRestriction'
 					] as VoteRestrictionRule;
-					console.log('Vote restriction value', voteRestrictionValue)
+					console.log('Vote restriction value', voteRestrictionValue);
 					if (voteRestrictionValue.__kind == 'TokenOwnership') {
 						restrictionIx = true;
 						restrictionMint = voteRestrictionValue.mint;
 					} else if (voteRestrictionValue.__kind == 'NftOwnership') {
-						restrictionMint = new PublicKey(
-							voteRestrictionValue.collectionId
-						);
+						restrictionMint = new PublicKey(voteRestrictionValue.collectionId);
 						isNftRestricted = true;
 						restrictionIx = true;
 					}
-					console.log('Restriction mint', restrictionMint.toBase58(),  { restrictionIx, isNftRestricted });
+					console.log('Restriction mint', restrictionMint.toBase58(), {
+						restrictionIx,
+						isNftRestricted
+					});
 					//TODO: handle other types of restrictions
 				}
 				let nftMint = getDefaultPublicKey();
@@ -237,14 +237,11 @@
 				const signature = await connection.sendRawTransaction(tx.serialize());
 				console.log('Signature', signature);
 				const latestBlockhash = await connection.getLatestBlockhash();
-				toast.push(
-					'Finalizing proposal creation... please wait',
-					{
-						target: 'new',
-						duration: 5000,
-						pausable: true
-					}
-				);
+				toast.push('Finalizing proposal creation... please wait', {
+					target: 'new',
+					duration: 5000,
+					pausable: true
+				});
 				const confirmTx = await connection.confirmTransaction(
 					{
 						signature: signature,

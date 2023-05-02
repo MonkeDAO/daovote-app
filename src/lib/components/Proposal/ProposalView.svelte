@@ -40,15 +40,13 @@
 		const checkedOptions = options.filter((option) => option.checked);
 		if (checkedOptions.length >= 1 && checkedOptions.length <= proposal.maxOptionsSelectable) {
 			voteConfirmationModal.openModal();
-		}
-		else if (checkedOptions.length > proposal.maxOptionsSelectable) {
+		} else if (checkedOptions.length > proposal.maxOptionsSelectable) {
 			toast.push(`You can only select ${proposal.maxOptionsSelectable} options`, {
-				duration: 3000,
+				duration: 3000
 			});
-		}
-		else {
+		} else {
 			toast.push('You must select at least one option', {
-				duration: 3000,
+				duration: 3000
 			});
 		}
 	}
@@ -69,11 +67,12 @@
 		return isOpen ? 'bg-green-500' : 'bg-red-500';
 	}
 </script>
+
 <VoteConfirmationModal
-bind:this={voteConfirmationModal}
-  options={options}
-  on:voteConfirmed={handleVoteConfirmed}
-  />
+	bind:this={voteConfirmationModal}
+	{options}
+	on:voteConfirmed={handleVoteConfirmed}
+/>
 <article
 	class="votecontent prose mx-auto mb-5 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
 >
@@ -91,7 +90,7 @@ bind:this={voteConfirmationModal}
 		</p>
 		<div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
 			Status: {proposal.voteOpen ? 'Open' : 'Closed'}
-			</div>
+		</div>
 	</div>
 	<div
 		class="-mx-4 my-2 flex h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"

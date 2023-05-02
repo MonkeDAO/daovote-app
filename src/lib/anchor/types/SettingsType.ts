@@ -5,21 +5,22 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
+import * as beet from '@metaplex-foundation/beet';
 /**
  * @category enums
  * @category generated
  */
 export enum SettingsType {
-  Description,
-  OwnerInfo,
-  VoteRestriction,
+	Description,
+	OwnerInfo,
+	VoteRestriction
 }
 
 /**
  * @category userTypes
  * @category generated
  */
-export const settingsTypeBeet = beet.fixedScalarEnum(
-  SettingsType
-) as beet.FixedSizeBeet<SettingsType, SettingsType>
+export const settingsTypeBeet = beet.fixedScalarEnum(SettingsType) as beet.FixedSizeBeet<
+	SettingsType,
+	SettingsType
+>;

@@ -5,7 +5,7 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
+import * as beet from '@metaplex-foundation/beet';
 /**
  * This type is used to derive the {@link AdditionalAccountIndices} type as well as the de/serializer.
  * However don't refer to it in your code but use the {@link AdditionalAccountIndices} type instead.
@@ -16,10 +16,10 @@ import * as beet from '@metaplex-foundation/beet'
  * @private
  */
 export type AdditionalAccountIndicesRecord = {
-  TokenOwnership: { tokenIdx: number }
-  NftOwnership: { tokenIdx: number; metaIdx: number; collectionIdx: number }
-  Null: void /* scalar variant */
-}
+	TokenOwnership: { tokenIdx: number };
+	NftOwnership: { tokenIdx: number; metaIdx: number; collectionIdx: number };
+	Null: void /* scalar variant */;
+};
 
 /**
  * Union type respresenting the AdditionalAccountIndices data enum defined in Rust.
@@ -32,45 +32,41 @@ export type AdditionalAccountIndicesRecord = {
  * @category enums
  * @category generated
  */
-export type AdditionalAccountIndices =
-  beet.DataEnumKeyAsKind<AdditionalAccountIndicesRecord>
+export type AdditionalAccountIndices = beet.DataEnumKeyAsKind<AdditionalAccountIndicesRecord>;
 
 export const isAdditionalAccountIndicesTokenOwnership = (
-  x: AdditionalAccountIndices
-): x is AdditionalAccountIndices & { __kind: 'TokenOwnership' } =>
-  x.__kind === 'TokenOwnership'
+	x: AdditionalAccountIndices
+): x is AdditionalAccountIndices & { __kind: 'TokenOwnership' } => x.__kind === 'TokenOwnership';
 export const isAdditionalAccountIndicesNftOwnership = (
-  x: AdditionalAccountIndices
-): x is AdditionalAccountIndices & { __kind: 'NftOwnership' } =>
-  x.__kind === 'NftOwnership'
+	x: AdditionalAccountIndices
+): x is AdditionalAccountIndices & { __kind: 'NftOwnership' } => x.__kind === 'NftOwnership';
 export const isAdditionalAccountIndicesNull = (
-  x: AdditionalAccountIndices
-): x is AdditionalAccountIndices & { __kind: 'Null' } => x.__kind === 'Null'
+	x: AdditionalAccountIndices
+): x is AdditionalAccountIndices & { __kind: 'Null' } => x.__kind === 'Null';
 
 /**
  * @category userTypes
  * @category generated
  */
-export const additionalAccountIndicesBeet =
-  beet.dataEnum<AdditionalAccountIndicesRecord>([
-    [
-      'TokenOwnership',
-      new beet.BeetArgsStruct<AdditionalAccountIndicesRecord['TokenOwnership']>(
-        [['tokenIdx', beet.u8]],
-        'AdditionalAccountIndicesRecord["TokenOwnership"]'
-      ),
-    ],
+export const additionalAccountIndicesBeet = beet.dataEnum<AdditionalAccountIndicesRecord>([
+	[
+		'TokenOwnership',
+		new beet.BeetArgsStruct<AdditionalAccountIndicesRecord['TokenOwnership']>(
+			[['tokenIdx', beet.u8]],
+			'AdditionalAccountIndicesRecord["TokenOwnership"]'
+		)
+	],
 
-    [
-      'NftOwnership',
-      new beet.BeetArgsStruct<AdditionalAccountIndicesRecord['NftOwnership']>(
-        [
-          ['tokenIdx', beet.u8],
-          ['metaIdx', beet.u8],
-          ['collectionIdx', beet.u8],
-        ],
-        'AdditionalAccountIndicesRecord["NftOwnership"]'
-      ),
-    ],
-    ['Null', beet.unit],
-  ]) as beet.FixableBeet<AdditionalAccountIndices, AdditionalAccountIndices>
+	[
+		'NftOwnership',
+		new beet.BeetArgsStruct<AdditionalAccountIndicesRecord['NftOwnership']>(
+			[
+				['tokenIdx', beet.u8],
+				['metaIdx', beet.u8],
+				['collectionIdx', beet.u8]
+			],
+			'AdditionalAccountIndicesRecord["NftOwnership"]'
+		)
+	],
+	['Null', beet.unit]
+]) as beet.FixableBeet<AdditionalAccountIndices, AdditionalAccountIndices>;
