@@ -5,7 +5,7 @@
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { onMount } from 'svelte';
 	import type { VoteBankItem } from '$lib/types';
-	import VoteBankCardLite from '$lib/components/Vote/VoteBanks/VoteBankCardLite.svelte';
+	import GeneralCard from '$lib/components/GeneralCard.svelte';
 	export let data: any;
 	let connection: Connection;
 	let wallet: any;
@@ -20,6 +20,14 @@
 	}
     $: if (wallet && connection && banks) {
         fetchAllBanks();
+    }
+
+    function mapItemToCardItem(item: VoteBankItem) {
+        return {
+            title: item.title,
+            description: item.description,
+            url: `/votebank/${item.votebank}`,
+        }
     }
 
 	async function fetchAllBanks() {
@@ -105,7 +113,7 @@
 	{#if votebankItems}
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 			{#each votebankItems as votebankItem}
-				<VoteBankCardLite item={votebankItem} />
+				<GeneralCard item={mapItemToCardItem(votebankItem)} />
 			{/each}
 		</div>
 	{/if}

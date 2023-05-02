@@ -38,7 +38,7 @@
 		const htmlString = $editor.getHTML();
 		// Create a Blob object from the HTML string
 		const blob = new Blob([htmlString], { type: 'text/html' });
-		const file = new File([blob], `daovote_proposal_${wallet?.publicKey ?? Date.now()}`, { type: 'text/html' });
+		const file = new File([blob], `daovote_proposal_${wallet?.publicKey}_${Date.now()}`, { type: 'text/html' });
 		console.log('file', file);
 		toast.push('File ready to upload!')
 		dispatch('file-generated', file);

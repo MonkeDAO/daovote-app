@@ -95,3 +95,9 @@ export type VoteBankItem = {
 	title: string;
 	description: string;
 }
+
+export type CardItem = {
+	title: string;
+	description: string;
+	url: string;
+}

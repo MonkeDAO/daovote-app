@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ProposalCards from '$lib/components/Proposal/ProposalCard.svelte';
-	import type { ProposalItem } from '$lib/types';
+	import GeneralCard from '$lib/components/GeneralCard.svelte';
+	import type { CardItem, ProposalItem } from '$lib/types';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import { onMount } from 'svelte';
 	
@@ -13,6 +13,14 @@
         open_proposals = data.json.open_proposals;
         closed_proposals = data.json.closed_proposals;
         loading = false;
+    }
+    function mapItemToCardItem(item: ProposalItem): CardItem {
+      return {
+        title: item.data.title,
+        description: item.data.summary,
+        url: `/votebank/${item.votebank}/proposal/${item.proposalId}`,
+
+      }
     }
 
 </script>
@@ -56,7 +64,7 @@
           {#if open_proposals.length > 0}
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 place-items-center w-full">
               {#each open_proposals as item (item)}
-                <ProposalCards item={item} />
+                <GeneralCard item={mapItemToCardItem(item)} />
               {/each}
             </div>
           {:else}
@@ -74,7 +82,7 @@
           {#if closed_proposals.length > 0}
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full">
               {#each closed_proposals as item (item)}
-                <ProposalCards item={item} />
+                <GeneralCard item={mapItemToCardItem(item)} />
               {/each}
             </div>
           {:else}
