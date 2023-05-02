@@ -5,8 +5,11 @@
 	import {
 		TREASURY_ADDRESS,
 		fetchProposalById,
+		getDefaultPublicKey,
 		getExplorerUrl,
+		isDefaultPublicKey,
 		proposalAccountPda,
+		toAccountMetadata,
 		voteAccountPda,
 		votebankAccountPda
 	} from '$lib/utils/solana';
@@ -16,6 +19,9 @@
 	import { onMount } from 'svelte';
 	import { PublicKey, type Connection, type AccountMeta, Transaction } from '@solana/web3.js';
 	import { Votebank } from '$lib/anchor/accounts';
+	import type { Metaplex } from '@metaplex-foundation/js';
+	import type { Program } from '@project-serum/anchor';
+	import { walletProgramConnection } from '$lib/wallet';
 	import type {
 		SettingsData,
 		VoteRestrictionRule,
@@ -24,6 +30,7 @@
 	} from '$lib/anchor/types';
 	import type { VoteInstructionArgs } from '$lib/anchor/instructions/vote';
 	import { toast } from '@zerodevx/svelte-toast';
+	import { getAssociatedTokenAddress } from '@solana/spl-token';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -31,16 +38,42 @@
 	let proposalItem: ProposalItem;
 	let wallet: any;
 	let loading = true;
-	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
-		connection = $workSpace.provider.connection;
-		wallet = $walletStore.wallet;
+	let text = "Loading..."
+	let error = false;
+	let ready: boolean;
+	let currentUser: PublicKey;
+	let metaplex: Metaplex;
+	let program: Program;
+	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
+	$: {
+		ready = $walletConnectionFactory.ready;
+		if (ready && $walletConnectionFactory.connection) {
+			connection = $walletConnectionFactory.connection;
+		}
+		if (ready && $walletConnectionFactory.wallet) {
+			wallet = $walletConnectionFactory.wallet;
+		}
+		if (ready && $walletConnectionFactory.metaplex) {
+			metaplex = $walletConnectionFactory.metaplex;
+		}
+		if (ready && $walletConnectionFactory.program) {
+			program = $walletConnectionFactory.program;
+		}
+		if (ready && $walletConnectionFactory.publicKey) {
+			currentUser = $walletConnectionFactory.publicKey;
+		}
+		console.log('Derived store updated:', $walletConnectionFactory);
 	}
 
 	$: data = data;
-	
-	if (data) {
+	$: if (data && data.proposal) {
 		proposalItem = data.proposal;
 		loading = false;
+		error = false;
+	}
+	else if (data && !data.proposal){
+		error = true
+		text = "Proposal not found. Try reloading the page. If this was recently created it may take a few seconds to appear."
 	}
 
 	function buildVotedFor(selectedOptions: any[]) {
@@ -54,12 +87,14 @@
 	}
 
 	async function buildVoteTxn(votedFor: VoteEntry[]) {
-		if (
-			$workSpace.program &&
-			$walletStore.publicKey &&
-			$walletStore.signTransaction &&
-			connection
-		) {
+	     if (
+				connection &&
+				wallet &&
+				metaplex &&
+				program &&
+				currentUser &&
+				$walletStore.signTransaction
+			) {
 			const votebankAccountAddress = new PublicKey(data.address);
 			const voteBankAccountRaw = await Votebank.fromAccountAddress(
 				connection,
@@ -69,12 +104,10 @@
 			const [proposalAccount, __] = proposalAccountPda(
 				votebankAccountAddress,
 				proposalItem.proposalId,
-				$workSpace.program.programId
+				program.programId
 			);
 			//let accountIndicies: AdditionalAccountIndices[] = [];
-			const accountIndicies: any[] = [];
 			const accountsMeta: AccountMeta[] = [];
-			let mint: PublicKey = new PublicKey('11111111111111111111111111111111');
 			const proposalSettings = proposalItem.settings as SettingsData[];
 			const proposalVoteRestriction = proposalSettings.find((x) => x.__kind == 'VoteRestriction');
 			if (proposalVoteRestriction) {
@@ -84,44 +117,94 @@
 				console.log('voteRestrictionValue', voteRestrictionValue);
 			}
 			const settings = voteBankAccountRaw.settings as SettingsData[];
-			const voteRestriction = settings.find((x) => x.__kind == 'VoteRestriction');
-			if (voteRestriction) {
-				const voteRestrictionValue = (voteRestriction as any)[
+				const voteRestriction = settings.find((x) => x.__kind == 'VoteRestriction');
+				let restrictionMint = getDefaultPublicKey();
+				let isNftRestricted = false;
+				let restrictionIx = false;
+				if (voteRestriction) {
+					console.log('Vote restriction', voteRestriction);
+					const voteRestrictionValue = (voteRestriction as any)[
 					'voteRestriction'
-				] as VoteRestrictionRule;
-				console.log('voteRestrictionValue', voteRestrictionValue);
-				if (voteRestrictionValue.__kind == 'TokenOwnership') {
-					const tokenAddress = new PublicKey(voteRestrictionValue.mint);
-					mint = tokenAddress;
-					const tokenAccountAddress = await connection.getParsedTokenAccountsByOwner(
-						wallet.publicKey,
-						{
-							mint: tokenAddress
+					] as VoteRestrictionRule;
+					console.log('Vote restriction value', voteRestrictionValue)
+					if (voteRestrictionValue.__kind == 'TokenOwnership') {
+						restrictionIx = true;
+						restrictionMint = voteRestrictionValue.mint;
+					} else if (voteRestrictionValue.__kind == 'NftOwnership') {
+						restrictionMint = new PublicKey(
+							voteRestrictionValue.collectionId
+						);
+						isNftRestricted = true;
+						restrictionIx = true;
+					}
+					console.log('Restriction mint', restrictionMint.toBase58(),  { restrictionIx, isNftRestricted });
+					//TODO: handle other types of restrictions
+				}
+				let mint = getDefaultPublicKey();
+				let nftMintMetadata = getDefaultPublicKey();
+				let tokenAccount = getDefaultPublicKey();
+				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
+				if (isNftRestricted) {
+					const nfts = await metaplex.nfts().findAllByOwner({
+						owner: currentUser
+					});
+
+					// Find by collection id:
+					nfts.find((nft) => {
+						if (
+							nft.collection &&
+							nft.collection.address.toBase58() === restrictionMint.toBase58()
+						) {
+							mint = (nft as any)['mintAddress'];
+							nftMintMetadata = nft.address;
+							return true;
 						}
-					);
-					if (tokenAccountAddress.value.length > 0) {
-						const tokenAccount = tokenAccountAddress.value[0].pubkey;
-						// const tokenAccount = tokenAccountAddress.value[0].pubkey;
-						console.log('tokenAccount', tokenAccount);
-						accountsMeta.push({
-							pubkey: tokenAccount,
-							isWritable: true,
-							isSigner: false
-						});
-						accountIndicies.push({
+						return false;
+					});
+					additionalAccountOffsets = [
+						{
+							nftOwnership: {
+								tokenIdx: 0,
+								metaIdx: 1,
+								collectionIdx: 2
+							}
+						}
+					];
+					tokenAccount = await getAssociatedTokenAddress(mint, currentUser);
+				} else if (restrictionIx && !isNftRestricted) {
+					tokenAccount = await getAssociatedTokenAddress(restrictionMint, currentUser);
+					/**
+					 * Set the mint to the restriction mint since its a token. this needs to be passed as the nftVoteMint for ix
+					*/
+					mint = restrictionMint; 
+					console.log('Token account', tokenAccount.toBase58());
+					additionalAccountOffsets = [
+						{
 							tokenOwnership: {
 								tokenIdx: 0
 							}
-						});
-					}
+						}
+					];
 				}
-				if (voteRestrictionValue.__kind == 'NftOwnership') {
-					const collectionAddress = new PublicKey(voteRestrictionValue.collectionId);
-					//TODO: fetch nfts find the one that matches the collectionid
+
+				if (restrictionIx && isDefaultPublicKey(tokenAccount)) {
+					toast.push(
+						`You need to have this token ${restrictionMint.toBase58()} to create a proposal`,
+						{ target: 'new' }
+					);
+					return;
 				}
-			}
+				const tokenToAccountMetaFormat = isNftRestricted
+					? [
+							toAccountMetadata(tokenAccount),
+							toAccountMetadata(nftMintMetadata),
+							toAccountMetadata(restrictionMint)
+					  ]
+					: restrictionIx
+					? [toAccountMetadata(tokenAccount)]
+					: [];
 			const [vote] = voteAccountPda(votebankAccountAddress, mint, proposalItem.proposalId);
-			const voteAccountCheck = await $workSpace.program.account.voteAccount.fetch(
+			const voteAccountCheck = await program.account.voteAccount.fetch(
 				vote,
 				'confirmed'
 			)
@@ -133,8 +216,9 @@
 				toast.push('You have already voted for this proposal');
 				return;
 			}
-			const ix = await $workSpace.program.methods
-				.vote(proposalItem.proposalId, votedFor, accountIndicies)
+			console.log('vote', { voteAccount: vote.toBase58(), Nftmint: mint.toBase58(), mint: mint.toBase58(), accountOffsets: additionalAccountOffsets, accountsMeta, tokenToAccountMetaFormat   });
+			const ix = await program.methods
+				.vote(proposalItem.proposalId, votedFor, additionalAccountOffsets)
 				.accounts({
 					voter: wallet.publicKey,
 					votebank: votebankAccountAddress,
@@ -144,10 +228,10 @@
 					treasury: TREASURY_ADDRESS,
 					systemProgram: new PublicKey('11111111111111111111111111111111')
 				})
-				.remainingAccounts(accountsMeta)
+				.remainingAccounts(tokenToAccountMetaFormat)
 				.instruction();
 			const tx = new Transaction().add(ix);
-			tx.feePayer = $walletStore.publicKey;
+			tx.feePayer = currentUser;
 			tx.recentBlockhash = (await $workSpace.connection.getLatestBlockhash()).blockhash;
 			var sig = await $walletStore.signTransaction(tx);
 
@@ -163,7 +247,7 @@
 				},
 				'confirmed'
 			);
-			const voteCreatedAccount = await $workSpace.program.account.voteAccount.fetch(
+			const voteCreatedAccount = await program.account.voteAccount.fetch(
 				vote,
 				'confirmed'
 			);
@@ -186,10 +270,13 @@
 	}
 </script>
 
-{#if loading}
-	<div class="flex h-screen items-center justify-center">
-		<progress class="progress w-56" />
-	</div>
+{#if loading || error}
+<div class="flex items-center justify-center min-h-screen">
+  <div class="mb-16 max-w-2xl">
+    <h3 class="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-relaxed max-w-md mx-auto">{text}</h3>
+    <progress class="progress progress-primary w-70" />
+  </div>
+</div>
 {:else}
 	<ProposalView proposal={proposalItem} on:vote={handleVoteSubmit} />
 {/if}

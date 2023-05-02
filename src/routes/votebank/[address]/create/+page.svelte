@@ -237,6 +237,14 @@
 				const signature = await connection.sendRawTransaction(tx.serialize());
 				console.log('Signature', signature);
 				const latestBlockhash = await connection.getLatestBlockhash();
+				toast.push(
+					'Finalizing proposal creation... please wait',
+					{
+						target: 'new',
+						duration: 5000,
+						pausable: true
+					}
+				);
 				const confirmTx = await connection.confirmTransaction(
 					{
 						signature: signature,

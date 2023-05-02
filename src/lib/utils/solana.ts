@@ -69,7 +69,7 @@ export async function fetchProposalById(connection: Connection, votebank: Public
       console.log('returning proposalItem', proposalItem)
       return proposalItem;
   } catch (err) {
-    console.log('fetchProposalById', err);
+      console.log('fetchProposalById', err);
       return null;
   }
 }

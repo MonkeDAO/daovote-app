@@ -10,16 +10,10 @@ export async function load({ params }: any) {
     const connection = new web3.Connection(clusterApiUrl('devnet'));
     const data = await fetchProposalById(connection, new PublicKey(address), id);
     console.log('load proposal/id', data, id, address)
-    if (data) {
-      return {
-        address,
-        id,
-        proposal: data
-      }
-    }
     return {
       address,
-      id
+      id,
+      proposal: data
     }
   }
   
