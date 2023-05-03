@@ -1,7 +1,7 @@
 <script>
 	import MobileMenu from './MobileMenu.svelte';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { REPO_URL } from '$lib/siteConfig';
+	import { REPO_URL, VOTEBANK } from '$lib/siteConfig';
 	import NavLink from './NavLink.svelte';
 	import { WalletMultiButton } from '@svelte-on-solana/wallet-adapter-ui';
 	let isDark = false;
@@ -43,11 +43,11 @@
 		<li>
 			<NavLink href="/about">About</NavLink>
 		</li>
-		<!-- {#if $walletStore?.connected}
+		{#if $walletStore?.connected}
 			<li>
-				<NavLink href="/votebanks">Votebanks</NavLink>
+				<NavLink href="/votebank/{VOTEBANK}/create">Create Proposal</NavLink>
 			</li>
-		{/if} -->
+		{/if}
 	</ul>
 	<div class="flex items-center space-x-4">
 		<WalletMultiButton maxNumberOfWallets={5} />

@@ -334,10 +334,10 @@
 <div class="wrap">
 	<SvelteToast target="new" options={{ intro: { y: -64 } }} />
 </div>
-<div class="flex min-h-screen flex-col justify-center py-6 dark:prose-invert sm:py-12">
-	<div class="relative py-3 sm:mx-auto sm:max-w-xl">
+<div class="flex min-h-screen flex-col justify-center dark:prose-invert sm:py-12">
+	<div class="relative sm:mx-auto sm:max-w-xl">
 		<div
-			class="bg-gray-0 relative mx-8 rounded-3xl px-4 py-10 shadow dark:bg-white sm:p-10 md:mx-0"
+			class="bg-gray-0 relative mx-8 rounded-3xl px-4 shadow dark:bg-white sm:p-10 md:mx-0"
 		>
 			<div class="mx-auto max-w-md">
 				<div class="flex items-center space-x-5">
@@ -349,7 +349,7 @@
 					<div class="block self-start pl-2 text-xl font-semibold text-gray-700">
 						<h2 class="leading-relaxed">Create a Proposal</h2>
 						<p class="text-sm font-normal leading-relaxed text-gray-500">
-							You can either upload a file or use the editor.
+							You need $SHDW to create proposal.
 						</p>
 					</div>
 				</div>

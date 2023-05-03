@@ -220,7 +220,7 @@
 			</form>
 		</div>
 
-		{#if useEditor}
+		<!-- {#if useEditor}
 			<div class="mx-auto w-full max-w-5xl">
 				<button class="btn-primary btn mb-1 mt-1" on:click={toggleEditor}>Upload a File</button>
 				{#if Editor}
@@ -231,7 +231,7 @@
 			<div class="mx-auto w-full max-w-5xl">
 				<button class="btn-primary btn mt-1" on:click={toggleEditor}>Use the Editor</button>
 			</div>
-		{/if}
+		{/if} -->
 	</div>
 </div>
 
