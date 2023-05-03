@@ -43,11 +43,11 @@
 		<li>
 			<NavLink href="/about">About</NavLink>
 		</li>
-		{#if $walletStore?.connected}
+		<!-- {#if $walletStore?.connected}
 			<li>
 				<NavLink href="/votebanks">Votebanks</NavLink>
 			</li>
-		{/if}
+		{/if} -->
 	</ul>
 	<div class="flex items-center space-x-4">
 		<WalletMultiButton maxNumberOfWallets={5} />

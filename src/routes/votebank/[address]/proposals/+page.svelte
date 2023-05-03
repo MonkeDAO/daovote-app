@@ -2,7 +2,9 @@
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
 	import type { CardItem, ProposalItem } from '$lib/types';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	
+	import {
+		SITE_TITLE,
+	} from '$lib/siteConfig';
 	export let data: any;
 	let open_proposals: ProposalItem[] = [];
 	let closed_proposals: ProposalItem[] = [];
@@ -25,22 +27,46 @@
 <!-- ... -->
 
 <div class="container mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+	<div class="flex flex-col-reverse items-start sm:flex-row">
+		<div class="flex flex-col pr-8">
+			<h1 class="mb-3 text-3xl font-bold tracking-tight text-black dark:text-white md:text-5xl">
+				This is
+
+				<span
+					class="relative ml-2 inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-green-800"
+				>
+					<span class="relative skew-y-3 text-yellow-50">{SITE_TITLE}</span>
+				</span>
+				!
+			</h1>
+			<h2 class="mb-4 text-gray-700 dark:text-gray-200">
+				An on-chain voting solution built by <span class="font-semibold">Degens.</span> Made for
+				<a class="text-green-800 dark:text-yellow-50" href="https://monkedao.io">MonkeDAO</a>.
+			</h2>
+			<!-- <p class="mb-16 text-gray-600 dark:text-gray-400">
+				<a href={REPO_URL}>View source and feature list here!</a>
+			</p> -->
+		</div>
+		<!-- <div
+				class="w-[80px] h-[80px] rounded-full sm:w-[176px] sm:h-[136px] relative mb-8 sm:mb-0 mr-auto bg-cyan-300 bg-opacity-25"
+			/> -->
+	</div>
 	<h3
 		class="mb-6 text-center text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl"
 	>
 		Proposals
 	</h3>
-	<div class="mb-6 flex justify-center">
+	<div class="mb-6 flex justify-center tabs">
 		<button
-			class="btn-outline btn-wide btn mx-1 px-1 sm:px-4"
-			class:active={currentTab === 'open'}
+			class="tab tab-bordered px-1 sm:px-4"
+			class:active={currentTab === 'open' ? 'tab-active' : 'tab-disabled'}
 			on:click={() => (currentTab = 'open')}
 		>
 			Open
 		</button>
 		<button
-			class="btn-outline btn-wide btn mx-1 px-1 sm:px-4"
-			class:active={currentTab === 'closed'}
+			class="tab tab-bordered px-1 sm:px-4"
+			class:active={currentTab === 'closed' ? 'tab-active' : 'tab-disabled'}
 			on:click={() => (currentTab = 'closed')}
 		>
 			Closed

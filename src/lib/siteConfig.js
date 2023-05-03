@@ -10,6 +10,9 @@ export const MY_YOUTUBE = 'https://youtube.com/swyxTV';
 export const POST_CATEGORIES = ['Essay', 'Note']; // Other categories you can consider adding: Talks, Tutorials, Snippets, Podcasts, Notes...
 export const GH_PUBLISHED_TAGS = ['Published'];
 
+// variables related to program
+export const VOTEBANK = '8zHqm7LYF2DqGhVzZxPPhZ2pQ438qf33eeRqtRJssVhd';
+
 // auto generated variables
 export const REPO_URL = 'https://github.com/' + GH_USER_REPO;
 export const REPO_OWNER = GH_USER_REPO.split('/')[0];

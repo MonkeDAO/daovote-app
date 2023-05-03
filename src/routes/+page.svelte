@@ -1,28 +1,31 @@
-<script>
+<script lang="ts">
 	import Newsletter from '$lib/components/Newsletter.svelte';
-	import FeatureCard from '$lib/components/FeatureCard.svelte';
-	import LatestPosts from '$lib/components/LatestPosts.svelte';
+	import GeneralCard from '$lib/components/GeneralCard.svelte';
+	import type { CardItem, ProposalItem } from '$lib/types';
 	import {
 		SITE_URL,
-		REPO_URL,
 		SITE_TITLE,
 		SITE_DESCRIPTION,
 		DEFAULT_OG_IMAGE,
-		MY_TWITTER_HANDLE
+		MY_TWITTER_HANDLE,
+		REPO_URL,
 	} from '$lib/siteConfig';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-ui';
-	import { balanceStore } from '$lib/balance';
-	import { shdwBalanceStore } from '$lib/shdwbalance';
-	import { forcedConnection } from '$lib/drive';
-	/** @type {import('./$types').PageData} */
-	export let data;
-	// technically this is a slighlty different type because doesnt have 'content' but we'll let it slide
-	/** @type {import('$lib/types').ContentItem[]} */
-	$: items = data.items;
-	$: $walletStore.connected &&
-		$walletStore.publicKey &&
-		balanceStore.getUserSOLBalance($walletStore.publicKey, $workSpace?.connection);
+	export let data: any;
+	let open_proposals: ProposalItem[] = [];
+	let closed_proposals: ProposalItem[] = [];
+	let loading = true;
+	$: if (data) {
+		open_proposals = data.json.open_proposals;
+		closed_proposals = data.json.closed_proposals;
+		loading = false;
+	}
+	function mapItemToCardItem(item: ProposalItem): CardItem {
+		return {
+			title: item.data.title,
+			description: item.data.summary,
+			url: `/votebank/${item.votebank}/proposal/${item.proposalId}`
+		};
+	}
 </script>
 
 <svelte:head>
@@ -71,23 +74,45 @@
 
 	<section class="mb-16 w-full">
 		<h3 class="mb-6 text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl">
-			Featured Proposals
+			Open Proposals
 		</h3>
 		<div class="flex flex-col gap-6 md:flex-row">
-			{#each items as item (item)}
-				<FeatureCard title={item.title} href="/{item.id}" stringData="Jan 2022" />
-			{/each}
-			<!-- <FeatureCard title="Welcome to swyxkit 2022!" href="/welcome" stringData="Jan 2022" />
-			<FeatureCard
-				title="Moving to a GitHub CMS"
-				href="/moving-to-a-github-cms"
-				stringData="Jan 2022"
-			/>
-			<FeatureCard title="HTML Ipsum demo" href="/moo" stringData="Jan 2022" /> -->
+			{#if loading}
+				<div class="flex items-center justify-center">
+					<progress class="progress w-56" />
+				</div>
+			{:else if open_proposals.length > 0}
+				<div
+					class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+				>
+					{#each open_proposals as item (item)}
+						<GeneralCard item={mapItemToCardItem(item)} />
+					{/each}
+				</div>
+			{:else}
+				<div class="flex items-center justify-center">
+					<p class="text-gray-500">No open proposals</p>
+				</div>
+			{/if}
 		</div>
 	</section>
-
-	<LatestPosts {items} />
-
+	<section class="mb-8 w-full">
+		<h3
+			id="latest"
+			class="mb-6 text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl"
+		>
+			Closed Proposals
+		</h3>
+		<ul class="space-y-2 text-white">
+			{#each open_proposals as item (item)}
+				<li>
+					<a class="font-bold" data-sveltekit-preload-data href="/votebank/{item.votebank}/proposal/{item.proposalId}">{item.data.title}</a>
+					<span class="hidden text-xs text-black dark:text-gray-400 sm:inline"
+						>{new Date().toISOString().slice(0, 10)}</span
+					>
+				</li>
+			{/each}
+		</ul>
+	</section>
 	<Newsletter />
 </div>
