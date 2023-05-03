@@ -7,92 +7,77 @@
 
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
-import { VoteEntry, voteEntryBeet } from '../types/VoteEntry'
-import {
-  AdditionalAccountIndices,
-  additionalAccountIndicesBeet,
-} from '../types/AdditionalAccountIndices'
 
 /**
  * @category Instructions
- * @category Vote
+ * @category CloseProposal
  * @category generated
  */
-export type VoteInstructionArgs = {
+export type CloseProposalInstructionArgs = {
   proposalId: number
-  voteEntries: VoteEntry[]
-  additionalAccountOffsets: AdditionalAccountIndices[]
 }
 /**
  * @category Instructions
- * @category Vote
+ * @category CloseProposal
  * @category generated
  */
-export const voteStruct = new beet.FixableBeetArgsStruct<
-  VoteInstructionArgs & {
+export const closeProposalStruct = new beet.BeetArgsStruct<
+  CloseProposalInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['proposalId', beet.u32],
-    ['voteEntries', beet.array(voteEntryBeet)],
-    ['additionalAccountOffsets', beet.array(additionalAccountIndicesBeet)],
   ],
-  'VoteInstructionArgs'
+  'CloseProposalInstructionArgs'
 )
 /**
- * Accounts required by the _vote_ instruction
+ * Accounts required by the _closeProposal_ instruction
  *
- * @property [_writable_, **signer**] voter
- * @property [_writable_] votebank
  * @property [_writable_] proposal
- * @property [_writable_] votes
- * @property [] nftVoteMint
- * @property [_writable_] treasury
+ * @property [_writable_] votebank
+ * @property [**signer**] proposalOwner
  * @category Instructions
- * @category Vote
+ * @category CloseProposal
  * @category generated
  */
-export type VoteInstructionAccounts = {
-  voter: web3.PublicKey
-  votebank: web3.PublicKey
+export type CloseProposalInstructionAccounts = {
   proposal: web3.PublicKey
-  votes: web3.PublicKey
-  nftVoteMint: web3.PublicKey
-  treasury: web3.PublicKey
+  votebank: web3.PublicKey
+  proposalOwner: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const voteInstructionDiscriminator = [
-  227, 110, 155, 23, 136, 126, 172, 25,
+export const closeProposalInstructionDiscriminator = [
+  213, 178, 139, 19, 50, 191, 82, 245,
 ]
 
 /**
- * Creates a _Vote_ instruction.
+ * Creates a _CloseProposal_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category Vote
+ * @category CloseProposal
  * @category generated
  */
-export function createVoteInstruction(
-  accounts: VoteInstructionAccounts,
-  args: VoteInstructionArgs,
+export function createCloseProposalInstruction(
+  accounts: CloseProposalInstructionAccounts,
+  args: CloseProposalInstructionArgs,
   programId = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
 ) {
-  const [data] = voteStruct.serialize({
-    instructionDiscriminator: voteInstructionDiscriminator,
+  const [data] = closeProposalStruct.serialize({
+    instructionDiscriminator: closeProposalInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.voter,
+      pubkey: accounts.proposal,
       isWritable: true,
-      isSigner: true,
+      isSigner: false,
     },
     {
       pubkey: accounts.votebank,
@@ -100,24 +85,9 @@ export function createVoteInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.proposal,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.votes,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nftVoteMint,
+      pubkey: accounts.proposalOwner,
       isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.treasury,
-      isWritable: true,
-      isSigner: false,
+      isSigner: true,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,

@@ -7,7 +7,8 @@
 
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
-import { VoteEntry, voteEntryBeet } from '../types/VoteEntry'
+import { VoteOption, voteOptionBeet } from '../types/VoteOption'
+import { SettingsData, settingsDataBeet } from '../types/SettingsData'
 import {
   AdditionalAccountIndices,
   additionalAccountIndicesBeet,
@@ -15,84 +16,88 @@ import {
 
 /**
  * @category Instructions
- * @category Vote
+ * @category CreateProposal
  * @category generated
  */
-export type VoteInstructionArgs = {
+export type CreateProposalInstructionArgs = {
+  options: VoteOption[]
+  maxOptionsSelectable: number
+  data: Uint8Array
   proposalId: number
-  voteEntries: VoteEntry[]
+  settings: SettingsData[]
   additionalAccountOffsets: AdditionalAccountIndices[]
+  endTime: beet.bignum
 }
 /**
  * @category Instructions
- * @category Vote
+ * @category CreateProposal
  * @category generated
  */
-export const voteStruct = new beet.FixableBeetArgsStruct<
-  VoteInstructionArgs & {
+export const createProposalStruct = new beet.FixableBeetArgsStruct<
+  CreateProposalInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['options', beet.array(voteOptionBeet)],
+    ['maxOptionsSelectable', beet.u8],
+    ['data', beet.bytes],
     ['proposalId', beet.u32],
-    ['voteEntries', beet.array(voteEntryBeet)],
+    ['settings', beet.array(settingsDataBeet)],
     ['additionalAccountOffsets', beet.array(additionalAccountIndicesBeet)],
+    ['endTime', beet.i64],
   ],
-  'VoteInstructionArgs'
+  'CreateProposalInstructionArgs'
 )
 /**
- * Accounts required by the _vote_ instruction
+ * Accounts required by the _createProposal_ instruction
  *
- * @property [_writable_, **signer**] voter
- * @property [_writable_] votebank
  * @property [_writable_] proposal
- * @property [_writable_] votes
- * @property [] nftVoteMint
+ * @property [_writable_] votebank
+ * @property [_writable_, **signer**] poster
  * @property [_writable_] treasury
  * @category Instructions
- * @category Vote
+ * @category CreateProposal
  * @category generated
  */
-export type VoteInstructionAccounts = {
-  voter: web3.PublicKey
-  votebank: web3.PublicKey
+export type CreateProposalInstructionAccounts = {
   proposal: web3.PublicKey
-  votes: web3.PublicKey
-  nftVoteMint: web3.PublicKey
+  votebank: web3.PublicKey
+  poster: web3.PublicKey
   treasury: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const voteInstructionDiscriminator = [
-  227, 110, 155, 23, 136, 126, 172, 25,
+export const createProposalInstructionDiscriminator = [
+  132, 116, 68, 174, 216, 160, 198, 22,
 ]
 
 /**
- * Creates a _Vote_ instruction.
+ * Creates a _CreateProposal_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category Vote
+ * @category CreateProposal
  * @category generated
  */
-export function createVoteInstruction(
-  accounts: VoteInstructionAccounts,
-  args: VoteInstructionArgs,
+export function createCreateProposalInstruction(
+  accounts: CreateProposalInstructionAccounts,
+  args: CreateProposalInstructionArgs,
   programId = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
 ) {
-  const [data] = voteStruct.serialize({
-    instructionDiscriminator: voteInstructionDiscriminator,
+  const [data] = createProposalStruct.serialize({
+    instructionDiscriminator: createProposalInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.voter,
+      pubkey: accounts.proposal,
       isWritable: true,
-      isSigner: true,
+      isSigner: false,
     },
     {
       pubkey: accounts.votebank,
@@ -100,19 +105,9 @@ export function createVoteInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.proposal,
+      pubkey: accounts.poster,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.votes,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nftVoteMint,
-      isWritable: false,
-      isSigner: false,
+      isSigner: true,
     },
     {
       pubkey: accounts.treasury,

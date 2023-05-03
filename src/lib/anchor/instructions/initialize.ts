@@ -5,114 +5,95 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
+import * as splToken from '@solana/spl-token'
 import * as web3 from '@solana/web3.js'
-import { VoteEntry, voteEntryBeet } from '../types/VoteEntry'
-import {
-  AdditionalAccountIndices,
-  additionalAccountIndicesBeet,
-} from '../types/AdditionalAccountIndices'
+import * as beet from '@metaplex-foundation/beet'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
+import { SettingsData, settingsDataBeet } from '../types/SettingsData'
 
 /**
  * @category Instructions
- * @category Vote
+ * @category Initialize
  * @category generated
  */
-export type VoteInstructionArgs = {
-  proposalId: number
-  voteEntries: VoteEntry[]
-  additionalAccountOffsets: AdditionalAccountIndices[]
+export type InitializeInstructionArgs = {
+  title: string
+  owners: web3.PublicKey[]
+  desc: beet.COption<SettingsData>
+  restrictions: beet.COption<SettingsData>
 }
 /**
  * @category Instructions
- * @category Vote
+ * @category Initialize
  * @category generated
  */
-export const voteStruct = new beet.FixableBeetArgsStruct<
-  VoteInstructionArgs & {
+export const initializeStruct = new beet.FixableBeetArgsStruct<
+  InitializeInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['proposalId', beet.u32],
-    ['voteEntries', beet.array(voteEntryBeet)],
-    ['additionalAccountOffsets', beet.array(additionalAccountIndicesBeet)],
+    ['title', beet.utf8String],
+    ['owners', beet.array(beetSolana.publicKey)],
+    ['desc', beet.coption(settingsDataBeet)],
+    ['restrictions', beet.coption(settingsDataBeet)],
   ],
-  'VoteInstructionArgs'
+  'InitializeInstructionArgs'
 )
 /**
- * Accounts required by the _vote_ instruction
+ * Accounts required by the _initialize_ instruction
  *
- * @property [_writable_, **signer**] voter
  * @property [_writable_] votebank
- * @property [_writable_] proposal
- * @property [_writable_] votes
- * @property [] nftVoteMint
+ * @property [_writable_, **signer**] signer
  * @property [_writable_] treasury
  * @category Instructions
- * @category Vote
+ * @category Initialize
  * @category generated
  */
-export type VoteInstructionAccounts = {
-  voter: web3.PublicKey
+export type InitializeInstructionAccounts = {
   votebank: web3.PublicKey
-  proposal: web3.PublicKey
-  votes: web3.PublicKey
-  nftVoteMint: web3.PublicKey
+  signer: web3.PublicKey
   treasury: web3.PublicKey
   systemProgram?: web3.PublicKey
+  tokenProgram?: web3.PublicKey
+  rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const voteInstructionDiscriminator = [
-  227, 110, 155, 23, 136, 126, 172, 25,
+export const initializeInstructionDiscriminator = [
+  175, 175, 109, 31, 13, 152, 155, 237,
 ]
 
 /**
- * Creates a _Vote_ instruction.
+ * Creates a _Initialize_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category Vote
+ * @category Initialize
  * @category generated
  */
-export function createVoteInstruction(
-  accounts: VoteInstructionAccounts,
-  args: VoteInstructionArgs,
+export function createInitializeInstruction(
+  accounts: InitializeInstructionAccounts,
+  args: InitializeInstructionArgs,
   programId = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
 ) {
-  const [data] = voteStruct.serialize({
-    instructionDiscriminator: voteInstructionDiscriminator,
+  const [data] = initializeStruct.serialize({
+    instructionDiscriminator: initializeInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
-    {
-      pubkey: accounts.voter,
-      isWritable: true,
-      isSigner: true,
-    },
     {
       pubkey: accounts.votebank,
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.proposal,
+      pubkey: accounts.signer,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.votes,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nftVoteMint,
-      isWritable: false,
-      isSigner: false,
+      isSigner: true,
     },
     {
       pubkey: accounts.treasury,
@@ -121,6 +102,16 @@ export function createVoteInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },
