@@ -3977,6 +3977,11 @@ date-fns@^2.29.1, date-fns@^2.29.3:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
   integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
 
+date-picker-svelte@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/date-picker-svelte/-/date-picker-svelte-2.4.3.tgz#318edf8ebd1baa167e54972010fcc72118910be3"
+  integrity sha512-aYQzLNc7MfMWYc5InrCQv26geewkTeLg0x4R5Rr3H4YJS1i1VucQxOIvObjaJ64ylCBwVnEpQeO5iBq3semn1A==
+
 debug@4, debug@4.3.4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.2, debug@^4.3.3, debug@^4.3.4, debug@~4.3.1, debug@~4.3.2:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"

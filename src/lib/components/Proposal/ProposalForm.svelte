@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+	import { DateInput } from 'date-picker-svelte';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import type { Connection } from '@solana/web3.js';
@@ -14,7 +15,9 @@
 	let wallet: any;
 	let title = '';
 	let description = '';
-	let endDate = '';
+	let endDate: Date | null | undefined = null;
+	const currDate = new Date();
+	const maxDate = new Date(currDate.getFullYear() + 5, currDate.getMonth(), currDate.getDate());
 	let settingsType = '';
 	let settingsValue = '';
 	let useEditor = false;
@@ -34,15 +37,30 @@
 		skipFileUpload = !skipFileUpload;
 	}
 
+	function isSelectedDateValid(selectedDate: Date): boolean {
+		// Create a new Date object representing the current date and time
+		const currentDate = new Date();
+
+		// Set hours, minutes, seconds, and milliseconds to 0
+		currentDate.setHours(0, 0, 0, 0);
+
+		// Compare the selected date with the current date
+		return selectedDate >= currentDate;
+	}
+
 	function submitForm() {
 		if (!wallet || !connection) {
 			toast.push('Please connect your wallet');
 			return;
 		}
-		// if (endDate && new Date(endDate) < new Date()) {
-		// 	toast.push('Dates must be in the future');
-		// 	return;
-		// }
+		if (endDate && !isSelectedDateValid(endDate)) {
+			toast.push('End dates must be in the future');
+			return;
+		}
+		if (!endDate) {
+			toast.push('Please enter a valid end date');
+			return;
+		}
 		if (maxOptions < 1) {
 			toast.push('Please enter a valid number of options. 1 or greater');
 			return;
@@ -65,7 +83,7 @@
 		description = '';
 		settingsType = '';
 		settingsValue = '';
-		endDate = '';
+		endDate = null;
 		options = [{ id: 0, name: '' }];
 		maxOptions = 1;
 	}
@@ -122,14 +140,7 @@
 				</div>
 				<div class="flex flex-col">
 					<label for="end" class="leading-loose">End Date</label>
-					<div class="relative text-gray-400 focus-within:text-gray-600">
-						<input
-							id="end"
-							type="text"
-							class="w-full rounded border bg-gray-400 py-2 pl-10 pr-4 placeholder-gray-700 focus:border-gray-900 focus:outline-none focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 sm:text-sm"
-							placeholder="26/02/2020"
-							bind:value={endDate}
-						/>
+					<div class="date-picker-container relative text-gray-400 focus-within:text-gray-600">
 						<div class="absolute left-3 top-2">
 							<svg
 								class="h-6 w-6"
@@ -137,13 +148,17 @@
 								stroke="currentColor"
 								viewBox="0 0 24 24"
 								xmlns="http://www.w3.org/2000/svg"
-								><path
+							>
+								<path
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
 									d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-								/></svg
-							>
+								/>
+							</svg>
+						</div>
+						<div class="relative pl-10">
+							<DateInput bind:value={endDate} min={new Date()} max={maxDate} />
 						</div>
 					</div>
 				</div>
@@ -217,11 +232,18 @@
 							required={!skipFileUpload && !generatedFile}
 						/>
 						<label class="label cursor-pointer">
-							<span class="label-text">Skip File Upload</span> 
-						<div class="tooltip" data-tip="Descriptions can't be that long. It is recommended to upload a file.">
-							<input type="checkbox" on:change={handleSkipUpload} checked={skipFileUpload} class="checkbox checkbox-primary" />
-						</div>
-
+							<span class="label-text">Skip File Upload</span>
+							<div
+								class="tooltip"
+								data-tip="Descriptions can't be that long. It is recommended to upload a file."
+							>
+								<input
+									type="checkbox"
+									on:change={handleSkipUpload}
+									checked={skipFileUpload}
+									class="checkbox-primary checkbox"
+								/>
+							</div>
 						</label>
 					</div>
 				{/if}
@@ -264,5 +286,10 @@
 		cursor: pointer;
 		color: white;
 		background-color: #4e44ce;
+	}
+	.date-picker-container {
+		/* --date-picker-background: #1b1e27;
+    --date-picker-foreground: #f7f7f7; */
+		--date-input-width: 100%;
 	}
 </style>

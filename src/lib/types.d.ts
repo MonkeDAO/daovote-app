@@ -70,6 +70,7 @@ export type ProposalItem = {
 	voterCount: number;
 	voteOpen: boolean;
 	proposalId: number;
+	endTime: beet.bignum;
 };
 
 export type ProposalData = {
