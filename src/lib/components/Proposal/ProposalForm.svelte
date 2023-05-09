@@ -123,7 +123,7 @@
 						type="text"
 						id="title"
 						bind:value={title}
-						class="form-input mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						class="form-input mt-1 block w-full rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 						placeholder=" Proposal Title"
 						required
 					/>
@@ -133,7 +133,7 @@
 					<textarea
 						id="description"
 						bind:value={description}
-						class="form-textarea mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						class="form-textarea mt-1 block w-full rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 						rows="3"
 						placeholder=" This proposal is to vote on whether..."
 					/>
@@ -167,7 +167,7 @@
 					<select
 						id="settingsType"
 						bind:value={settingsType}
-						class="form-select mt-1 block w-full rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						class="form-select mt-1 block w-full rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 					>
 						<option value="">Select a type</option>
 						<option value="option1">Option 1</option>
@@ -195,7 +195,7 @@
 							<input
 								type="text"
 								bind:value={option.name}
-								class="form-input mt-1 block w-full max-w-xs rounded bg-gray-400 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+								class="form-input mt-1 block w-full max-w-xs rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 								placeholder=" Option"
 								required
 							/>
