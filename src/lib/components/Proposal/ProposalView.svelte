@@ -4,7 +4,10 @@
 	import PdfViewer from '$lib/components/PDFViewer.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast';
-	export let proposal: any;
+	import type { ProposalItem } from '$lib/types';
+	import { bnToDate } from '$lib/utils/solana';
+	import { formatDate } from '$lib/utils/date';
+	export let proposal: ProposalItem;
 	let showPdf = false;
 	let showImg = false;
 	let notSupported = false;
@@ -82,14 +85,21 @@
 		{proposal.data.title}
 	</h1>
 	<h4>Proposal ID {proposal.proposalId}: {proposal.data.summary}</h4>
-	<div
-		class="bg border-red mt-2 flex w-full justify-between sm:items-start md:flex-row md:items-center"
-	>
-		<p class="flex items-center text-sm text-gray-700 dark:text-gray-300">
-			Created Date: {new Date().toISOString().slice(0, 10)}
-		</p>
-		<div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-			Status: {proposal.voteOpen ? 'Open' : 'Closed'}
+	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
+		<div class="flex w-full items-start justify-between">
+			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
+				<p class="flex items-center">
+					Created Date: {new Date().toISOString().slice(0, 10)}
+				</p>
+				{#if bnToDate(proposal.endTime).getTime() !== new Date(0).getTime()}
+					<p class="flex items-center">
+						End Date: {formatDate(bnToDate(proposal.endTime))}
+					</p>
+				{/if}
+			</div>
+			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
+				Status: {proposal.voteOpen ? 'Open' : 'Closed'}
+			</div>
 		</div>
 	</div>
 	<div
@@ -110,7 +120,7 @@
 				<img src={proposal.data.url} alt="Proposal image" />
 			</CollapsablePanel>
 		</div>
-	{:else if notSupported}
+	{:else if notSupported && proposal.data.url !== ''}
 		<div class="mt-4">
 			<h3 class="text-red-500">
 				File not supported for viewer. <a href={proposal.data.url} target="_blank"

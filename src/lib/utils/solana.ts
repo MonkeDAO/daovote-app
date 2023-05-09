@@ -53,6 +53,24 @@ export function toAccountMetadata(key: PublicKey): AccountMeta {
 	};
 }
 
+export function bnToDate(bnTimestamp: anchor.BN): Date {
+	const timestampSeconds = bnTimestamp.toNumber();
+	const timestampMilliseconds = timestampSeconds * 1000;
+	const date = new Date(timestampMilliseconds);
+	return date;
+}
+
+export function dateToBn(dateOrString: Date | string): anchor.BN {
+	// Create a new Date object from the input, if it's a date string
+	const date = typeof dateOrString === 'string' ? new Date(dateOrString) : dateOrString;
+	const timestampMilliseconds = date.getTime();
+	const timestampSeconds = Math.floor(timestampMilliseconds / 1000);
+	const bnTimestamp = new anchor.BN(timestampSeconds);
+
+	return bnTimestamp;
+}
+
+
 export async function fetchProposalById(
 	connection: Connection,
 	votebank: PublicKey,

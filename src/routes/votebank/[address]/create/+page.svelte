@@ -19,7 +19,7 @@
 		postDataToBuffer,
 		proposalAccountPda,
 		toAccountMetadata	} from '$lib/utils/solana';
-	import type { Program } from '@project-serum/anchor';
+	import { BN, type Program } from '@project-serum/anchor';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { SettingsData, VoteRestrictionRule } from '$lib/anchor/types';
@@ -31,7 +31,7 @@
 	let currentUser: PublicKey;
 	let metaplex: Metaplex;
 	let program: Program;
-	let shadowDriveUrl: string;
+	let shadowDriveUrl: string = '';
 	let wallet: any;
 	let shdwBalance: number;
 	let ready: boolean;
@@ -108,7 +108,7 @@
 					proposalId,
 					votebankAddress.toBase58(),
 					voteBankAccountRaw,
-					title
+					title,
 				);
 
 				//TODO figure out how to get the token mint from settings and use that instead of hardcoding
@@ -207,7 +207,8 @@
 					summary: proposal.description,
 					url: shadowDriveUrl
 				};
-				console.log('Post data', postData, additionalAccountOffsets, tokenToAccountMetaFormat);
+				const endDateTimeStamp = Date.parse(proposal.endDate)/1000;
+				console.log('Post data', postData, additionalAccountOffsets, tokenToAccountMetaFormat, endDateTimeStamp);
 				const ix = await program.methods
 					.createProposal(
 						options,
@@ -215,7 +216,8 @@
 						postDataToBuffer(postData),
 						proposalId,
 						[], //TODO: add settings if needed?
-						additionalAccountOffsets
+						additionalAccountOffsets,
+						new BN(endDateTimeStamp),
 					)
 					.accounts({
 						proposal: proposalAccount,
@@ -318,8 +320,12 @@
 		console.log('filegenerated', event);
 		file = event.detail.file;
 		proposal = event.detail.proposal;
-		//TODO: Figure a way to combine two methods so its atomic?
-		await uploadFile(file).then(async (res) => {
+		const skipUpload = event.detail.skipUpload;
+		if (skipUpload) {
+			await createProposal();
+		}
+		else {
+			await uploadFile(file).then(async (res) => {
 			toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, {
 				target: 'new'
 			});
@@ -327,6 +333,9 @@
 				await createProposal();
 			}
 		});
+		}
+		//TODO: Figure a way to combine two methods so its atomic?
+		
 	}
 	onDestroy(unsubscribe);
 </script>
