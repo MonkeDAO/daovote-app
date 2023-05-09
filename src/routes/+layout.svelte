@@ -67,7 +67,7 @@
 	<div class="grid grid-flow-col gap-4">
 		<a class="text-gray-500 transition hover:text-gray-300" href="/">Home</a>
 		<a class="text-gray-500 transition hover:text-gray-300" href="/about">About</a>
-		<a class="text-gray-500 transition hover:text-gray-300" href="/#newsletter">Newsletter</a>
+		<!-- <a class="text-gray-500 transition hover:text-gray-300" href="/#newsletter">Newsletter</a> -->
 	</div>
 	<div>
 		<div class="grid grid-flow-col gap-4">
