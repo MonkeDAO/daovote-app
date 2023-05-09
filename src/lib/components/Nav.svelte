@@ -1,7 +1,7 @@
 <script>
 	import MobileMenu from './MobileMenu.svelte';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { REPO_URL, VOTEBANK } from '$lib/siteConfig';
+	import { VOTEBANK } from '$lib/siteConfig';
 	import NavLink from './NavLink.svelte';
 	import { WalletMultiButton } from '@svelte-on-solana/wallet-adapter-ui';
 	let isDark = false;
@@ -37,9 +37,9 @@
 		<li>
 			<NavLink href="/">Home</NavLink>
 		</li>
-		<li>
+		<!-- <li>
 			<NavLink href="/blog">Search</NavLink>
-		</li>
+		</li> -->
 		<li>
 			<NavLink href="/about">About</NavLink>
 		</li>
