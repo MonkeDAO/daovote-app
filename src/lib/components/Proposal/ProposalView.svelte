@@ -7,12 +7,15 @@
 	import { toast } from '@zerodevx/svelte-toast';
 	import type { ProposalItem } from '$lib/types';
 	import { bnToDate } from '$lib/utils/solana';
-	import { formatDate, getRemainingTime } from '$lib/utils/date';
+	import { formatDate, getRemainingTime, isDefaultDate } from '$lib/utils/date';
 	import { BN } from '@project-serum/anchor';
 	import CountDownCard from '../CountDownCard.svelte';
 	import ConfirmationModal from '../ConfirmationModal.svelte';
+	import NftGrid from '../NFTGrid.svelte';
+	import { selectedNfts } from '$lib/selectedNfts';
 	export let proposal: ProposalItem;
 	export let isOwner: boolean;
+	export let nfts: any[];
 	let showPdf = false;
 	let ended = false;
 	let showImg = false;
@@ -22,8 +25,8 @@
 	let confirmationModal: any;
 
 	const dispatch = createEventDispatcher();
-	console.log('proposal view', proposal);
-
+	console.log('proposal view', proposal, nfts);
+	
 	$: proposal = proposal;
 
 	if (proposal?.data?.url?.endsWith('.pdf')) {
@@ -79,7 +82,7 @@
 		const dispatchedOptions = event.detail;
 		console.log('selectedOptions', dispatchedOptions);
 		voteConfirmationModal.closeModal();
-		dispatch('vote', dispatchedOptions);
+		dispatch('vote', { chosenOptions: dispatchedOptions, selectedNfts: $selectedNfts });
 		options = options.map((option: any) => {
 			return {
 				...option,
@@ -129,7 +132,7 @@
 				<p class="flex items-center">
 					Created Date: {bnToDate(new BN(proposal.data.time)).toISOString().slice(0, 10)}
 				</p>
-				{#if bnToDate(proposal.endTime).getTime() !== new Date(0).getTime()}
+				{#if !isDefaultDate(bnToDate(proposal.endTime))}
 					<p class="flex items-center">
 						End Date: {formatDate(bnToDate(proposal.endTime))}
 					</p>
@@ -143,7 +146,7 @@
 	<div
 		class="-mx-4 my-2 flex h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
 	/>
-	{#if bnToDate(proposal.endTime).getTime() !== new Date(0).getTime()}
+	{#if !isDefaultDate(bnToDate(proposal.endTime))}
 		<div class="mt-2">
 			<CountDownCard targetDate={bnToDate(proposal.endTime)} />
 		</div>
@@ -214,6 +217,7 @@
 			>Vote
 		</button>
 	</div>
+	<NftGrid nfts={nfts} />
 	{#if isOwner && proposal.voteOpen}
 	<CollapsableClickPanel title="Close Proposal">
 

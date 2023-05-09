@@ -17,7 +17,8 @@
 		return {
 			title: item.data.title,
 			description: item.data.summary,
-			url: `/votebank/${item.votebank}/proposal/${item.proposalId}`
+			url: `/votebank/${item.votebank}/proposal/${item.proposalId}`,
+			endtime: item.endTime,
 		};
 	}
 </script>

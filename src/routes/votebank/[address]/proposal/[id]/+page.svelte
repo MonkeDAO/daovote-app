@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ProposalView from '$lib/components/Proposal/ProposalView.svelte';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import type { ProposalItem } from '$lib/types';
+	import type { NftMetadata, ProposalItem } from '$lib/types';
 	import {
 		TREASURY_ADDRESS,
 		bnToDate,
@@ -21,12 +21,12 @@
 	import type { Program } from '@project-serum/anchor';
 	import { walletProgramConnection } from '$lib/wallet';
 	import type { SettingsData, VoteRestrictionRule, VoteEntry } from '$lib/anchor/types';
-	import { toast } from '@zerodevx/svelte-toast';
+	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import type { Adapter } from '@solana/wallet-adapter-base';
-	import { getRemainingSeconds, getRemainingTime } from '$lib/utils/date';
+	import { getRemainingSeconds, getRemainingTime, isDefaultDate } from '$lib/utils/date';
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
-
+	
 	export let data: any;
 	console.log('proposal page', data);
 	let connection: Connection;
@@ -42,6 +42,7 @@
 	let program: Program;
 	let owners: PublicKey[] = [];
 	let isOwner: boolean;
+	let nfts: any[];
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
 	$: {
 		ready = $walletConnectionFactory.ready;
@@ -59,6 +60,25 @@
 		}
 		if (ready && $walletConnectionFactory.publicKey) {
 			currentUser = $walletConnectionFactory.publicKey;
+		}
+	}
+	$: if (ready && currentUser && connection) {
+		fetchNftsFromServer();
+	}
+
+	async function fetchNftsFromServer() {
+		try {
+			console.log('fetching nfts', currentUser.toBase58());
+			const publicKey = currentUser.toBase58();
+			const res = await fetch(`/api/fetchNfts/${publicKey}`);
+			const data = await res.json();
+			if (data.error) {
+				throw new Error(data.error);
+			}
+
+			nfts = data.nfts;
+		} catch (err) {
+			console.error(err);
 		}
 	}
 
@@ -93,7 +113,7 @@
 		return votedFor;
 	}
 
-	async function buildVoteTxn(votedFor: VoteEntry[]) {
+	async function buildVoteTxn(votedFor: VoteEntry[], nfts: NftMetadata[]) {
 		if (
 			connection &&
 			wallet &&
@@ -104,15 +124,19 @@
 		) {
 			console.log('proposalItem', proposalItem);
 			const endTime = bnToDate(proposalItem.endTime);
-			const remainingTime = getRemainingTime(endTime);
-			const totalSecondsRemaining = getRemainingSeconds(remainingTime);
-			if (totalSecondsRemaining < 30) {
-				toast.push('Less than 30 seconds remaining. This vote might fail!', { target: 'new' });
-			}
-			if (remainingTime.ended) {
-				toast.push('Vote has ended.', { target: 'new' });
-				ended = true;
-				return;
+			const isDefault = isDefaultDate(endTime);
+			if (!isDefault) {
+				const remainingTime = getRemainingTime(endTime);
+				const totalSecondsRemaining = getRemainingSeconds(remainingTime);
+				if (totalSecondsRemaining < 30 && !ended) {
+					toast.push('Less than 30 seconds remaining. This vote might fail!', { target: 'new' });
+				}
+				if (remainingTime.ended) {
+					toast.pop({ target: 'new' });
+					toast.push('Vote has ended.', { target: 'new' });
+					ended = true;
+					return;
+				}
 			}
 			const votebankAccountAddress = new PublicKey(data.address);
 			const voteBankAccountRaw = await Votebank.fromAccountAddress(
@@ -135,7 +159,6 @@
 				] as VoteRestrictionRule;
 				console.log('voteRestrictionValue', voteRestrictionValue);
 			}
-
 			const settings = voteBankAccountRaw.settings as SettingsData[];
 			const voteRestriction = settings.find((x) => x.__kind == 'VoteRestriction');
 			let restrictionMint = getDefaultPublicKey();
@@ -165,16 +188,17 @@
 			let nftMintMetadata = getDefaultPublicKey();
 			let tokenAccount = getDefaultPublicKey();
 			let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
+			//TODO: Break up into multiple IX per NFTs passed in. important!
 			if (isNftRestricted) {
-				const nfts = await metaplex.nfts().findAllByOwner({
-					owner: currentUser
-				});
-
+				if (nfts.length === 0) {
+					toast.push('You must select at least one NFT to vote.', { target: 'new' });
+					return;
+				}
 				// Find by collection id:
 				nfts.find((nft) => {
-					if (nft.collection && nft.collection.address.toBase58() === restrictionMint.toBase58()) {
-						mint = (nft as any)['mintAddress'];
-						nftMintMetadata = nft.address;
+					if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
+						mint = new PublicKey(nft.address);
+						nftMintMetadata = new PublicKey(nft.metadataAddress);
 						return true;
 					}
 					return false;
@@ -294,18 +318,18 @@
 			$walletStore.signTransaction
 		) {
 			const voteBankAddress = new PublicKey(votebank);
-			const [proposalAccount] = proposalAccountPda(
-				new PublicKey(votebank),
-				proposalId
+			const [proposalAccount] = proposalAccountPda(new PublicKey(votebank), proposalId);
+			const ix = createCloseProposalInstruction(
+				{
+					proposal: proposalAccount,
+					proposalOwner: currentUser,
+					votebank: voteBankAddress,
+					systemProgram: new PublicKey('11111111111111111111111111111111')
+				},
+				{
+					proposalId: proposalId
+				}
 			);
-			const ix = createCloseProposalInstruction({
-				proposal: proposalAccount,
-				proposalOwner: currentUser,
-				votebank: voteBankAddress,
-				systemProgram: new PublicKey('11111111111111111111111111111111'),
-			}, {
-				proposalId: proposalId,
-			});
 			const tx = new Transaction().add(ix);
 			tx.feePayer = currentUser;
 			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
@@ -327,16 +351,19 @@
 			//Force close refresh data on page
 			data.proposal.voteOpen = false;
 			const explorerUrl = `${getExplorerUrl('devnet', 'transaction', signature)}`;
-			toast.push(`Proposal closed! <a href="${explorerUrl}" target="_blank">${voteBankAddress.toBase58()}</a>`, {
-				duration: 3000,
-				pausable: true
-			});
+			toast.push(
+				`Proposal closed! <a href="${explorerUrl}" target="_blank">${voteBankAddress.toBase58()}</a>`,
+				{
+					duration: 3000,
+					pausable: true
+				}
+			);
 		}
 	}
 
 	async function handleVoteSubmit(event: CustomEvent) {
-		const voteOptions = buildVotedFor(event.detail);
-		const voteTxn = await buildVoteTxn(voteOptions);
+		const voteOptions = buildVotedFor(event.detail.chosenOptions);
+		const voteTxn = await buildVoteTxn(voteOptions, event.detail.selectedNfts);
 		console.log('vote', event, voteTxn);
 	}
 
@@ -344,21 +371,17 @@
 		if (isOwner) {
 			console.log('close proposal', e.detail);
 			const { proposalId, votebank } = e.detail;
-			toast.push(
-					`Closing proposal...`,
-					{ target: 'new' }
-				);
+			toast.push(`Closing proposal...`, { target: 'new' });
 			await closeProposal(proposalId, votebank);
-		}
-		else {
-			toast.push(
-					`You are not an authorized owner of this proposal`,
-					{ target: 'new' }
-				);
+		} else {
+			toast.push(`You are not an authorized owner of this proposal`, { target: 'new' });
 		}
 	}
 </script>
 
+<div class="wrap">
+	<SvelteToast target="new" options={{ intro: { y: -64 } }} />
+</div>
 {#if loading || error}
 	<div class="flex min-h-screen items-center justify-center">
 		<div class="mb-16 max-w-2xl">
@@ -371,5 +394,31 @@
 		</div>
 	</div>
 {:else}
-	<ProposalView proposal={proposalItem} on:vote={handleVoteSubmit} on:closeProposal={handleCloseProposal} {isOwner} />
+	<ProposalView
+		proposal={proposalItem}
+		on:vote={handleVoteSubmit}
+		on:closeProposal={handleCloseProposal}
+		{isOwner}
+		{nfts}
+	/>
 {/if}
+
+<style>
+	wrap {
+		--toastContainerTop: 0.5rem;
+		--toastContainerRight: 0.5rem;
+		--toastContainerBottom: auto;
+		--toastContainerLeft: 0.5rem;
+		--toastWidth: 100%;
+		--toastMinHeight: 2rem;
+		--toastPadding: 0 0.5rem;
+		font-size: 0.875rem;
+	}
+	@media (min-width: 40rem) {
+		.wrap {
+			--toastContainerRight: auto;
+			--toastContainerLeft: calc(50vw - 20rem);
+			--toastWidth: 40rem;
+		}
+	}
+</style>

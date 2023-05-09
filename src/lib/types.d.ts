@@ -102,5 +102,19 @@ export type CardItem = {
 	title: string;
 	description: string;
 	url: string;
-	endtime: beet.bignum;
+	endtime?: beet.bignum;
 };
+
+export type NftMetadata = {
+	json: {
+		name?: string;
+		image?: string;
+	},
+	collection?: {
+		address?: string;
+		verified?: boolean;
+	},
+	metadataAddress: string;
+	owner: string;
+	address: string;
+}
