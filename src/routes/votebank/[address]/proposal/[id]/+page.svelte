@@ -39,6 +39,8 @@
 	let currentUser: PublicKey;
 	let metaplex: Metaplex;
 	let program: Program;
+	let owners: PublicKey[] = [];
+	let isOwner: boolean;
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
 	$: {
 		ready = $walletConnectionFactory.ready;
@@ -68,6 +70,16 @@
 		error = true;
 		text =
 			'Proposal not found. Try reloading the page. If this was recently created it may take a few seconds to appear.';
+	}
+	if (data && data.owners) {
+		owners = data.owners;
+	}
+
+	$: {
+		if (owners && currentUser) {
+			isOwner = owners.some((x) => x.equals(currentUser));
+			console.log('isOwner', isOwner);
+		}
 	}
 
 	function buildVotedFor(selectedOptions: any[]) {
@@ -289,5 +301,5 @@
 		</div>
 	</div>
 {:else}
-	<ProposalView proposal={proposalItem} on:vote={handleVoteSubmit} />
+	<ProposalView proposal={proposalItem} on:vote={handleVoteSubmit} {isOwner} />
 {/if}

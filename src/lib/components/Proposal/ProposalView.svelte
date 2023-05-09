@@ -9,13 +9,16 @@
 	import { formatDate, getRemainingTime } from '$lib/utils/date';
 	import { BN } from '@project-serum/anchor';
 	import CountDownCard from '../CountDownCard.svelte';
+	import ConfirmationModal from '../ConfirmationModal.svelte';
 	export let proposal: ProposalItem;
+	export let isOwner: boolean;
 	let showPdf = false;
 	let ended = false;
 	let showImg = false;
 	let notSupported = false;
 	let options: any[];
 	let voteConfirmationModal: any;
+	let confirmationModal: any;
 
 	const dispatch = createEventDispatcher();
 	console.log('proposal view', proposal);
@@ -83,12 +86,27 @@
 	function getBadgeClass(isOpen: boolean) {
 		return isOpen ? 'bg-green-500' : 'bg-red-500';
 	}
+	function closeProposal() {
+		confirmationModal.openModal();
+	}
+	function handleCloseProposal(e: CustomEvent<any>): void {
+		confirmationModal.closeModal();
+		dispatch('closeProposal', e.detail);
+		console.log('close proposal', e.detail);
+	}
 </script>
 
 <VoteConfirmationModal
 	bind:this={voteConfirmationModal}
 	{options}
 	on:voteConfirmed={handleVoteConfirmed}
+/>
+<ConfirmationModal
+	data
+	bind:this={confirmationModal}
+	message="Are you sure you want to close this proposal?"
+	eventOnConfirm="closeProposal"
+	on:closeProposal={handleCloseProposal}
 />
 <article
 	class="votecontent prose mx-auto mb-5 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
@@ -192,6 +210,15 @@
 			disabled={ended}
 			>Vote
 		</button>
+		{#if isOwner && proposal.voteOpen}
+			<div class="mb-4 flex items-center justify-center">
+				<button
+					class="btn-primary btn"
+					on:click={closeProposal}
+					disabled={!isOwner || !proposal.voteOpen}>Close Proposal</button
+				>
+			</div>
+		{/if}
 	</div>
 </article>
 

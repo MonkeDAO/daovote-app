@@ -59,12 +59,6 @@
 	$: if (data.address) {
 		votebankAddress = new PublicKey(data.address);
 	}
-	console.log(
-		'walletFactory',
-		$walletConnectionFactory,
-		$walletConnectionFactory.metaplex,
-		$walletConnectionFactory.publicKey?.toBase58()
-	);
 	const unsubscribe = shdwBalanceStore.subscribe((value) => {
 		shdwBalance = value.balance;
 	});
@@ -361,7 +355,7 @@
 					<div class="block self-start pl-2 text-xl font-semibold text-gray-700">
 						<h2 class="leading-relaxed">Create a Proposal</h2>
 						<p class="text-sm font-normal leading-relaxed text-gray-500">
-							You need $SHDW to create proposal.
+							You need $SHDW to create a proposal with files.
 						</p>
 					</div>
 				</div>
