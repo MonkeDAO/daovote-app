@@ -122,10 +122,9 @@
 	>
 		{proposal.data.title}
 	</h1>
-	<h4 class="tracking-tight text-gray-400 dark:text-white">
-		Proposal ID {proposal.proposalId}: <br />
-		{proposal.data.summary}
-	</h4>
+	<h3 class="tracking-tight text-gray-400 dark:text-white">
+		Proposal ID {proposal.proposalId}: {proposal.data.summary}
+	</h3>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
