@@ -2,18 +2,20 @@ import type { NftMetadata } from '$lib/types';
 import { writable } from 'svelte/store';
 
 interface NftStore {
-	data: NftMetadata[];
+	data: NftMetadata[] | undefined;
+    owner: string | undefined;
 }
 
 const createNftStore = () => {
 	const { subscribe, set } = writable<NftStore>({
-		data: []
+		data: undefined,
+        owner: undefined
 	});
 
 	return {
 		subscribe,
-		setNfts: (nfts: NftMetadata[]) => set({ data: nfts }),
-		clear: () => set({ data: [] })
+		setNfts: (nfts: NftMetadata[], owner: string) => set({ data: nfts, owner: owner }),
+		clear: () => set({ data: undefined, owner: undefined })
 	};
 };
 

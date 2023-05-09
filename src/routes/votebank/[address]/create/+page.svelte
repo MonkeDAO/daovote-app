@@ -25,7 +25,11 @@
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { SettingsData, VoteRestrictionRule } from '$lib/anchor/types';
+	import type { NftMetadata } from '$lib/types';
+	import { nftStoreUser } from '$lib/stores/nftStoreUser';
+	import { nftStore } from '$lib/stores/nftStore';
 	export let data: any;
+	let nfts: NftMetadata[];
 	let file: any;
 	let votebankAddress: PublicKey;
 	let proposal: any;
@@ -38,6 +42,7 @@
 	let shdwBalance: number;
 	let ready: boolean;
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
+	const nftWallet = nftStoreUser(walletStore);
 	$: {
 		ready = $walletConnectionFactory.ready;
 		if (ready && $walletConnectionFactory.connection) {
@@ -55,7 +60,7 @@
 		if (ready && $walletConnectionFactory.publicKey) {
 			currentUser = $walletConnectionFactory.publicKey;
 		}
-		console.log('Derived store updated:', $walletConnectionFactory);
+		console.log('Derived store updated:', $walletConnectionFactory, $nftWallet);
 	}
 	$: if (data.address) {
 		votebankAddress = new PublicKey(data.address);
@@ -63,6 +68,30 @@
 	const unsubscribe = shdwBalanceStore.subscribe((value) => {
 		shdwBalance = value.balance;
 	});
+
+	$: if (ready && currentUser && connection && $walletConnectionFactory.wallet?.connected && (!$nftWallet.isCurrentWallet || !$nftWallet.nfts)) {
+		fetchNftsFromServer();
+	}
+	$: if ($nftWallet.nfts) {
+		nfts = $nftWallet.nfts;
+	};
+	
+	async function fetchNftsFromServer() {
+		try {
+			console.log('fetching nfts', currentUser.toBase58());
+			const publicKey = currentUser.toBase58();
+			const res = await fetch(`/api/fetchNfts/${publicKey}`);
+			const data = await res.json();
+			if (data.error) {
+				throw new Error(data.error);
+			}
+
+			nfts = data.nfts;
+			nftStore.setNfts(data.nfts, currentUser.toBase58());
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
 	async function createProposal() {
 		try {
@@ -116,18 +145,18 @@
 				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
 				if (isNftRestricted) {
 					//TODO: Move this to a store or something.
-					const nfts = await metaplex.nfts().findAllByOwner({
-						owner: currentUser
-					});
+					// const nfts = await metaplex.nfts().findAllByOwner({
+					// 	owner: currentUser
+					// });
 
 					// Find by collection id:
 					nfts.find((nft) => {
 						if (
 							nft.collection &&
-							nft.collection.address.toBase58() === restrictionMint.toBase58()
+							nft.collection.address === restrictionMint.toBase58()
 						) {
-							nftMint = (nft as any)['mintAddress'];
-							nftMintMetadata = nft.address;
+							nftMint = new PublicKey(nft.metadataAddress); //(nft as any)['mintAddress'];
+							nftMintMetadata = new PublicKey(nft.address);
 							return true;
 						}
 						return false;

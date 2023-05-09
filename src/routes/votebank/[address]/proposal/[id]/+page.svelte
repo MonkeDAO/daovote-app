@@ -27,9 +27,12 @@
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { getRemainingSeconds, getRemainingTime, isDefaultDate } from '$lib/utils/date';
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
+	import { nftStoreUser } from '$lib/stores/nftStoreUser';
+	import { nftStore } from '$lib/stores/nftStore';
 
 	export let data: any;
 	console.log('proposal page', data);
+	let nfts: NftMetadata[];
 	let connection: Connection;
 	let proposalItem: ProposalItem;
 	let wallet: Adapter;
@@ -43,8 +46,8 @@
 	let program: Program;
 	let owners: PublicKey[] = [];
 	let isOwner: boolean;
-	let nfts: any[];
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
+	const nftWallet = nftStoreUser(walletStore);
 	$: {
 		ready = $walletConnectionFactory.ready;
 		if (ready && $walletConnectionFactory.connection) {
@@ -63,8 +66,10 @@
 			currentUser = $walletConnectionFactory.publicKey;
 		}
 	}
-
-	$: if (ready && currentUser && connection) {
+	$: if ($nftWallet.nfts) {
+		nfts = $nftWallet.nfts;
+	};
+	$: if (ready && currentUser && connection && $walletConnectionFactory.wallet?.connected && (!$nftWallet.isCurrentWallet || !$nftWallet.nfts)) {
 		fetchNftsFromServer();
 	}
 
@@ -79,6 +84,7 @@
 			}
 
 			nfts = data.nfts;
+			nftStore.setNfts(data.nfts, currentUser.toBase58());
 		} catch (err) {
 			console.error(err);
 		}
