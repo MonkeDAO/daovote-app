@@ -65,6 +65,12 @@
 			toast.push('Please enter a valid number of options. 1 or greater');
 			return;
 		}
+		if (maxOptions > options.length) {
+			toast.push(
+				'Please enter a valid number of max options. Less than the number of vote options'
+			);
+			return;
+		}
 		if (!generatedFile && !skipFileUpload) {
 			toast.push('Please upload a file or use the editor and generate a file');
 			return;
@@ -93,7 +99,13 @@
 	}
 
 	function removeOption(optionID: number) {
+		if (options.length === 1) {
+			return;
+		}
 		options = options.filter((option) => option.id !== optionID);
+		if (maxOptions > options.length) {
+			maxOptions = options.length;
+		}
 	}
 	function toggleEditor() {
 		useEditor = !useEditor;
@@ -123,7 +135,7 @@
 						type="text"
 						id="title"
 						bind:value={title}
-						class="form-input mt-1 block w-full rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						class="custom-input max-ws-xs input-bordered input-primary input mt-1 w-full rounded"
 						placeholder=" Proposal Title"
 						required
 					/>
@@ -133,7 +145,7 @@
 					<textarea
 						id="description"
 						bind:value={description}
-						class="form-textarea mt-1 block w-full rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						class="textarea-primary textarea mt-1 block h-24 w-full rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 						rows="3"
 						placeholder=" This proposal is to vote on whether..."
 					/>
@@ -162,7 +174,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="flex flex-col">
+				<!-- TODO: Come back to this:
+					<div class="flex flex-col">
 					<label for="settingsType" class="leading-loose">Settings Type</label>
 					<select
 						id="settingsType"
@@ -187,7 +200,7 @@
 							required
 						/>
 					</div>
-				{/if}
+				{/if} -->
 				<div class="flex flex-col">
 					<label for="options" class="leading-loose">Options</label>
 					{#each options as option (option.id)}
@@ -195,7 +208,7 @@
 							<input
 								type="text"
 								bind:value={option.name}
-								class="form-input mt-1 block w-full max-w-xs rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+								class="custom-input max-ws-xs input-primary input mt-1 block w-full rounded"
 								placeholder=" Option"
 								required
 							/>
@@ -209,7 +222,7 @@
 					>
 				</div>
 				<div class="flex flex-col">
-					<label class="input-group input-group-vertical text-gray-100">
+					<!-- <label class="input-group input-group-vertical text-gray-100">
 						<span>Max options voter can pick</span>
 						<input
 							type="number"
@@ -218,7 +231,32 @@
 							class="input-bordered input"
 							required
 						/>
-					</label>
+					</label> -->
+					<div class="w-full max-w-xs">
+						<!-- svelte-ignore a11y-label-has-associated-control -->
+						<label class="label">
+							<span class="label-text text-gray-700">Max options voter can pick</span>
+						</label>
+						<input
+							type="number"
+							placeholder="1"
+							disabled
+							bind:value={maxOptions}
+							class="custom-input input-primary input w-full max-w-xs"
+						/>
+					</div>
+					<input
+						type="range"
+						min="1"
+						max={options.length}
+						bind:value={maxOptions}
+						class="range range-primary mt-1"
+						step="1"
+					/>
+					<div class="flex w-full justify-between px-2 text-xs">
+						<span>1</span>
+						<span>{options.length}</span>
+					</div>
 				</div>
 				{#if !useEditor}
 					<div class="flex flex-col">
@@ -277,7 +315,7 @@
 	</div>
 </div>
 
-<style>
+<style lang="postcss">
 	button {
 		border: none;
 		padding: 8px;
@@ -291,5 +329,8 @@
 		/* --date-picker-background: #1b1e27;
     --date-picker-foreground: #f7f7f7; */
 		--date-input-width: 100%;
+	}
+	.custom-input {
+		@apply bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500;
 	}
 </style>
