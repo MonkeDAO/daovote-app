@@ -2,6 +2,16 @@ import { PublicKey, Connection, type AccountMeta } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
 import { Proposal } from '$lib/anchor/accounts';
 import type { ProposalItem } from '$lib/types';
+import {
+	isSettingsDataVoteRestriction,
+	isVoteRestrictionRuleNftListAnyOwnership,
+	isVoteRestrictionRuleNftOwnership,
+	isVoteRestrictionRuleNull,
+	isVoteRestrictionRuleTokenOrNftAnyOwnership,
+	isVoteRestrictionRuleTokenOwnership,
+	type SettingsData,
+	type VoteRestrictionRule
+} from '$lib/anchor/types';
 
 export const CREATOR_SEED: string = 'monkedevs';
 export const VOTEBANK_SEED: string = 'votebank';
@@ -218,4 +228,53 @@ export function trimAddress(str: string): string {
 	const end = str.slice(-4);
 
 	return `${start}${ellipsis}${end}`;
+}
+
+export function extractRestrictionData(settings: SettingsData[]) {
+	const voteRestriction = settings.find(isSettingsDataVoteRestriction);
+	let ruleKind = VoteRestrictionRuleKindMap.Null;
+	let restrictionMint = getDefaultPublicKey();
+	let isNftRestricted = false;
+	let restrictionIx = false;
+	if (voteRestriction) {
+		const voteRestrictionValue = isSettingsDataVoteRestriction(voteRestriction)
+			? voteRestriction.voteRestriction
+			: null;
+		//Due to typescript type safety have to do explicit if checks... >:(
+		if (voteRestrictionValue) {
+			if (isVoteRestrictionRuleTokenOwnership(voteRestrictionValue)) {
+				ruleKind = VoteRestrictionRuleKindMap.TokenOwnership;
+				restrictionIx = true;
+				restrictionMint = voteRestrictionValue.mint;
+			} else if (isVoteRestrictionRuleNftOwnership(voteRestrictionValue)) {
+				ruleKind = VoteRestrictionRuleKindMap.NftOwnership;
+				restrictionIx = true;
+				restrictionMint = voteRestrictionValue.collectionId;
+				isNftRestricted = true;
+			} else if (isVoteRestrictionRuleTokenOrNftAnyOwnership(voteRestrictionValue)) {
+				ruleKind = VoteRestrictionRuleKindMap.TokenOrNftAnyOwnership;
+				//TODO: handle this
+			} else if (isVoteRestrictionRuleNftListAnyOwnership(voteRestrictionValue)) {
+				ruleKind = VoteRestrictionRuleKindMap.NftListAnyOwnership;
+				//TODO: handle this
+			} else if (isVoteRestrictionRuleNull(voteRestrictionValue)) {
+				ruleKind = VoteRestrictionRuleKindMap.Null;
+				//TODO: handle this
+			}
+		}
+	}
+	return {
+		restrictionMint,
+		isNftRestricted,
+		restrictionIx,
+		ruleKind
+	};
+}
+
+export enum VoteRestrictionRuleKindMap {
+	TokenOwnership = 'TokenOwnership',
+	NftOwnership = 'NftOwnership',
+	Null = 'Null',
+	NftListAnyOwnership = 'NftListAnyOwnership',
+	TokenOrNftAnyOwnership = 'TokenOrNftAnyOwnership'
 }

@@ -33,25 +33,28 @@
 		</div>
 		<progress class="w-70 progress progress-primary" />
 	</div>
+	<!--TODO: Add grouping / sorting by collection based on the proposal/votebank restriction-->
 {:else if !loading && nfts}
 	<div class="mb-4 grid grid-cols-4 gap-4">
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div
-					class="cursor-pointer rounded border border-gray-300 p-2 hover:border-blue-500 {$selectedNfts.includes(
-						nft
-					)
-						? 'selected'
-						: ''}"
-					on:click={() => toggleNftSelection(nft)}
-				>
-					<img
-						src={nft.json.image}
-						alt={nft.json.name}
-						class="h-auto w-full rounded object-cover"
-					/>
-					<p class="text-sm">{nft.json.name}</p>
+				<div class="tooltip tooltip-info" data-tip={nft.collection.name}>
+					<div
+						class="cursor-pointer rounded border border-gray-300 p-2 hover:border-blue-500 {$selectedNfts.includes(
+							nft
+						)
+							? 'selected'
+							: ''}"
+						on:click={() => toggleNftSelection(nft)}
+					>
+						<img
+							src={nft.json.image}
+							alt={nft.json.name}
+							class="h-auto w-full rounded object-cover"
+						/>
+						<p class="text-sm">{nft.json.name}</p>
+					</div>
 				</div>
 			{/if}
 		{/each}

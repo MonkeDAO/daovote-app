@@ -13,6 +13,7 @@
 	import {
 		SYSTEM_PROGRAM_ID,
 		TREASURY_ADDRESS,
+		extractRestrictionData,
 		getDefaultPublicKey,
 		getExplorerUrl,
 		isDefaultPublicKey,
@@ -106,37 +107,15 @@
 					title
 				);
 
-				//TODO figure out how to get the token mint from settings and use that instead of hardcoding
 				const settings = voteBankAccountRaw.settings as SettingsData[];
-				const voteRestriction = settings.find((x) => x.__kind == 'VoteRestriction');
-				let restrictionMint = getDefaultPublicKey();
-				let isNftRestricted = false;
-				let restrictionIx = false;
-				if (voteRestriction) {
-					console.log('Vote restriction', voteRestriction);
-					const voteRestrictionValue = (voteRestriction as any)[
-						'voteRestriction'
-					] as VoteRestrictionRule;
-					console.log('Vote restriction value', voteRestrictionValue);
-					if (voteRestrictionValue.__kind == 'TokenOwnership') {
-						restrictionIx = true;
-						restrictionMint = voteRestrictionValue.mint;
-					} else if (voteRestrictionValue.__kind == 'NftOwnership') {
-						restrictionMint = new PublicKey(voteRestrictionValue.collectionId);
-						isNftRestricted = true;
-						restrictionIx = true;
-					}
-					console.log('Restriction mint', restrictionMint.toBase58(), {
-						restrictionIx,
-						isNftRestricted
-					});
-					//TODO: handle other types of restrictions
-				}
+				const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
+					extractRestrictionData(settings);
 				let nftMint = getDefaultPublicKey();
 				let nftMintMetadata = getDefaultPublicKey();
 				let tokenAccount = getDefaultPublicKey();
 				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
 				if (isNftRestricted) {
+					//TODO: Move this to a store or something.
 					const nfts = await metaplex.nfts().findAllByOwner({
 						owner: currentUser
 					});

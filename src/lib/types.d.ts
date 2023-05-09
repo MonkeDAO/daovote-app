@@ -113,6 +113,7 @@ export type NftMetadata = {
 	collection?: {
 		address?: string;
 		verified?: boolean;
+		name?: string;
 	};
 	metadataAddress: string;
 	owner: string;

@@ -1,5 +1,5 @@
 // src/routes/+your-page/fetchNfts.ts
-import { Metaplex, guestIdentity, type Metadata } from '@metaplex-foundation/js';
+import { Metaplex, guestIdentity, type Metadata, PublicKey } from '@metaplex-foundation/js';
 import type { RequestHandler } from '@sveltejs/kit';
 import { web3 } from '@project-serum/anchor';
 import { clusterApiUrl } from '@solana/web3.js';
@@ -16,6 +16,27 @@ export const GET: RequestHandler = async (request) => {
 		});
 	}
 	const ownerPk = new web3.PublicKey(publicKey);
+	interface CollectionDictionary {
+		[address: string]: any;
+	}
+
+	const collections: CollectionDictionary = {};
+
+	async function getCollection(address: string | undefined) {
+		if (!address) {
+			return null;
+		}
+		if (collections[address]) {
+			// Collection has already been fetched, return the cached value
+			return collections[address];
+		} else {
+			// Collection has not been fetched, fetch and cache it
+			const collection = await metaplex.nfts().findByMint({ mintAddress: new PublicKey(address) });
+			collections[address] = collection;
+			return collection;
+		}
+	}
+
 	const nftsRaw = await metaplex.nfts().findAllByOwner({ owner: ownerPk });
 	let nfts: NftMetadata[] = [];
 	for (var nftRaw of nftsRaw) {
@@ -27,6 +48,7 @@ export const GET: RequestHandler = async (request) => {
 				console.log('bad Json skipping', err);
 			});
 			if (data) {
+				const collection = await getCollection(nftRaw.collection?.address?.toBase58());
 				nfts.push({
 					metadataAddress: nftRaw.address.toBase58(),
 					address: (nftRaw as Metadata)['mintAddress'].toBase58(),
@@ -37,20 +59,21 @@ export const GET: RequestHandler = async (request) => {
 					},
 					collection: {
 						address: nftRaw.collection?.address?.toBase58(),
-						verified: nftRaw.collection?.verified
+						verified: nftRaw.collection?.verified,
+						name: collection?.json?.name ?? 'Unknown'
 					}
 				});
 			}
 		}
 	}
 	nfts = nfts.sort((a: NftMetadata, b: NftMetadata) => {
-		if (a.collection?.address && b.collection?.address) {
+		if (a.collection?.name && b.collection?.name) {
 			// Both have collection address, compare them
-			return a.collection.address.localeCompare(b.collection.address);
-		} else if (a.collection?.address) {
+			return a.collection.name.localeCompare(b.collection.name);
+		} else if (a.collection?.name) {
 			// Only a has collection address, sort a before b
 			return -1;
-		} else if (b.collection?.address) {
+		} else if (b.collection?.name) {
 			// Only b has collection address, sort b before a
 			return 1;
 		} else {

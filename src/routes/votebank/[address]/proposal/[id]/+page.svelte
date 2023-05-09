@@ -5,6 +5,7 @@
 	import {
 		TREASURY_ADDRESS,
 		bnToDate,
+		extractRestrictionData,
 		getDefaultPublicKey,
 		getExplorerUrl,
 		isDefaultPublicKey,
@@ -20,7 +21,7 @@
 	import type { Metaplex } from '@metaplex-foundation/js';
 	import type { Program } from '@project-serum/anchor';
 	import { walletProgramConnection } from '$lib/wallet';
-	import type { SettingsData, VoteRestrictionRule, VoteEntry } from '$lib/anchor/types';
+	import type { SettingsData, VoteEntry } from '$lib/anchor/types';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import type { Adapter } from '@solana/wallet-adapter-base';
@@ -62,6 +63,7 @@
 			currentUser = $walletConnectionFactory.publicKey;
 		}
 	}
+
 	$: if (ready && currentUser && connection) {
 		fetchNftsFromServer();
 	}
@@ -152,38 +154,15 @@
 			//let accountIndicies: AdditionalAccountIndices[] = [];
 			const accountsMeta: AccountMeta[] = [];
 			const proposalSettings = proposalItem.settings as SettingsData[];
-			const proposalVoteRestriction = proposalSettings.find((x) => x.__kind == 'VoteRestriction');
-			if (proposalVoteRestriction) {
-				const voteRestrictionValue = (proposalVoteRestriction as any)[
-					'voteRestriction'
-				] as VoteRestrictionRule;
-				console.log('voteRestrictionValue', voteRestrictionValue);
-			}
+			const {
+				restrictionMint: proposalRestrictionMint,
+				isNftRestricted: proposalIsNftRestricted,
+				restrictionIx: proposalRestrictionIx,
+				ruleKind: proposalRulekind
+			} = extractRestrictionData(proposalSettings);
 			const settings = voteBankAccountRaw.settings as SettingsData[];
-			const voteRestriction = settings.find((x) => x.__kind == 'VoteRestriction');
-			let restrictionMint = getDefaultPublicKey();
-			let isNftRestricted = false;
-			let restrictionIx = false;
-			if (voteRestriction) {
-				console.log('Vote restriction', voteRestriction);
-				const voteRestrictionValue = (voteRestriction as any)[
-					'voteRestriction'
-				] as VoteRestrictionRule;
-				console.log('Vote restriction value', voteRestrictionValue);
-				if (voteRestrictionValue.__kind == 'TokenOwnership') {
-					restrictionIx = true;
-					restrictionMint = voteRestrictionValue.mint;
-				} else if (voteRestrictionValue.__kind == 'NftOwnership') {
-					restrictionMint = new PublicKey(voteRestrictionValue.collectionId);
-					isNftRestricted = true;
-					restrictionIx = true;
-				}
-				console.log('Restriction mint', restrictionMint.toBase58(), {
-					restrictionIx,
-					isNftRestricted
-				});
-				//TODO: handle other types of restrictions
-			}
+			const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
+				extractRestrictionData(settings);
 			let mint = getDefaultPublicKey();
 			let nftMintMetadata = getDefaultPublicKey();
 			let tokenAccount = getDefaultPublicKey();
@@ -303,7 +282,6 @@
 				pausable: true
 			});
 			data.proposal.voterCount = data.proposal.voterCount + 1;
-			console.log('settings', settings, proposalVoteRestriction, voteRestriction);
 			return { proposalAccount, votedFor, settings, votebank };
 		}
 	}
