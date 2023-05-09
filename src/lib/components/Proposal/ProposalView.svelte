@@ -84,7 +84,7 @@
 	>
 		{proposal.data.title}
 	</h1>
-	<h4>Proposal ID {proposal.proposalId}: {proposal.data.summary}</h4>
+	<h4 class="tracking-tight text-gray-400 dark:text-white">Proposal ID {proposal.proposalId}: <br> {proposal.data.summary}</h4>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
@@ -165,14 +165,14 @@
 			{/each}
 		</div>
 		<button
-			class="right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded bg-gray-100 px-4 pt-1 font-medium text-gray-900 dark:bg-gray-700 dark:text-gray-100"
+			class="right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded btn btn-primary px-4 pt-1 font-medium text-gray-900 bg-gray-100 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
 			on:click={handleVote}
 			>Vote
 		</button>
 	</div>
 </article>
 
-<style>
+<style lang="postcss">
 	/* https://ryanmulligan.dev/blog/layout-breakouts/ */
 	.votecontent {
 		--gap: clamp(1rem, 6vw, 3rem);
