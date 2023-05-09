@@ -1,5 +1,6 @@
 <script lang="ts">
-	import CollapsablePanel from '$lib/components/CollapsablePanel.svelte';
+	import CollapsablePanelButton from '$lib/components/CollapsablePanelButton.svelte';
+	import CollapsableClickPanel from '$lib/components/CollapsableClickPanel.svelte';
 	import VoteConfirmationModal from '$lib/components//Vote/Voting/VoteConfirmationModal.svelte';
 	import PdfViewer from '$lib/components/PDFViewer.svelte';
 	import { createEventDispatcher } from 'svelte';
@@ -149,16 +150,16 @@
 <div class="">
 	{#if showPdf}
 		<div class="mt-4">
-			<CollapsablePanel title="View PDF">
+			<CollapsablePanelButton title="View PDF">
 				<PdfViewer pdfUrl={proposal.data.url} />
-			</CollapsablePanel>
+			</CollapsablePanelButton>
 		</div>
 	{:else if showImg}
 		<div class="mt-4">
-			<CollapsablePanel title="View Image">
+			<CollapsablePanelButton title="View Image">
 				<!-- svelte-ignore a11y-img-redundant-alt -->
 				<img src={proposal.data.url} alt="Proposal image" />
-			</CollapsablePanel>
+			</CollapsablePanelButton>
 		</div>
 	{:else if notSupported && proposal.data.url !== ''}
 		<div class="mt-4">
@@ -210,16 +211,18 @@
 			disabled={ended}
 			>Vote
 		</button>
-		{#if isOwner && proposal.voteOpen}
+	</div>
+	<CollapsableClickPanel title="Close Proposal">
+	{#if isOwner && proposal.voteOpen}
 			<div class="mb-4 flex items-center justify-center">
 				<button
 					class="btn-primary btn"
 					on:click={closeProposal}
-					disabled={!isOwner || !proposal.voteOpen}>Close Proposal</button
+					disabled={!isOwner || !proposal.voteOpen}>Close it</button
 				>
 			</div>
 		{/if}
-	</div>
+	</CollapsableClickPanel>
 </article>
 
 <style lang="postcss">
