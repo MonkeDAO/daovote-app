@@ -108,7 +108,7 @@
 					proposalId,
 					votebankAddress.toBase58(),
 					voteBankAccountRaw,
-					title
+					title,
 				);
 
 				//TODO figure out how to get the token mint from settings and use that instead of hardcoding
@@ -207,7 +207,8 @@
 					summary: proposal.description,
 					url: shadowDriveUrl
 				};
-				console.log('Post data', postData, additionalAccountOffsets, tokenToAccountMetaFormat);
+				const endDateTimeStamp = Date.parse(proposal.endDate)/1000;
+				console.log('Post data', postData, additionalAccountOffsets, tokenToAccountMetaFormat, endDateTimeStamp);
 				const ix = await program.methods
 					.createProposal(
 						options,
@@ -215,6 +216,7 @@
 						postDataToBuffer(postData),
 						proposalId,
 						[], //TODO: add settings if needed?
+						endDateTimeStamp,
 						additionalAccountOffsets
 					)
 					.accounts({

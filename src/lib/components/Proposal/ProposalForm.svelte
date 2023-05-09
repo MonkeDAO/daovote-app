@@ -13,6 +13,7 @@
 	let wallet: any;
 	let title = '';
 	let description = '';
+	let endDate = '';
 	let settingsType = '';
 	let settingsValue = '';
 	let useEditor = false;
@@ -46,7 +47,7 @@
 		};
 
 		dispatch('submit-event', {
-			proposal: { title, description, settings, options, maxOptions },
+			proposal: { title, description, settings, options, maxOptions, endDate },
 			file: generatedFile
 		});
 		localStorage.removeItem('editorContent');
@@ -54,6 +55,7 @@
 		description = '';
 		settingsType = '';
 		settingsValue = '';
+		endDate = '';
 		options = [{ id: 0, name: '' }];
 		maxOptions = 1;
 	}
@@ -116,6 +118,7 @@
 							type="text"
 							class="w-full rounded border bg-gray-400 py-2 pl-10 pr-4 placeholder-gray-700 focus:border-gray-900 focus:outline-none focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500 sm:text-sm"
 							placeholder="26/02/2020"
+							bind:value={endDate}
 						/>
 						<div class="absolute left-3 top-2">
 							<svg
