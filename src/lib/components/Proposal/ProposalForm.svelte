@@ -94,6 +94,12 @@
 		maxOptions = 1;
 	}
 	function addOption() {
+		if (options.length >= 16) {
+			toast.push(
+				'You cannot add more than 16 options'
+			);
+			return;
+		}
 		const newOptionID = options.length;
 		options = [...options, { id: newOptionID, name: '' }];
 	}
@@ -222,41 +228,17 @@
 					>
 				</div>
 				<div class="flex flex-col">
-					<!-- <label class="input-group input-group-vertical text-gray-100">
-						<span>Max options voter can pick</span>
+					<label class="input-group input-group-vertical text-gray-100">
+						<span class="bg-gray-200 text-black dark:bg-gray-700 dark:text-gray-100">Max options voter can pick</span>
 						<input
 							type="number"
 							bind:value={maxOptions}
 							placeholder="1"
-							class="input-bordered input"
+							class="input-bordered input bg-gray-200 placeholder-gray-700 text-black dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 							required
 						/>
-					</label> -->
-					<div class="w-full max-w-xs">
-						<!-- svelte-ignore a11y-label-has-associated-control -->
-						<label class="label">
-							<span class="label-text text-gray-700">Max options voter can pick</span>
-						</label>
-						<input
-							type="number"
-							placeholder="1"
-							disabled
-							bind:value={maxOptions}
-							class="custom-input input-primary input w-full max-w-xs"
-						/>
-					</div>
-					<input
-						type="range"
-						min="1"
-						max={options.length}
-						bind:value={maxOptions}
-						class="range range-primary mt-1"
-						step="1"
-					/>
-					<div class="flex w-full justify-between px-2 text-xs">
-						<span>1</span>
-						<span>{options.length}</span>
-					</div>
+					</label>
+					
 				</div>
 				{#if !useEditor}
 					<div class="flex flex-col">
@@ -266,11 +248,11 @@
 							id="file"
 							on:change={handleFileSelected}
 							accept=".pdf,.docx,.txt,.json,.xlsx,.xls,.jpg,.png"
-							class="file-input-primary file-input file-input-sm mt-1 w-full max-w-xs rounded bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+							class="file-input-bordered file-input file-input-sm mt-1 w-full max-w-xs rounded bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 							required={!skipFileUpload && !generatedFile}
 						/>
-						<label class="label cursor-pointer">
-							<span class="label-text">Skip File Upload</span>
+						<label class="label cursor-pointer mt-5">
+							<label for="skip-file-upload" class="leading-loose">Skip File Upload</label>
 							<div
 								class="tooltip"
 								data-tip="Descriptions can't be that long. It is recommended to upload a file."

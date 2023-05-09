@@ -114,5 +114,5 @@
 			{/each}
 		</ul>
 	</section>
-	<!-- <Newsletter /> -->
+	<Newsletter />
 </div>
