@@ -8,11 +8,11 @@
 	import type { ProposalItem } from '$lib/types';
 	import { bnToDate } from '$lib/utils/solana';
 	import { formatDate, getRemainingTime, isDefaultDate } from '$lib/utils/date';
-	import { BN } from '@project-serum/anchor';
 	import CountDownCard from '../CountDownCard.svelte';
 	import ConfirmationModal from '../ConfirmationModal.svelte';
 	import NftGrid from '../NFTGrid.svelte';
 	import { selectedNfts } from '$lib/selectedNfts';
+	import { toBigNumber } from '@metaplex-foundation/js';
 	export let proposal: ProposalItem;
 	export let isOwner: boolean;
 	export let nfts: any[];
@@ -130,7 +130,7 @@
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
 				<p class="flex items-center">
-					Created Date: {bnToDate(new BN(proposal.data.time)).toISOString().slice(0, 10)}
+					Created Date: {bnToDate(toBigNumber(proposal.data.time)).toISOString().slice(0, 10)}
 				</p>
 				{#if !isDefaultDate(bnToDate(proposal.endTime))}
 					<p class="flex items-center">

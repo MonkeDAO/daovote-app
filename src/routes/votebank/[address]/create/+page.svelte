@@ -7,7 +7,7 @@
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 	import { createStorageAccount, getStorageAccounts, uploadToShadowDrive } from '$lib/drive';
 	import { shdwBalanceStore } from '$lib/shdwbalance';
-	import type { Metaplex } from '@metaplex-foundation/js';
+	import { toBigNumber, type Metaplex } from '@metaplex-foundation/js';
 	import { onDestroy } from 'svelte';
 	import { walletProgramConnection } from '$lib/wallet';
 	import {
@@ -20,7 +20,7 @@
 		proposalAccountPda,
 		toAccountMetadata
 	} from '$lib/utils/solana';
-	import { BN, type Program } from '@project-serum/anchor';
+	import type { Program } from '@project-serum/anchor';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { SettingsData, VoteRestrictionRule } from '$lib/anchor/types';
@@ -218,7 +218,7 @@
 						proposalId,
 						[], //TODO: add settings if needed?
 						additionalAccountOffsets,
-						new BN(endDateTimeStamp)
+						toBigNumber(endDateTimeStamp)
 					)
 					.accounts({
 						proposal: proposalAccount,
