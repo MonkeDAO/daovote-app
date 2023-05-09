@@ -102,4 +102,5 @@ export type CardItem = {
 	title: string;
 	description: string;
 	url: string;
+	endtime: beet.bignum;
 };

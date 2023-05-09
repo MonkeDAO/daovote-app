@@ -1,7 +1,22 @@
 <script lang="ts">
 	import type { CardItem } from '$lib/types';
 
+	import { onMount } from 'svelte';
 	export let item: CardItem;
+
+	let counter = 59;
+	function count() {
+		if (counter > 0) {
+			counter--;
+			setTimeout(count, 1000);
+		} else {
+			counter = 59;
+			setTimeout(count, 1000);
+		}
+	}
+	onMount(() => {
+		count();
+	});
 </script>
 
 <a
@@ -19,6 +34,15 @@
 		<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
 			{item.description}
 		</div>
+		<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
+			<span title="Clock countdown">
+				<span class="countdown font-mono text-m">
+					<span style="--value:10;" />:
+					<span style="--value:24;" />:
+					<span style="--value:{counter};" />
+				</span>
+			</span>
+		</div>
 	</div>
 </a>
 
@@ -31,5 +55,16 @@
 		min-height: 50px; /* Adjust this value to your preference */
 		max-height: 100px; /* Adjust this value to your preference */
 		overflow-y: auto;
+	}
+	.bar {
+		background-color: blue;
+		height: 20px;
+		margin-bottom: 10px;
+	}
+
+	.bar span {
+		background-color: red;
+		display: block;
+		height: 100%;
 	}
 </style>
