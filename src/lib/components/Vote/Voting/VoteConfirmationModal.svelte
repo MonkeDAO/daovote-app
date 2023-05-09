@@ -22,7 +22,7 @@
 
 <input type="checkbox" id="vote-confirmation-modal" class="modal-toggle" bind:this={modalInput} />
 <div class="modal">
-	<div class="modal-box">
+	<div class="modal-box bg-gray-100 dark:bg-gray-900">
 		<h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Vote Confirmation</h3>
 		<p class="py-4 text-gray-900 dark:text-gray-100">
 			Are you sure you want to cast your vote with the selected options?
