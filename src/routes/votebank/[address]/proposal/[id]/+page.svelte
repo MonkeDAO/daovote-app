@@ -80,6 +80,7 @@
 			const res = await fetch(`/api/fetchNfts/${publicKey}`);
 			const data = await res.json();
 			if (data.error) {
+				nfts = [];
 				throw new Error(data.error);
 			}
 
