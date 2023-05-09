@@ -57,6 +57,9 @@
 			}
 		}
 	}
+	if(!proposal.voteOpen) {
+		ended = true;
+	}
 	function handleVote() {
 		const checkedOptions = options.filter((option) => option.checked);
 		if (checkedOptions.length >= 1 && checkedOptions.length <= proposal.maxOptionsSelectable) {
@@ -93,7 +96,6 @@
 	function handleCloseProposal(e: CustomEvent<any>): void {
 		confirmationModal.closeModal();
 		dispatch('closeProposal', e.detail);
-		console.log('close proposal', e.detail);
 	}
 </script>
 
@@ -103,7 +105,7 @@
 	on:voteConfirmed={handleVoteConfirmed}
 />
 <ConfirmationModal
-	data
+	data={proposal}
 	bind:this={confirmationModal}
 	message="Are you sure you want to close this proposal?"
 	eventOnConfirm="closeProposal"
@@ -212,8 +214,9 @@
 			>Vote
 		</button>
 	</div>
-	<CollapsableClickPanel title="Close Proposal">
 	{#if isOwner && proposal.voteOpen}
+	<CollapsableClickPanel title="Close Proposal">
+
 			<div class="mb-4 flex items-center justify-center">
 				<button
 					class="btn-primary btn"
@@ -221,8 +224,8 @@
 					disabled={!isOwner || !proposal.voteOpen}>Close it</button
 				>
 			</div>
-		{/if}
 	</CollapsableClickPanel>
+	{/if}
 </article>
 
 <style lang="postcss">

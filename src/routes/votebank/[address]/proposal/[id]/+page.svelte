@@ -25,6 +25,7 @@
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { getRemainingSeconds, getRemainingTime } from '$lib/utils/date';
+	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -101,6 +102,7 @@
 			currentUser &&
 			$walletStore.signTransaction
 		) {
+			console.log('proposalItem', proposalItem);
 			const endTime = bnToDate(proposalItem.endTime);
 			const remainingTime = getRemainingTime(endTime);
 			const totalSecondsRemaining = getRemainingSeconds(remainingTime);
@@ -276,9 +278,59 @@
 				duration: 3000,
 				pausable: true
 			});
-
+			data.proposal.voterCount = data.proposal.voterCount + 1;
 			console.log('settings', settings, proposalVoteRestriction, voteRestriction);
 			return { proposalAccount, votedFor, settings, votebank };
+		}
+	}
+
+	async function closeProposal(proposalId: number, votebank: string) {
+		if (
+			connection &&
+			wallet &&
+			metaplex &&
+			program &&
+			currentUser &&
+			$walletStore.signTransaction
+		) {
+			const voteBankAddress = new PublicKey(votebank);
+			const [proposalAccount] = proposalAccountPda(
+				new PublicKey(votebank),
+				proposalId
+			);
+			const ix = createCloseProposalInstruction({
+				proposal: proposalAccount,
+				proposalOwner: currentUser,
+				votebank: voteBankAddress,
+				systemProgram: new PublicKey('11111111111111111111111111111111'),
+			}, {
+				proposalId: proposalId,
+			});
+			const tx = new Transaction().add(ix);
+			tx.feePayer = currentUser;
+			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			var sig = await $walletStore.signTransaction(tx);
+
+			sig?.verifySignatures();
+			const signature = await connection.sendRawTransaction(tx.serialize());
+			console.log('Signature', signature);
+			const latestBlockhash = await connection.getLatestBlockhash();
+
+			await connection.confirmTransaction(
+				{
+					signature: signature,
+					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+					blockhash: latestBlockhash.blockhash
+				},
+				'confirmed'
+			);
+			//Force close refresh data on page
+			data.proposal.voteOpen = false;
+			const explorerUrl = `${getExplorerUrl('devnet', 'transaction', signature)}`;
+			toast.push(`Proposal closed! <a href="${explorerUrl}" target="_blank">${voteBankAddress.toBase58()}</a>`, {
+				duration: 3000,
+				pausable: true
+			});
 		}
 	}
 
@@ -286,6 +338,24 @@
 		const voteOptions = buildVotedFor(event.detail);
 		const voteTxn = await buildVoteTxn(voteOptions);
 		console.log('vote', event, voteTxn);
+	}
+
+	async function handleCloseProposal(e: CustomEvent<any>): Promise<void> {
+		if (isOwner) {
+			console.log('close proposal', e.detail);
+			const { proposalId, votebank } = e.detail;
+			toast.push(
+					`Closing proposal...`,
+					{ target: 'new' }
+				);
+			await closeProposal(proposalId, votebank);
+		}
+		else {
+			toast.push(
+					`You are not an authorized owner of this proposal`,
+					{ target: 'new' }
+				);
+		}
 	}
 </script>
 
@@ -301,5 +371,5 @@
 		</div>
 	</div>
 {:else}
-	<ProposalView proposal={proposalItem} on:vote={handleVoteSubmit} {isOwner} />
+	<ProposalView proposal={proposalItem} on:vote={handleVoteSubmit} on:closeProposal={handleCloseProposal} {isOwner} />
 {/if}
