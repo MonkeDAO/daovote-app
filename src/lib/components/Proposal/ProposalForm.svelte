@@ -9,6 +9,7 @@
 
 	const dispatch = createEventDispatcher();
 	let generatedFile: File;
+	let skipFileUpload: boolean;
 	let connection: Connection;
 	let wallet: any;
 	let title = '';
@@ -29,16 +30,24 @@
 		Editor = module.default;
 	}
 
+	function handleSkipUpload() {
+		skipFileUpload = !skipFileUpload;
+	}
+
 	function submitForm() {
 		if (!wallet || !connection) {
 			toast.push('Please connect your wallet');
 			return;
 		}
+		// if (endDate && new Date(endDate) < new Date()) {
+		// 	toast.push('Dates must be in the future');
+		// 	return;
+		// }
 		if (maxOptions < 1) {
 			toast.push('Please enter a valid number of options. 1 or greater');
 			return;
 		}
-		if (!generatedFile) {
+		if (!generatedFile && !skipFileUpload) {
 			toast.push('Please upload a file or use the editor and generate a file');
 			return;
 		}
@@ -48,6 +57,7 @@
 
 		dispatch('submit-event', {
 			proposal: { title, description, settings, options, maxOptions, endDate },
+			skipUpload: skipFileUpload,
 			file: generatedFile
 		});
 		localStorage.removeItem('editorContent');
@@ -204,8 +214,15 @@
 							on:change={handleFileSelected}
 							accept=".pdf,.docx,.txt,.json,.xlsx,.xls,.jpg,.png"
 							class="file-input-primary file-input file-input-sm mt-1 w-full max-w-xs rounded bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
-							required={!generatedFile}
+							required={!skipFileUpload && !generatedFile}
 						/>
+						<label class="label cursor-pointer">
+							<span class="label-text">Skip File Upload</span> 
+						<div class="tooltip" data-tip="Descriptions can't be that long. It is recommended to upload a file.">
+							<input type="checkbox" on:change={handleSkipUpload} checked={skipFileUpload} class="checkbox checkbox-primary" />
+						</div>
+
+						</label>
 					</div>
 				{/if}
 				<div class="flex items-center space-x-4 pt-4">

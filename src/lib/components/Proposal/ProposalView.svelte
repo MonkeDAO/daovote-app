@@ -110,7 +110,7 @@
 				<img src={proposal.data.url} alt="Proposal image" />
 			</CollapsablePanel>
 		</div>
-	{:else if notSupported}
+	{:else if notSupported && proposal.data.url !== ''}
 		<div class="mt-4">
 			<h3 class="text-red-500">
 				File not supported for viewer. <a href={proposal.data.url} target="_blank"
