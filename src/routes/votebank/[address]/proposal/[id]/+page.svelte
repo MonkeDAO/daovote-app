@@ -2,6 +2,7 @@
 	import ProposalView from '$lib/components/Proposal/ProposalView.svelte';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import type { ProposalItem } from '$lib/types';
+	import { onMount } from 'svelte';
 	import {
 		TREASURY_ADDRESS,
 		bnToDate,
@@ -26,6 +27,7 @@
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { getRemainingSeconds, getRemainingTime } from '$lib/utils/date';
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
+	import { refetchStore } from '$lib/stores/refetchStore';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -42,6 +44,15 @@
 	let program: Program;
 	let owners: PublicKey[] = [];
 	let isOwner: boolean;
+	let refetch = () => {};
+
+	onMount(() => {
+ 	 const unsubscribe = refetchStore.subscribe((value) => {
+    	refetch = value;
+  	});
+
+  		return () => unsubscribe();
+	});
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
 	$: {
 		ready = $walletConnectionFactory.ready;
@@ -279,6 +290,7 @@
 				pausable: true
 			});
 			data.proposal.voterCount = data.proposal.voterCount + 1;
+			await refetch();
 			console.log('settings', settings, proposalVoteRestriction, voteRestriction);
 			return { proposalAccount, votedFor, settings, votebank };
 		}
@@ -331,6 +343,7 @@
 				duration: 3000,
 				pausable: true
 			});
+			await refetch();
 		}
 	}
 

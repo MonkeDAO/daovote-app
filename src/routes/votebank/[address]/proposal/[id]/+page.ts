@@ -5,10 +5,12 @@ import { isSettingsDataOwnerInfo, type SettingsDataRecord } from '$lib/anchor/ty
 import { fetchProposalById } from '$lib/utils/solana';
 import { web3 } from '@project-serum/anchor';
 import { PublicKey, clusterApiUrl } from '@solana/web3.js';
+import { refetchStore } from '$lib/stores/refetchStore';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params }: any) {
 	const { id, address } = params;
+	refetchStore.set(() => load({ params }));
 	const connection = new web3.Connection(clusterApiUrl('devnet'));
 	const voteBankAccountRaw = await Votebank.fromAccountAddress(connection, new PublicKey(address));
 	const votebank = voteBankAccountRaw?.pretty();
