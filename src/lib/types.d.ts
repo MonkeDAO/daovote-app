@@ -109,12 +109,12 @@ export type NftMetadata = {
 	json: {
 		name?: string;
 		image?: string;
-	},
+	};
 	collection?: {
 		address?: string;
 		verified?: boolean;
-	},
+	};
 	metadataAddress: string;
 	owner: string;
 	address: string;
-}
+};

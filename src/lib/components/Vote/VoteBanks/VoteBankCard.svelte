@@ -117,7 +117,7 @@
 						<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 						<div
 							tabindex="0"
-							class="collapse-arrow bg-base-400 rounded-box collapse border border-base-300"
+							class="bg-base-400 collapse-arrow rounded-box collapse border border-base-300"
 						>
 							<input type="checkbox" />
 							<div class="collapse-title text-lg font-medium text-gray-900 dark:text-gray-100">

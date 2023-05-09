@@ -27,7 +27,7 @@
 </script>
 
 {#if loading}
-	<div class="flex flex-col items-center justify-center mb-6">
+	<div class="mb-6 flex flex-col items-center justify-center">
 		<div class="text-3xl font-bold leading-relaxed text-gray-900 dark:text-gray-100">
 			Loading nfts...
 		</div>
@@ -51,7 +51,7 @@
 						alt={nft.json.name}
 						class="h-auto w-full rounded object-cover"
 					/>
-					<p class="mt-2 text-sm">{nft.json.name}</p>
+					<p class="text-sm">{nft.json.name}</p>
 				</div>
 			{/if}
 		{/each}
@@ -62,5 +62,16 @@
 	/* Add any additional styles here */
 	.selected {
 		border-color: blue;
+	}
+	.grid-cols-4 {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		grid-gap: 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.grid-cols-4 {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 </style>

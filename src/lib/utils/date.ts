@@ -18,7 +18,7 @@ export function getRemainingSeconds(remainingTime: any) {
 }
 
 export function isDefaultDate(date: Date) {
-    return date.getTime() === new Date(0).getTime()
+	return date.getTime() === new Date(0).getTime();
 }
 
 export function getRemainingTime(targetDate: Date) {

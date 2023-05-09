@@ -36,7 +36,7 @@
 		</div>
 		<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
 			<span title="Clock countdown">
-				<span class="countdown font-mono text-m">
+				<span class="text-m countdown font-mono">
 					<span style="--value:10;" />:
 					<span style="--value:24;" />:
 					<span style="--value:{counter};" />

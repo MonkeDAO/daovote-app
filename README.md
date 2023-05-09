@@ -13,6 +13,7 @@ An open source solution to governance
   </details>
 
 ## Links
+
 - https://github.com/MonkeDAO/daovote-app
 - https://github.com/MonkeDAO/omcvote
 
@@ -42,9 +43,9 @@ If you already have a Votebank created on the main omcvote deployed program, rem
 export const SITE_URL = 'https://monkedao.io';
 export const SITE_TITLE = 'DaoVote';
 export const SITE_DESCRIPTION = 'On Chain Voting for DAOs';
-export const MY_TWITTER_HANDLE = 'MonkeDAO'
+export const MY_TWITTER_HANDLE = 'MonkeDAO';
 ```
 
 ## Todos
 
-- Add back in Newsletter 
+- Add back in Newsletter

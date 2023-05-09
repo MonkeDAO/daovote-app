@@ -2,12 +2,7 @@
 	import Newsletter from '$lib/components/Newsletter.svelte';
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
 	import type { CardItem, ProposalItem } from '$lib/types';
-	import {
-		SITE_URL,
-		SITE_TITLE,
-		SITE_DESCRIPTION,
-		MY_TWITTER_HANDLE,
-	} from '$lib/siteConfig';
+	import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, MY_TWITTER_HANDLE } from '$lib/siteConfig';
 	export let data: any;
 	let open_proposals: ProposalItem[] = [];
 	let closed_proposals: ProposalItem[] = [];
@@ -22,7 +17,7 @@
 			title: item.data.title,
 			description: item.data.summary,
 			url: `/votebank/${item.votebank}/proposal/${item.proposalId}`,
-			endtime: item.endTime,
+			endtime: item.endTime
 		};
 	}
 </script>

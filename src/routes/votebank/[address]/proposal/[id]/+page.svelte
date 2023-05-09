@@ -26,7 +26,7 @@
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { getRemainingSeconds, getRemainingTime, isDefaultDate } from '$lib/utils/date';
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
-	
+
 	export let data: any;
 	console.log('proposal page', data);
 	let connection: Connection;

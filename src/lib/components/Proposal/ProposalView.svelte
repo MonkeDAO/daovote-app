@@ -26,7 +26,7 @@
 
 	const dispatch = createEventDispatcher();
 	console.log('proposal view', proposal, nfts);
-	
+
 	$: proposal = proposal;
 
 	if (proposal?.data?.url?.endsWith('.pdf')) {
@@ -60,7 +60,7 @@
 			}
 		}
 	}
-	if(!proposal.voteOpen) {
+	if (!proposal.voteOpen) {
 		ended = true;
 	}
 	function handleVote() {
@@ -122,7 +122,7 @@
 	>
 		{proposal.data.title}
 	</h1>
-	<h3 class="tracking-tight text-gray-400 dark:text-white">
+	<h3 class="tracking-tight text-gray-500 dark:text-white">
 		Proposal ID {proposal.proposalId}: {proposal.data.summary}
 	</h3>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
@@ -138,7 +138,12 @@
 				{/if}
 			</div>
 			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
-				Status: {proposal.voteOpen ? 'Open' : 'Closed'}
+				Status:
+				{#if proposal.voteOpen}
+					<div class="badge-success badge ml-1">Open</div>
+				{:else}
+					<div class="badge-error badge ml-1">Closed</div>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -216,10 +221,9 @@
 			>Vote
 		</button>
 	</div>
-	<NftGrid nfts={nfts} />
+	<NftGrid {nfts} />
 	{#if isOwner && proposal.voteOpen}
-	<CollapsableClickPanel title="Close Proposal">
-
+		<CollapsableClickPanel title="Close Proposal">
 			<div class="mb-4 flex items-center justify-center">
 				<button
 					class="btn-primary btn"
@@ -227,7 +231,7 @@
 					disabled={!isOwner || !proposal.voteOpen}>Close it</button
 				>
 			</div>
-	</CollapsableClickPanel>
+		</CollapsableClickPanel>
 	{/if}
 </article>
 

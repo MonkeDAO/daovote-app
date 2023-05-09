@@ -95,9 +95,7 @@
 	}
 	function addOption() {
 		if (options.length >= 16) {
-			toast.push(
-				'You cannot add more than 16 options'
-			);
+			toast.push('You cannot add more than 16 options');
 			return;
 		}
 		const newOptionID = options.length;
@@ -229,16 +227,17 @@
 				</div>
 				<div class="flex flex-col">
 					<label class="input-group input-group-vertical text-gray-100">
-						<span class="bg-gray-200 text-black dark:bg-gray-700 dark:text-gray-100">Max options voter can pick</span>
+						<span class="bg-gray-200 text-black dark:bg-gray-700 dark:text-gray-100"
+							>Max options voter can pick</span
+						>
 						<input
 							type="number"
 							bind:value={maxOptions}
 							placeholder="1"
-							class="input-bordered input bg-gray-200 placeholder-gray-700 text-black dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+							class="input-bordered input bg-gray-200 text-black placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 							required
 						/>
 					</label>
-					
 				</div>
 				{#if !useEditor}
 					<div class="flex flex-col">
@@ -251,7 +250,7 @@
 							class="file-input-bordered file-input file-input-sm mt-1 w-full max-w-xs rounded bg-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 							required={!skipFileUpload && !generatedFile}
 						/>
-						<label class="label cursor-pointer mt-5">
+						<label class="label mt-5 cursor-pointer">
 							<label for="skip-file-upload" class="leading-loose">Skip File Upload</label>
 							<div
 								class="tooltip"

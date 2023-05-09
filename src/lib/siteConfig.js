@@ -1,7 +1,7 @@
 export const SITE_URL = 'https://monkedao.io';
 export const SITE_TITLE = 'DaoVote';
 export const SITE_DESCRIPTION = 'On Chain Voting for DAOs';
-export const MY_TWITTER_HANDLE = 'MonkeDAO'
+export const MY_TWITTER_HANDLE = 'MonkeDAO';
 // variables related to program
 export const VOTEBANK = '8zHqm7LYF2DqGhVzZxPPhZ2pQ438qf33eeRqtRJssVhd';
 
