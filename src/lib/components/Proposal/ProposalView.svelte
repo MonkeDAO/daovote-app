@@ -6,9 +6,12 @@
 	import { toast } from '@zerodevx/svelte-toast';
 	import type { ProposalItem } from '$lib/types';
 	import { bnToDate } from '$lib/utils/solana';
-	import { formatDate } from '$lib/utils/date';
+	import { formatDate, getRemainingTime } from '$lib/utils/date';
+	import { BN } from '@project-serum/anchor';
+	import CountDownCard from '../CountDownCard.svelte';
 	export let proposal: ProposalItem;
 	let showPdf = false;
+	let ended = false;
 	let showImg = false;
 	let notSupported = false;
 	let options: any[];
@@ -38,6 +41,17 @@
 				checked: false
 			};
 		});
+		if (
+			proposal?.endTime &&
+			bnToDate(proposal.endTime).getTime() !== new Date(0).getTime() &&
+			proposal?.voteOpen
+		) {
+			const endTime = bnToDate(proposal.endTime);
+			const remainingTime = getRemainingTime(endTime);
+			if (remainingTime.ended) {
+				ended = true;
+			}
+		}
 	}
 	function handleVote() {
 		const checkedOptions = options.filter((option) => option.checked);
@@ -84,12 +98,15 @@
 	>
 		{proposal.data.title}
 	</h1>
-	<h4 class="tracking-tight text-gray-400 dark:text-white">Proposal ID {proposal.proposalId}: <br> {proposal.data.summary}</h4>
+	<h4 class="tracking-tight text-gray-400 dark:text-white">
+		Proposal ID {proposal.proposalId}: <br />
+		{proposal.data.summary}
+	</h4>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
 				<p class="flex items-center">
-					Created Date: {new Date().toISOString().slice(0, 10)}
+					Created Date: {bnToDate(new BN(proposal.data.time)).toISOString().slice(0, 10)}
 				</p>
 				{#if bnToDate(proposal.endTime).getTime() !== new Date(0).getTime()}
 					<p class="flex items-center">
@@ -105,6 +122,11 @@
 	<div
 		class="-mx-4 my-2 flex h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
 	/>
+	{#if bnToDate(proposal.endTime).getTime() !== new Date(0).getTime()}
+		<div class="mt-2">
+			<CountDownCard targetDate={bnToDate(proposal.endTime)} />
+		</div>
+	{/if}
 </article>
 <div class="">
 	{#if showPdf}
@@ -131,7 +153,7 @@
 	{/if}
 </div>
 <article
-	class="votecontent prose mx-auto mb-32 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
+	class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
 >
 	<div
 		class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
@@ -165,8 +187,9 @@
 			{/each}
 		</div>
 		<button
-			class="right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded btn btn-primary px-4 pt-1 font-medium text-gray-900 bg-gray-100 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
+			class="btn-primary btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded bg-gray-100 px-4 pt-1 font-medium text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
 			on:click={handleVote}
+			disabled={ended}
 			>Vote
 		</button>
 	</div>

@@ -77,6 +77,7 @@ export type ProposalData = {
 	title: string;
 	summary: string;
 	url: string;
+	time: number;
 };
 
 export type VoteBankProposalsNumeric = {

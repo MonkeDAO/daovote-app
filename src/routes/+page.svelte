@@ -8,7 +8,7 @@
 		SITE_DESCRIPTION,
 		DEFAULT_OG_IMAGE,
 		MY_TWITTER_HANDLE,
-		REPO_URL,
+		REPO_URL
 	} from '$lib/siteConfig';
 	export let data: any;
 	let open_proposals: ProposalItem[] = [];
@@ -106,7 +106,11 @@
 		<ul class="space-y-2 text-white">
 			{#each open_proposals as item (item)}
 				<li>
-					<a class="font-bold" data-sveltekit-preload-data href="/votebank/{item.votebank}/proposal/{item.proposalId}">{item.data.title}</a>
+					<a
+						class="font-bold"
+						data-sveltekit-preload-data
+						href="/votebank/{item.votebank}/proposal/{item.proposalId}">{item.data.title}</a
+					>
 					<span class="hidden text-xs text-black dark:text-gray-400 sm:inline"
 						>{new Date().toISOString().slice(0, 10)}</span
 					>

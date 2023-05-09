@@ -1,9 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { web3 } from '@project-serum/anchor';
 import { PublicKey, clusterApiUrl } from '@solana/web3.js';
-import {
-	VOTEBANK
-} from '$lib/siteConfig';
+import { VOTEBANK } from '$lib/siteConfig';
 import { Votebank } from '$lib/anchor/accounts';
 import type { VoteBankProposals } from '$lib/types';
 import { fetchProposals } from '$lib/utils/solana';

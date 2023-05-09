@@ -70,7 +70,6 @@ export function dateToBn(dateOrString: Date | string): anchor.BN {
 	return bnTimestamp;
 }
 
-
 export async function fetchProposalById(
 	connection: Connection,
 	votebank: PublicKey,
@@ -92,7 +91,6 @@ export async function fetchProposalById(
 			data: obj,
 			...rest
 		};
-		console.log('returning proposalItem', proposalItem);
 		return proposalItem;
 	} catch (err) {
 		console.log('fetchProposalById', err);

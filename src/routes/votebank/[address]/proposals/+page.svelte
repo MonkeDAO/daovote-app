@@ -2,9 +2,7 @@
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
 	import type { CardItem, ProposalItem } from '$lib/types';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import {
-		SITE_TITLE,
-	} from '$lib/siteConfig';
+	import { SITE_TITLE } from '$lib/siteConfig';
 	export let data: any;
 	let open_proposals: ProposalItem[] = [];
 	let closed_proposals: ProposalItem[] = [];
@@ -56,16 +54,16 @@
 	>
 		Proposals
 	</h3>
-	<div class="mb-6 flex justify-center tabs">
+	<div class="tabs mb-6 flex justify-center">
 		<button
-			class="tab tab-bordered px-1 sm:px-4"
+			class="tab-bordered tab px-1 sm:px-4"
 			class:active={currentTab === 'open' ? 'tab-active' : 'tab-disabled'}
 			on:click={() => (currentTab = 'open')}
 		>
 			Open
 		</button>
 		<button
-			class="tab tab-bordered px-1 sm:px-4"
+			class="tab-bordered tab px-1 sm:px-4"
 			class:active={currentTab === 'closed' ? 'tab-active' : 'tab-disabled'}
 			on:click={() => (currentTab = 'closed')}
 		>

@@ -4,12 +4,14 @@
 	import type { ProposalItem } from '$lib/types';
 	import {
 		TREASURY_ADDRESS,
+		bnToDate,
 		getDefaultPublicKey,
 		getExplorerUrl,
 		isDefaultPublicKey,
 		proposalAccountPda,
 		toAccountMetadata,
-		voteAccountPda	} from '$lib/utils/solana';
+		voteAccountPda
+	} from '$lib/utils/solana';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
@@ -18,13 +20,11 @@
 	import type { Metaplex } from '@metaplex-foundation/js';
 	import type { Program } from '@project-serum/anchor';
 	import { walletProgramConnection } from '$lib/wallet';
-	import type {
-		SettingsData,
-		VoteRestrictionRule,
-		VoteEntry	} from '$lib/anchor/types';
+	import type { SettingsData, VoteRestrictionRule, VoteEntry } from '$lib/anchor/types';
 	import { toast } from '@zerodevx/svelte-toast';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import type { Adapter } from '@solana/wallet-adapter-base';
+	import { getRemainingSeconds, getRemainingTime } from '$lib/utils/date';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -35,6 +35,7 @@
 	let text = 'Loading...';
 	let error = false;
 	let ready: boolean;
+	let ended = false;
 	let currentUser: PublicKey;
 	let metaplex: Metaplex;
 	let program: Program;
@@ -56,7 +57,6 @@
 		if (ready && $walletConnectionFactory.publicKey) {
 			currentUser = $walletConnectionFactory.publicKey;
 		}
-		console.log('Derived store updated:', $walletConnectionFactory);
 	}
 
 	$: data = data;
@@ -89,6 +89,17 @@
 			currentUser &&
 			$walletStore.signTransaction
 		) {
+			const endTime = bnToDate(proposalItem.endTime);
+			const remainingTime = getRemainingTime(endTime);
+			const totalSecondsRemaining = getRemainingSeconds(remainingTime);
+			if (totalSecondsRemaining < 30) {
+				toast.push('Less than 30 seconds remaining. This vote might fail!', { target: 'new' });
+			}
+			if (remainingTime.ended) {
+				toast.push('Vote has ended.', { target: 'new' });
+				ended = true;
+				return;
+			}
 			const votebankAccountAddress = new PublicKey(data.address);
 			const voteBankAccountRaw = await Votebank.fromAccountAddress(
 				connection,
@@ -110,6 +121,7 @@
 				] as VoteRestrictionRule;
 				console.log('voteRestrictionValue', voteRestrictionValue);
 			}
+
 			const settings = voteBankAccountRaw.settings as SettingsData[];
 			const voteRestriction = settings.find((x) => x.__kind == 'VoteRestriction');
 			let restrictionMint = getDefaultPublicKey();
@@ -236,7 +248,7 @@
 			const signature = await connection.sendRawTransaction(tx.serialize());
 			console.log('Signature', signature);
 			const latestBlockhash = await connection.getLatestBlockhash();
-			
+
 			await connection.confirmTransaction(
 				{
 					signature: signature,

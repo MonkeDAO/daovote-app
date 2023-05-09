@@ -18,7 +18,8 @@
 		isDefaultPublicKey,
 		postDataToBuffer,
 		proposalAccountPda,
-		toAccountMetadata	} from '$lib/utils/solana';
+		toAccountMetadata
+	} from '$lib/utils/solana';
 	import { BN, type Program } from '@project-serum/anchor';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import { Votebank } from '$lib/anchor/accounts';
@@ -108,7 +109,7 @@
 					proposalId,
 					votebankAddress.toBase58(),
 					voteBankAccountRaw,
-					title,
+					title
 				);
 
 				//TODO figure out how to get the token mint from settings and use that instead of hardcoding
@@ -207,8 +208,14 @@
 					summary: proposal.description,
 					url: shadowDriveUrl
 				};
-				const endDateTimeStamp = Date.parse(proposal.endDate)/1000;
-				console.log('Post data', postData, additionalAccountOffsets, tokenToAccountMetaFormat, endDateTimeStamp);
+				const endDateTimeStamp = Date.parse(proposal.endDate) / 1000;
+				console.log(
+					'Post data',
+					postData,
+					additionalAccountOffsets,
+					tokenToAccountMetaFormat,
+					endDateTimeStamp
+				);
 				const ix = await program.methods
 					.createProposal(
 						options,
@@ -217,7 +224,7 @@
 						proposalId,
 						[], //TODO: add settings if needed?
 						additionalAccountOffsets,
-						new BN(endDateTimeStamp),
+						new BN(endDateTimeStamp)
 					)
 					.accounts({
 						proposal: proposalAccount,
@@ -242,7 +249,7 @@
 					duration: 5000,
 					pausable: true
 				});
-				
+
 				await connection.confirmTransaction(
 					{
 						signature: signature,
@@ -323,19 +330,17 @@
 		const skipUpload = event.detail.skipUpload;
 		if (skipUpload) {
 			await createProposal();
-		}
-		else {
+		} else {
 			await uploadFile(file).then(async (res) => {
-			toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, {
-				target: 'new'
+				toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, {
+					target: 'new'
+				});
+				if (res) {
+					await createProposal();
+				}
 			});
-			if (res) {
-				await createProposal();
-			}
-		});
 		}
 		//TODO: Figure a way to combine two methods so its atomic?
-		
 	}
 	onDestroy(unsubscribe);
 </script>
@@ -345,9 +350,7 @@
 </div>
 <div class="flex min-h-screen flex-col justify-center dark:prose-invert sm:py-12">
 	<div class="relative sm:mx-auto sm:max-w-xl">
-		<div
-			class="bg-gray-0 relative mx-8 rounded-3xl px-4 shadow dark:bg-white sm:p-10 md:mx-0"
-		>
+		<div class="bg-gray-0 relative mx-8 rounded-3xl px-4 shadow dark:bg-white sm:p-10 md:mx-0">
 			<div class="mx-auto max-w-md">
 				<div class="flex items-center space-x-5">
 					<div
