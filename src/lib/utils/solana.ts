@@ -122,7 +122,17 @@ export async function fetchProposals(
 		})
 	);
 	console.log('returning proposals', proposals);
-	return proposals;
+	return proposals.sort((a, b) => {
+		// first sort by voteCount in descending order
+		if (a.voterCount > b.voterCount) return -1;
+		if (a.voterCount < b.voterCount) return 1;
+	
+		// if voteCount is equal, sort by proposalId in ascending order
+		if (a.proposalId > b.proposalId) return 1;
+		if (a.proposalId < b.proposalId) return -1;
+	
+		return 0; // if both voteCount and proposalId are equal
+	});
 }
 
 export function postDataToBuffer(proposalData: any): Buffer {

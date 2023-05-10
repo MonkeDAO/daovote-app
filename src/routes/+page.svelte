@@ -96,7 +96,7 @@
 			Closed Proposals
 		</h3>
 		<ul class="space-y-2 text-white">
-			{#each open_proposals as item (item)}
+			{#each closed_proposals as item (item)}
 				<li>
 					<a
 						class="font-bold"

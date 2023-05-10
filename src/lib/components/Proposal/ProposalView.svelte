@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { PublicKey, type Connection } from '@solana/web3.js';
-
+	import type { Connection } from '@solana/web3.js';
 	import CollapsablePanelButton from '$lib/components/CollapsablePanelButton.svelte';
 	import CollapsableClickPanel from '$lib/components/CollapsableClickPanel.svelte';
 	import VoteConfirmationModal from '$lib/components//Vote/Voting/VoteConfirmationModal.svelte';
 	import PdfViewer from '$lib/components/PDFViewer.svelte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast';
 	import type { NftMetadata, ProposalItem } from '$lib/types';
 	import { bnToDate, extractRestrictionData, voteAccountPdaExists } from '$lib/utils/solana';
@@ -15,8 +14,8 @@
 	import ConfirmationModal from '../ConfirmationModal.svelte';
 	import NftGrid from '../NFTGrid.svelte';
 	import { selectedNfts } from '$lib/selectedNfts';
-	import { toBigNumber } from '@metaplex-foundation/js';
 	import type { SettingsData } from '$lib/anchor/types';
+	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 
 	export let proposalData: {
 		proposal: ProposalItem;
@@ -35,7 +34,7 @@
 	let options: any[];
 	let voteConfirmationModal: any;
 	let confirmationModal: any;
-	let nftsFiltered: NftMetadata[] | undefined;
+	let eligibleNfts: NftMetadata[] | undefined;
 	let ineligibleNfts: NftMetadata[] | undefined;
 	let connection: Connection;
 
@@ -50,38 +49,43 @@
 		connection = $workSpace?.provider?.connection;
 	}
 
+	filteredNftStore.subscribe(($filteredNftStore) => {
+		eligibleNfts = $filteredNftStore.eligible;
+		ineligibleNfts = $filteredNftStore.ineligible;
+	});
+
 	$: {
-		if (nfts && votebankSettings) {
+		if (nfts && votebankSettings && connection && proposal) {
 			const voteBankSetting = extractRestrictionData(votebankSettings);
 			if (voteBankSetting.isNftRestricted && voteBankSetting.restrictionMint) {
-				const filteredNfts = nfts.filter((nft) => {
-					return nft.collection?.address === voteBankSetting.restrictionMint.toBase58();
-				});
-				fetchAccountIfExists(filteredNfts);
+				filteredNftStore.filterNfts(connection, proposal, votebankSettings, nfts);
 			}
 		}
 	}
-	async function checkVoteAccount(nft: NftMetadata) {
-		const accountExists = await voteAccountPdaExists(
-			connection,
-			new PublicKey(proposal.votebank),
-			new PublicKey(nft.address),
-			proposal.proposalId
-		);
-		return { nft, accountExists };
-	}
-	async function fetchAccountIfExists(filteredNfts: NftMetadata[]) {
-		if (connection && proposal) {
-			const nftsVoteAccounts = await Promise.all(filteredNfts.map(checkVoteAccount));
-			nftsFiltered = nftsVoteAccounts
-				.filter(({ accountExists }) => !accountExists)
-				.map(({ nft }) => nft);
-			ineligibleNfts = nftsVoteAccounts
-				.filter(({ accountExists }) => accountExists)
-				.map(({ nft }) => nft);
-			console.log('nftsFiltered', nftsFiltered, ineligibleNfts);
-		}
-	}
+	onDestroy(() => {
+    	filteredNftStore.clear();
+	});
+	// async function checkVoteAccount(nft: NftMetadata) {
+	// 	const accountExists = await voteAccountPdaExists(
+	// 		connection,
+	// 		new PublicKey(proposal.votebank),
+	// 		new PublicKey(nft.address),
+	// 		proposal.proposalId
+	// 	);
+	// 	return { nft, accountExists };
+	// }
+	// async function fetchAccountIfExists(filteredNfts: NftMetadata[]) {
+	// 	if (connection && proposal) {
+	// 		const nftsVoteAccounts = await Promise.all(filteredNfts.map(checkVoteAccount));
+	// 		nftsFiltered = nftsVoteAccounts
+	// 			.filter(({ accountExists }) => !accountExists)
+	// 			.map(({ nft }) => nft);
+	// 		ineligibleNfts = nftsVoteAccounts
+	// 			.filter(({ accountExists }) => accountExists)
+	// 			.map(({ nft }) => nft);
+	// 		console.log('nftsFiltered', nftsFiltered, ineligibleNfts);
+	// 	}
+	// }
 
 	if (proposalData.proposal?.data?.url?.endsWith('.pdf')) {
 		showPdf = true;
@@ -278,7 +282,7 @@
 			>Vote
 		</button>
 	</div>
-	<NftGrid nfts={nftsFiltered} />
+	<NftGrid nfts={eligibleNfts} />
 	{#if isOwner && proposal.voteOpen}
 		<CollapsableClickPanel title="Close Proposal">
 			<div class="mb-4 flex items-center justify-center">
