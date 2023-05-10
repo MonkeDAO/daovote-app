@@ -7,6 +7,7 @@
 	import { toast } from '@zerodevx/svelte-toast';
 	import Fa from 'svelte-fa';
 	import { faCancel } from '@fortawesome/free-solid-svg-icons';
+	import LoadingOverlay from '../LoadingOverlay.svelte';
 
 	const dispatch = createEventDispatcher();
 	let generatedFile: File;
@@ -129,6 +130,7 @@
 	}
 </script>
 
+<LoadingOverlay />
 <div>
 	<div class="divide-y divide-gray-200">
 		<div class="space-y-4 py-8 text-base leading-6 text-gray-700 sm:text-lg sm:leading-7">

@@ -13,6 +13,7 @@
 	import {
 		SYSTEM_PROGRAM_ID,
 		TREASURY_ADDRESS,
+		extractCustomCodes,
 		extractRestrictionData,
 		getDefaultPublicKey,
 		getExplorerUrl,
@@ -28,6 +29,9 @@
 	import type { NftMetadata } from '$lib/types';
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
 	import { nftSyncStore } from '$lib/stores/nftStore';
+	import { message } from '$lib/stores/messageStore';
+	import { loading as loadingStore } from '$lib/stores/loadingStore';
+
 	export let data: any;
 	let nfts: NftMetadata[];
 	let file: any;
@@ -87,7 +91,7 @@
 				$walletStore.signTransaction &&
 				votebankAddress
 			) {
-				toast.push('Creating proposal...', { target: 'new' });
+				message.set('Creating proposal...');
 				/* interact with the program via rpc */
 				console.log('Vote', $workSpace.baseAccount?.publicKey.toBase58());
 				const voteBankAccountRaw = await Votebank.fromAccountAddress(connection, votebankAddress);
@@ -135,8 +139,8 @@
 					// Find by collection id:
 					nfts.find((nft) => {
 						if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
-							nftMint = new PublicKey(nft.metadataAddress); //(nft as any)['mintAddress'];
-							nftMintMetadata = new PublicKey(nft.address);
+							nftMint = new PublicKey(nft.address); //(nft as any)['mintAddress'];
+							nftMintMetadata = new PublicKey(nft.metadataAddress);
 							return true;
 						}
 						return false;
@@ -220,18 +224,28 @@
 				const tx = new Transaction().add(ix);
 				tx.feePayer = currentUser;
 				tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+				message.set('Simulating transaction...');
+				//const test = VersionedTransaction.deserialize(tx.serialize());
+				const t = await connection.simulateTransaction(tx);
+				if (t.value.err) {
+					const messages = extractCustomCodes(t.value.err);
+					if (messages.length > 0) {
+						const msgString = messages.join(', ');
+						message.set(`Error: ${msgString}`);
+						setTimeout(() => {
+							reset();
+						}, 2000);
+						return;
+					}
+				}
+				message.set('Waiting for signature...');
 				var sig = await $walletStore.signTransaction(tx);
 
 				sig?.verifySignatures();
 				const signature = await connection.sendRawTransaction(tx.serialize());
 				console.log('Signature', signature);
 				const latestBlockhash = await connection.getLatestBlockhash();
-				toast.push('Finalizing proposal creation... please wait', {
-					target: 'new',
-					duration: 5000,
-					pausable: true
-				});
-
+				message.set('Confirming transaction...');
 				await connection.confirmTransaction(
 					{
 						signature: signature,
@@ -245,6 +259,7 @@
 					'confirmed'
 				);
 				console.log('Proposal created data', proposalCreatedAccount);
+				message.set('Proposal created!');
 				const explorerUrl = `${getExplorerUrl('devnet', 'transaction', signature)}`;
 				toast.push(
 					`Proposal created <a href="/votebank/${votebankAddress}/proposal/${proposalId}" target="_blank">View proposal</a> </br> <a href="${explorerUrl}" target="_blank">View on Solana Explorer</a>`,
@@ -257,6 +272,8 @@
 			}
 		} catch (err) {
 			console.log('Transaction error: ', err);
+			message.set('Error creating proposal!');
+			setTimeout(() => reset(), 2000);
 		}
 	}
 
@@ -264,7 +281,7 @@
 		if (connection && wallet) {
 			try {
 				console.log('connection', connection);
-				toast.push('Uploading file to shadow drive...', { target: 'new' });
+				message.set('Uploading file to shadow drive...');
 				const response = await getStorageAccounts(connection, wallet);
 				if (response.length > 0) {
 					const storage = response[0];
@@ -278,19 +295,23 @@
 						return false;
 					}
 				} else {
+					message.set('No storage account found, creating one...')
 					const createResponse = await createStorageAccount(connection, wallet);
 					if (!createResponse.shdw_bucket) {
 						toast.push('Error creating storage account!', { target: 'new' });
 						return false;
 					}
+					message.set('Storage account created, uploading file...')
 					const test = await uploadToShadowDrive(
 						connection,
 						wallet,
 						new PublicKey(createResponse.shdw_bucket),
 						file
 					);
+					
 					console.log('Upload response', test);
 					if (test.finalized_locations.length > 0) {
+						message.set('File uploaded!')
 						shadowDriveUrl = test.finalized_locations[0];
 						return true;
 					} else {
@@ -310,6 +331,7 @@
 		file = event.detail.file;
 		proposal = event.detail.proposal;
 		const skipUpload = event.detail.skipUpload;
+		loadingStore.set(true)
 		if (skipUpload) {
 			await createProposal();
 		} else {
@@ -323,6 +345,10 @@
 			});
 		}
 		//TODO: Figure a way to combine two methods so its atomic?
+	}
+	function reset() {
+		loadingStore.set(false);
+		message.set('');
 	}
 	onDestroy(unsubscribe);
 </script>

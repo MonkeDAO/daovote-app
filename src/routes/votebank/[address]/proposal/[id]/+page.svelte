@@ -117,7 +117,7 @@
 			$walletStore.signTransaction
 		) {
 			try {
-				message.set('Waiting for wallet approval...');
+				message.set('Voting for proposal...');
 				loadingStore.set(true);
 				console.log('proposalItem', proposalItem);
 				const endTime = bnToDate(proposalItem.endTime);
@@ -254,8 +254,22 @@
 				const tx = new Transaction().add(ix);
 				tx.feePayer = currentUser;
 				tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+				message.set('Simulating transaction...');
+				//const test = VersionedTransaction.deserialize(tx.serialize());
+				const t = await connection.simulateTransaction(tx);
+				if (t.value.err) {
+					const messages = extractCustomCodes(t.value.err);
+					if (messages.length > 0) {
+						const msgString = messages.join(', ');
+						message.set(`Error: ${msgString}`);
+						setTimeout(() => {
+							reset();
+						}, 2000);
+						return;
+					}
+				}
+				message.set('Waiting for signature...');
 				var sig = await $walletStore.signTransaction(tx);
-				message.set('Sending vote...');
 				sig?.verifySignatures();
 				const signature = await connection.sendRawTransaction(tx.serialize());
 				console.log('Signature', signature);
@@ -317,7 +331,7 @@
 				const tx = new Transaction().add(ix);
 				tx.feePayer = currentUser;
 				tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-				message.set('Simulating txn...');
+				message.set('Simulating transaction...');
 				//const test = VersionedTransaction.deserialize(tx.serialize());
 				const t = await connection.simulateTransaction(tx);
 				if (t.value.err) {
