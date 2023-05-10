@@ -48,17 +48,17 @@
 			{#if nft.json}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div
-					class="cursor-pointer p-2"
+					class="p-2"
 				>
 					<div class="avatar {nft.eligible
-						? 'online'
-						: 'offline'}">
+						? 'offline cursor-pointer'
+						: 'online'}">
 						<div class="rounded-full {$selectedNfts.includes(
 							nft
 						)
 							? 'ring ring-primary-focus ring-offset-base-100 ring-offset-2'
 							: ''}"
-						on:click={() => toggleNftSelection(nft)}>
+						on:click={() => nft.eligible ? toggleNftSelection(nft) : console.log("ineligible")}>
 							<img
 								class="mt-0 h-full w-full object-fill"
 								src={nft.json.image}
