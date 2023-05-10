@@ -23,12 +23,12 @@
 <input type="checkbox" id="vote-confirmation-modal" class="modal-toggle" bind:this={modalInput} />
 <div class="modal">
 	<div class="modal-box bg-gray-100 dark:bg-gray-900">
-		<h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Vote Confirmation</h3>
-		<p class="py-4 text-gray-900 dark:text-gray-100">
+		<h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Vote Confirmation</h3>
+		<p class="py-4 text-xl text-gray-900 dark:text-gray-100">
 			Are you sure you want to cast your vote with the selected options?
 		</p>
 		<div class="modal-action">
-			<label for="vote-confirmation-modal" class="btn-error btn">Cancel</label>
+			<label for="vote-confirmation-modal" class="btn">Cancel</label>
 			<button class="btn-primary btn" on:click={handleClick}>Confirm</button>
 		</div>
 	</div>
