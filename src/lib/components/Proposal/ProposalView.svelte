@@ -16,15 +16,14 @@
 	import { selectedNfts } from '$lib/selectedNfts';
 	import type { SettingsData } from '$lib/anchor/types';
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
+	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
 
 	export let proposalData: {
 		proposal: ProposalItem;
 		nfts?: NftMetadata[];
-		isOwner: boolean;
 		votebankSettings?: SettingsData[];
 	};
 	let proposal: ProposalItem;
-	let isOwner: boolean;
 	let nfts: NftMetadata[] | undefined;
 	let votebankSettings: SettingsData[] | undefined;
 	let showPdf = false;
@@ -37,12 +36,16 @@
 	let eligibleNfts: NftMetadata[] | undefined;
 	let ineligibleNfts: NftMetadata[] | undefined;
 	let connection: Connection;
+	let isOwner: boolean;
 
+	$: {
+		isOwner = $ownerCheckStore.isOwner;
+		$ownerCheckSyncStore;
+	}
 	const dispatch = createEventDispatcher();
 	console.log('proposal view', proposalData.proposal, proposalData.nfts);
 
-	$: proposal = proposalData.proposal;
-	$: isOwner = proposalData.isOwner;
+	$: proposal = proposalData.proposal;;
 	$: nfts = proposalData.nfts;
 	$: votebankSettings = proposalData.votebankSettings;
 	$: if ($workSpace?.provider?.connection) {

@@ -29,6 +29,7 @@
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
 	import { nftSyncStore, nftWalletDisconnectListener } from '$lib/stores/nftStore';
+	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -45,8 +46,12 @@
 	let currentUser: PublicKey;
 	let metaplex: Metaplex;
 	let program: Program;
-	let owners: PublicKey[] = [];
 	let isOwner: boolean;
+
+	$: {
+		isOwner = $ownerCheckStore.isOwner;
+		$ownerCheckSyncStore;
+	}
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
 	const nftWallet = nftStoreUser(walletStore);
 	$: {
@@ -85,18 +90,8 @@
 		text =
 			'Proposal not found. Try reloading the page. If this was recently created it may take a few seconds to appear.';
 	}
-	if (data && data.owners) {
-		owners = data.owners;
-	}
 	if (data && data.voteBankSettings) {
 		votebankSettings = data.voteBankSettings;
-	}
-
-	$: {
-		if (owners && currentUser) {
-			isOwner = owners.some((x) => x.equals(currentUser));
-			console.log('isOwner', isOwner);
-		}
 	}
 
 	function buildVotedFor(selectedOptions: any[]) {
@@ -369,7 +364,6 @@
 	<ProposalView
 		proposalData={{
 			proposal: proposalItem,
-			isOwner,
 			nfts,
 			votebankSettings
 		}}

@@ -12,18 +12,18 @@ export async function load({ params }: any) {
 	const connection = new web3.Connection(clusterApiUrl('devnet'));
 	const voteBankAccountRaw = await Votebank.fromAccountAddress(connection, new PublicKey(address));
 	const votebank = voteBankAccountRaw?.pretty();
-	const ownerInfo = votebank?.settings.find((x) => isSettingsDataOwnerInfo(x));
-	const owners: PublicKey[] = [];
-	if (ownerInfo) {
-		owners.push(...(isSettingsDataOwnerInfo(ownerInfo) ? ownerInfo.owners : []));
-	}
+	// const ownerInfo = votebank?.settings.find((x) => isSettingsDataOwnerInfo(x));
+	// const owners: PublicKey[] = [];
+	// if (ownerInfo) {
+	// 	owners.push(...(isSettingsDataOwnerInfo(ownerInfo) ? ownerInfo.owners : []));
+	// }
 	const data = await fetchProposalById(connection, new PublicKey(address), id);
 	console.log('load proposal/id', data, id, address);
 	return {
 		address,
 		id,
 		proposal: data,
-		owners: owners,
+		//owners: owners,
 		voteBankSettings: votebank?.settings
 	};
 }
