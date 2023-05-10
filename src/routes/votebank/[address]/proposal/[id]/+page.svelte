@@ -227,7 +227,10 @@
 					});
 				if (voteAccountCheck) {
 					console.log('voteAccountCheck', voteAccountCheck);
-					toast.push('You have already voted for this proposal');
+					message.set('You have already voted for this proposal');
+					setTimeout(() => {
+						reset();
+					}, 1500);
 					return;
 				}
 				console.log('vote', {
