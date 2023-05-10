@@ -61,21 +61,24 @@
 			}
 		}
 	}
-
+	async function checkVoteAccount(nft: NftMetadata) {
+		const accountExists = await voteAccountPdaExists(
+			connection,
+			new PublicKey(proposal.votebank),
+			new PublicKey(nft.address),
+			proposal.proposalId
+		);
+		return { nft, accountExists };
+	}
 	async function fetchAccountIfExists(filteredNfts: NftMetadata[]) {
 		if (connection && proposal) {
-			async function checkVoteAccount(nft: NftMetadata) {
-				const accountExists = await voteAccountPdaExists(
-					connection,
-					new PublicKey(proposal.votebank),
-					new PublicKey(nft.address),
-					proposal.proposalId
-				);
-				return { nft, accountExists };
-			}
 			const nftsVoteAccounts = await Promise.all(filteredNfts.map(checkVoteAccount));
-			nftsFiltered = nftsVoteAccounts.filter(({ accountExists }) => !accountExists).map(({ nft }) => nft);
-			ineligibleNfts = nftsVoteAccounts.filter(({ accountExists }) => accountExists).map(({ nft }) => nft);
+			nftsFiltered = nftsVoteAccounts
+				.filter(({ accountExists }) => !accountExists)
+				.map(({ nft }) => nft);
+			ineligibleNfts = nftsVoteAccounts
+				.filter(({ accountExists }) => accountExists)
+				.map(({ nft }) => nft);
 			console.log('nftsFiltered', nftsFiltered, ineligibleNfts);
 		}
 	}
