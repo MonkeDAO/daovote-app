@@ -3,7 +3,7 @@
 	import { onMount, onDestroy } from 'svelte';
 
 	export let targetDate: Date;
-
+	export let displayLabel: Boolean;
 	let days = 0;
 	let hours = 0;
 	let minutes = 0;
@@ -36,40 +36,31 @@
 	});
 </script>
 
-<div class="countdown-container">
-	<div class="timer-heading">Time Remaining</div>
+<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
+	<span title="Clock countdown">
 	{#if !ended}
-		<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-			<div class="countdown-item">
-				<span class="text-2xl font-semibold">{days}</span>
-				<span>Days</span>
-			</div>
-			<div class="countdown-item">
-				<span class="text-2xl font-semibold">{hours}</span>
-				<span>Hours</span>
-			</div>
-			<div class="countdown-item">
-				<span class="text-2xl font-semibold">{minutes}</span>
-				<span>Minutes</span>
-			</div>
-			<div class="countdown-item">
-				<span class="text-2xl font-semibold">{seconds}</span>
-				<span>Seconds</span>
-			</div>
-		</div>
+	<span class="text-m countdown font-mono">
+		{#if displayLabel} Ending on &nbsp;{/if}
+		<span style="--value:{days};" />:
+		<span style="--value:{hours};" />:
+		<span style="--value:{minutes};" />:
+			<span style="--value:{seconds};" />
+
+		</span>
 	{:else}
-		<p class="text-2xl font-semibold">Ended</p>
+		<p class="text-sm font-semibold">Ended</p>
 	{/if}
+	</span>
 </div>
 
 <style lang="postcss">
 	.countdown-container {
-		@apply rounded-md bg-blue-500 p-4 text-center text-white dark:bg-gray-600;
+		@apply text-center text-black dark:bg-gray-600;
 	}
 	.countdown-item {
 		@apply flex flex-col items-center;
 	}
 	.timer-heading {
-		@apply mb-2 text-lg font-bold leading-none;
+		@apply mb-2 text-sm leading-none;
 	}
 </style>

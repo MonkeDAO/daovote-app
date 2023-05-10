@@ -128,13 +128,13 @@
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
-				<p class="flex items-center">
+				<!-- <p class="flex items-center">
 					Created Date: {bnToDate(toBigNumber(proposal.data.time)).toISOString().slice(0, 10)}
-				</p>
+				</p> -->
 				{#if !isDefaultDate(bnToDate(proposal.endTime))}
-					<p class="flex items-center">
-						End Date: {formatDate(bnToDate(proposal.endTime))}
-					</p>
+					<CountDownCard targetDate={bnToDate(proposal.endTime)} displayLabel={true} />
+				{:else}
+					<div>Created On: {new Date(proposal?.data?.time * 1000).toLocaleDateString()}</div>
 				{/if}
 			</div>
 			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
@@ -150,11 +150,11 @@
 	<div
 		class="-mx-4 my-2 flex h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
 	/>
-	{#if !isDefaultDate(bnToDate(proposal.endTime))}
+	<!-- {#if !isDefaultDate(bnToDate(proposal.endTime))}
 		<div class="mt-2">
 			<CountDownCard targetDate={bnToDate(proposal.endTime)} />
 		</div>
-	{/if}
+	{/if} -->
 </article>
 <div class="">
 	{#if showPdf}

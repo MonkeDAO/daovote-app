@@ -1,22 +1,9 @@
 <script lang="ts">
 	import type { CardItem } from '$lib/types';
-
+	import CountDownCard from './CountDownCard.svelte';
+	import { bnToDate } from '$lib/utils/solana';
 	import { onMount } from 'svelte';
 	export let item: CardItem;
-
-	let counter = 59;
-	function count() {
-		if (counter > 0) {
-			counter--;
-			setTimeout(count, 1000);
-		} else {
-			counter = 59;
-			setTimeout(count, 1000);
-		}
-	}
-	onMount(() => {
-		count();
-	});
 </script>
 
 <a
@@ -34,15 +21,7 @@
 		<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
 			{item.description}
 		</div>
-		<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
-			<span title="Clock countdown">
-				<span class="text-m countdown font-mono">
-					<span style="--value:10;" />:
-					<span style="--value:24;" />:
-					<span style="--value:{counter};" />
-				</span>
-			</span>
-		</div>
+		<CountDownCard targetDate={bnToDate(item.endtime)} displayLabel={false} />
 	</div>
 </a>
 
