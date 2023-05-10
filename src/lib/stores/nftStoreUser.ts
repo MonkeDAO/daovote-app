@@ -1,9 +1,9 @@
-import { type Readable, derived } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
 import type { WalletStore } from '@svelte-on-solana/wallet-adapter-core';
-import { nftStore } from './nftStore';
+import { nftStore, nftSyncStore } from './nftStore';
 
 export const nftStoreUser = (walletStore: Readable<WalletStore>) => {
-	return derived([walletStore, nftStore], ([$walletStore, $nftStore]) => {
+	return derived([walletStore, nftStore, nftSyncStore], ([$walletStore, $nftStore]) => {
 		return {
 			walletAddress: $walletStore?.publicKey?.toBase58() || null,
 			nfts: $nftStore.data,

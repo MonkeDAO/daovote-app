@@ -28,7 +28,7 @@
 	import { getRemainingSeconds, getRemainingTime, isDefaultDate } from '$lib/utils/date';
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
-	import { nftStore } from '$lib/stores/nftStore';
+	import { nftSyncStore, nftWalletDisconnectListener } from '$lib/stores/nftStore';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -66,29 +66,12 @@
 			currentUser = $walletConnectionFactory.publicKey;
 		}
 	}
-	$: if ($nftWallet.nfts) {
-		nfts = $nftWallet.nfts;
-	};
-	$: if (ready && currentUser && connection && $walletConnectionFactory.wallet?.connected && (!$nftWallet.isCurrentWallet || !$nftWallet.nfts)) {
-		fetchNftsFromServer();
-	}
-
-	async function fetchNftsFromServer() {
-		try {
-			console.log('fetching nfts', currentUser.toBase58());
-			const publicKey = currentUser.toBase58();
-			const res = await fetch(`/api/fetchNfts/${publicKey}`);
-			const data = await res.json();
-			if (data.error) {
-				nfts = [];
-				throw new Error(data.error);
-			}
-
-			nfts = data.nfts;
-			nftStore.setNfts(data.nfts, currentUser.toBase58());
-		} catch (err) {
-			console.error(err);
+	$: {
+		if ($nftWallet.nfts) {
+			nfts = $nftWallet.nfts;
 		}
+		$nftSyncStore;  // access nftSyncStore
+		$nftWalletDisconnectListener;
 	}
 
 	$: data = data;

@@ -1,15 +1,21 @@
 <!-- src/components/NftGrid.svelte -->
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { selectedNfts } from '$lib/selectedNfts';
-
+	import { nftStoreUser } from '$lib/stores/nftStoreUser';
+	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	export let nfts: any[];
+	const nftSyncing = nftStoreUser(walletStore);
 	let loading = true;
-	onMount(() => {
-		// Perform any additional actions when the component is mounted
-	});
 	$: if (nfts && nfts.length >= 0) {
 		loading = false;
+	}
+	$: if (!$nftSyncing.isCurrentWallet) {
+		loading = true;
+	}
+	else {
+		setTimeout(() => {
+			loading = false;
+		}, 1500);
 	}
 	function toggleNftSelection(nft: any) {
 		if (isSelected(nft)) {

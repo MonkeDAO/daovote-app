@@ -27,7 +27,7 @@
 	import type { SettingsData, VoteRestrictionRule } from '$lib/anchor/types';
 	import type { NftMetadata } from '$lib/types';
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
-	import { nftStore } from '$lib/stores/nftStore';
+	import { nftSyncStore } from '$lib/stores/nftStore';
 	export let data: any;
 	let nfts: NftMetadata[];
 	let file: any;
@@ -69,29 +69,11 @@
 		shdwBalance = value.balance;
 	});
 
-	$: if (ready && currentUser && connection && $walletConnectionFactory.wallet?.connected && (!$nftWallet.isCurrentWallet || !$nftWallet.nfts)) {
-		fetchNftsFromServer();
-	}
-	$: if ($nftWallet.nfts) {
-		nfts = $nftWallet.nfts;
-	};
-	
-	async function fetchNftsFromServer() {
-		try {
-			console.log('fetching nfts', currentUser.toBase58());
-			const publicKey = currentUser.toBase58();
-			const res = await fetch(`/api/fetchNfts/${publicKey}`);
-			const data = await res.json();
-			if (data.error) {
-				nfts = [];
-				throw new Error(data.error);
-			}
-
-			nfts = data.nfts;
-			nftStore.setNfts(data.nfts, currentUser.toBase58());
-		} catch (err) {
-			console.error(err);
+	$: {
+		if ($nftWallet.nfts) {
+			nfts = $nftWallet.nfts;
 		}
+		$nftSyncStore;  // access nftSyncStore
 	}
 
 	async function createProposal() {
