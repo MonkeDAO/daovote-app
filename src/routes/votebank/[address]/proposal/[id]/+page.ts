@@ -23,6 +23,7 @@ export async function load({ params }: any) {
 		address,
 		id,
 		proposal: data,
-		owners: owners
+		owners: owners,
+		voteBankSettings: votebank?.settings
 	};
 }

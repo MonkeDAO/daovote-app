@@ -3,7 +3,7 @@
 	import { onMount, onDestroy } from 'svelte';
 
 	export let targetDate: Date;
-	export let displayLabel: Boolean;
+	export let displayLabel: boolean;
 	let days = 0;
 	let hours = 0;
 	let minutes = 0;

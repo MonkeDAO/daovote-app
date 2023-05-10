@@ -2,8 +2,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { selectedNfts } from '$lib/selectedNfts';
+	import type { NftMetadata } from '$lib/types';
 
-	export let nfts: any[];
+	export let nfts: NftMetadata[] | undefined;
 	let loading = true;
 	onMount(() => {
 		// Perform any additional actions when the component is mounted
@@ -39,7 +40,7 @@
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div class="tooltip tooltip-info" data-tip={nft.collection.name}>
+				<div class="tooltip tooltip-info" data-tip={nft.collection?.name}>
 					<div
 						class="cursor-pointer rounded border border-gray-300 p-2 hover:border-blue-500 {$selectedNfts.includes(
 							nft
