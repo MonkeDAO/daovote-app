@@ -10,6 +10,7 @@
 	let loading = true;
 	$: if (nfts && nfts.length >= 0 && $nftSyncing.isCurrentWallet) {
 		loading = false;
+		console.log("holy", nfts);
 	}
 	$: if (!$nftSyncing.isCurrentWallet) {
 		loading = true;
@@ -46,22 +47,26 @@
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div class="tooltip tooltip-info" data-tip={nft.collection?.name}>
-					<div
-						class="cursor-pointer rounded border border-gray-300 p-2 hover:border-blue-500 {$selectedNfts.includes(
+				<div
+					class="cursor-pointer p-2"
+				>
+					<div class="avatar {nft.eligible
+						? 'online'
+						: 'offline'}">
+						<div class="rounded-full {$selectedNfts.includes(
 							nft
 						)
-							? 'selected'
+							? 'ring ring-primary-focus ring-offset-base-100 ring-offset-2'
 							: ''}"
-						on:click={() => toggleNftSelection(nft)}
-					>
-						<img
-							src={nft.json.image}
-							alt={nft.json.name}
-							class="h-auto w-full rounded object-cover"
-						/>
-						<p class="text-sm">{nft.json.name}</p>
+						on:click={() => toggleNftSelection(nft)}>
+							<img
+								class="mt-0 h-full w-full object-fill"
+								src={nft.json.image}
+								alt={nft.json.name}
+							/>
+						</div>
 					</div>
+					<p class="text-sm font-bold text-black dark:text-white">{nft.json.name}</p>
 				</div>
 			{/if}
 		{/each}

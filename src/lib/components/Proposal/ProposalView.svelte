@@ -36,10 +36,12 @@
 	let confirmationModal: any;
 	let eligibleNfts: NftMetadata[] | undefined;
 	let ineligibleNfts: NftMetadata[] | undefined;
+	let allNfts: NftMetadata[] | undefined;
 	let connection: Connection;
 	let isOwner: boolean;
 	let isNftRestricted: boolean;
 
+	let modalOpen = false;
 	$: {
 		isOwner = $ownerCheckStore.isOwner;
 		$ownerCheckSyncStore;
@@ -57,6 +59,13 @@
 	filteredNftStore.subscribe(($filteredNftStore) => {
 		eligibleNfts = $filteredNftStore.eligible;
 		ineligibleNfts = $filteredNftStore.ineligible;
+		allNfts = eligibleNfts?.concat(ineligibleNfts!).map((nft) => {
+			let eligible = false;
+			if (eligibleNfts?.includes(nft)) {
+				eligible = true;
+			}
+			return { ...nft, eligible };
+		});
 	});
 
 	$: {
@@ -164,9 +173,9 @@
 		});
 		selectedNfts.reset();
 	}
-	function getBadgeClass(isOpen: boolean) {
-		return isOpen ? 'bg-green-500' : 'bg-red-500';
-	}
+	// function getBadgeClass(isOpen: boolean) {
+	// 	return isOpen ? 'bg-green-500' : 'bg-red-500';
+	// }
 	function closeProposal() {
 		confirmationModal.openModal();
 	}
@@ -296,17 +305,27 @@
 			>Vote
 		</button>
 	</div>
-	<NftGrid nfts={eligibleNfts} />
+	<NftGrid nfts={allNfts} />
 	{#if isOwner && proposal.voteOpen}
-		<CollapsableClickPanel title="Close Proposal">
-			<div class="mb-4 flex items-center justify-center">
-				<button
-					class="btn-primary btn"
-					on:click={closeProposal}
-					disabled={!isOwner || !proposal.voteOpen}>Close it</button
-				>
+		<div
+			class="relative m-px overflow-hidden rounded-md bg-slate-800 px-2 py-2 text-lg dark:bg-gray-300"
+		>
+			<div
+				class="absolute -left-[15px] -top-[50px] z-0 h-[140px] w-[140px] rounded-full border bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 blur-[60px] transition-all dark:blur-[80px]"
+			/>
+			<div class="relative z-10 text-center">
+				<p class="text-sm text-gray-300 dark:text-black">
+					<strong class="text-white dark:text-black">Note:</strong> You are the
+					<a href="/pricing" class="font-semibold text-gray-300 dark:text-black">owner</a> of this
+					proposal. Close proposal
+					<button
+						class="text-white text-white underline dark:text-gray-700"
+						on:click={closeProposal}
+						disabled={!isOwner || !proposal.voteOpen}>here</button
+					>
+				</p>
 			</div>
-		</CollapsableClickPanel>
+		</div>
 	{/if}
 </article>
 
