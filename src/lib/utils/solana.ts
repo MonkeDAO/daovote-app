@@ -1,6 +1,6 @@
 import { PublicKey, Connection, type AccountMeta } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
-import { Proposal } from '$lib/anchor/accounts';
+import { Proposal, VoteAccount } from '$lib/anchor/accounts';
 import type { ProposalItem } from '$lib/types';
 import {
 	isSettingsDataVoteRestriction,
@@ -196,6 +196,21 @@ export function voteAccountPda(
 		[Buffer.from(VOTE_SEED), votebank.toBuffer(), nft.toBuffer(), toLittleEndianUint32(proposalId)],
 		programId
 	);
+}
+
+export async function voteAccountPdaExists(
+	connection: anchor.web3.Connection,
+	votebank: anchor.web3.PublicKey,
+	nft: anchor.web3.PublicKey,
+	proposalId: number,
+	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID
+): Promise<boolean> {
+	const [voteAccount] = voteAccountPda(votebank, nft, proposalId, programId);
+	const voteAccountStruct = await VoteAccount.fromAccountAddress(connection, voteAccount).catch(
+		(e) => console.log('voteAccount doesnt exist', e)
+	);
+	console.log('voteAccountStruct', voteAccountStruct, nft.toBase58());
+	return voteAccountStruct !== undefined;
 }
 
 export function getExplorerUrl(

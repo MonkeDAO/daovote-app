@@ -35,6 +35,7 @@
 	let nfts: NftMetadata[];
 	let connection: Connection;
 	let proposalItem: ProposalItem;
+	let votebankSettings: SettingsData[];
 	let wallet: Adapter;
 	let loading = true;
 	let text = 'Loading...';
@@ -86,6 +87,9 @@
 	}
 	if (data && data.owners) {
 		owners = data.owners;
+	}
+	if (data && data.voteBankSettings) {
+		votebankSettings = data.voteBankSettings;
 	}
 
 	$: {
@@ -363,11 +367,14 @@
 	</div>
 {:else}
 	<ProposalView
-		proposal={proposalItem}
+		proposalData={{
+			proposal: proposalItem,
+			isOwner,
+			nfts,
+			votebankSettings
+		}}
 		on:vote={handleVoteSubmit}
 		on:closeProposal={handleCloseProposal}
-		{isOwner}
-		{nfts}
 	/>
 {/if}
 

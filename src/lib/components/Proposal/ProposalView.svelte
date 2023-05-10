@@ -1,21 +1,33 @@
 <script lang="ts">
+	import { PublicKey, type Connection } from '@solana/web3.js';
+
 	import CollapsablePanelButton from '$lib/components/CollapsablePanelButton.svelte';
 	import CollapsableClickPanel from '$lib/components/CollapsableClickPanel.svelte';
 	import VoteConfirmationModal from '$lib/components//Vote/Voting/VoteConfirmationModal.svelte';
 	import PdfViewer from '$lib/components/PDFViewer.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast';
-	import type { ProposalItem } from '$lib/types';
-	import { bnToDate } from '$lib/utils/solana';
+	import type { NftMetadata, ProposalItem } from '$lib/types';
+	import { bnToDate, extractRestrictionData, voteAccountPdaExists } from '$lib/utils/solana';
 	import { formatDate, getRemainingTime, isDefaultDate } from '$lib/utils/date';
+	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import CountDownCard from '../CountDownCard.svelte';
 	import ConfirmationModal from '../ConfirmationModal.svelte';
 	import NftGrid from '../NFTGrid.svelte';
 	import { selectedNfts } from '$lib/selectedNfts';
 	import { toBigNumber } from '@metaplex-foundation/js';
-	export let proposal: ProposalItem;
-	export let isOwner: boolean;
-	export let nfts: any[];
+	import type { SettingsData } from '$lib/anchor/types';
+
+	export let proposalData: {
+		proposal: ProposalItem;
+		nfts?: NftMetadata[];
+		isOwner: boolean;
+		votebankSettings?: SettingsData[];
+	};
+	let proposal: ProposalItem;
+	let isOwner: boolean;
+	let nfts: NftMetadata[] | undefined;
+	let votebankSettings: SettingsData[] | undefined;
 	let showPdf = false;
 	let ended = false;
 	let showImg = false;
@@ -23,25 +35,67 @@
 	let options: any[];
 	let voteConfirmationModal: any;
 	let confirmationModal: any;
+	let nftsFiltered: NftMetadata[] | undefined;
+	let ineligibleNfts: NftMetadata[] | undefined;
+	let connection: Connection;
 
 	const dispatch = createEventDispatcher();
-	console.log('proposal view', proposal, nfts);
+	console.log('proposal view', proposalData.proposal, proposalData.nfts);
 
-	$: proposal = proposal;
+	$: proposal = proposalData.proposal;
+	$: isOwner = proposalData.isOwner;
+	$: nfts = proposalData.nfts;
+	$: votebankSettings = proposalData.votebankSettings;
+	$: if ($workSpace?.provider?.connection) {
+		connection = $workSpace?.provider?.connection;
+	}
 
-	if (proposal?.data?.url?.endsWith('.pdf')) {
+	$: {
+		if (nfts && votebankSettings) {
+			const voteBankSetting = extractRestrictionData(votebankSettings);
+			if (voteBankSetting.isNftRestricted && voteBankSetting.restrictionMint) {
+				const filteredNfts = nfts.filter((nft) => {
+					return nft.collection?.address === voteBankSetting.restrictionMint.toBase58();
+				});
+				fetchAccountIfExists(filteredNfts);
+			}
+		}
+	}
+	async function checkVoteAccount(nft: NftMetadata) {
+		const accountExists = await voteAccountPdaExists(
+			connection,
+			new PublicKey(proposal.votebank),
+			new PublicKey(nft.address),
+			proposal.proposalId
+		);
+		return { nft, accountExists };
+	}
+	async function fetchAccountIfExists(filteredNfts: NftMetadata[]) {
+		if (connection && proposal) {
+			const nftsVoteAccounts = await Promise.all(filteredNfts.map(checkVoteAccount));
+			nftsFiltered = nftsVoteAccounts
+				.filter(({ accountExists }) => !accountExists)
+				.map(({ nft }) => nft);
+			ineligibleNfts = nftsVoteAccounts
+				.filter(({ accountExists }) => accountExists)
+				.map(({ nft }) => nft);
+			console.log('nftsFiltered', nftsFiltered, ineligibleNfts);
+		}
+	}
+
+	if (proposalData.proposal?.data?.url?.endsWith('.pdf')) {
 		showPdf = true;
 	} else if (
-		proposal?.data?.url.endsWith('.png') ||
-		proposal?.data?.url.endsWith('.jpg') ||
-		proposal?.data?.url.endsWith('.jpeg')
+		proposalData.proposal?.data?.url.endsWith('.png') ||
+		proposalData.proposal?.data?.url.endsWith('.jpg') ||
+		proposalData.proposal?.data?.url.endsWith('.jpeg')
 	) {
 		showImg = true;
 	} else {
 		notSupported = true;
 	}
-	if (proposal?.options) {
-		options = proposal.options.map((option: any) => {
+	if (proposalData.proposal?.options) {
+		options = proposalData.proposal.options.map((option: any) => {
 			return {
 				id: option.id,
 				title: option.title,
@@ -49,20 +103,21 @@
 			};
 		});
 		if (
-			proposal?.endTime &&
-			bnToDate(proposal.endTime).getTime() !== new Date(0).getTime() &&
-			proposal?.voteOpen
+			proposalData.proposal?.endTime &&
+			!isDefaultDate(bnToDate(proposalData.proposal.endTime)) &&
+			proposalData.proposal?.voteOpen
 		) {
-			const endTime = bnToDate(proposal.endTime);
+			const endTime = bnToDate(proposalData.proposal.endTime);
 			const remainingTime = getRemainingTime(endTime);
 			if (remainingTime.ended) {
 				ended = true;
 			}
 		}
 	}
-	if (!proposal.voteOpen) {
+	if (!proposalData.proposal.voteOpen) {
 		ended = true;
 	}
+
 	function handleVote() {
 		const checkedOptions = options.filter((option) => option.checked);
 		if (checkedOptions.length >= 1 && checkedOptions.length <= proposal.maxOptionsSelectable) {
@@ -83,12 +138,14 @@
 		console.log('selectedOptions', dispatchedOptions);
 		voteConfirmationModal.closeModal();
 		dispatch('vote', { chosenOptions: dispatchedOptions, selectedNfts: $selectedNfts });
+
 		options = options.map((option: any) => {
 			return {
 				...option,
 				checked: false
 			};
 		});
+		selectedNfts.reset();
 	}
 	function getBadgeClass(isOpen: boolean) {
 		return isOpen ? 'bg-green-500' : 'bg-red-500';
@@ -128,13 +185,13 @@
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
-				<p class="flex items-center">
+				<!-- <p class="flex items-center">
 					Created Date: {bnToDate(toBigNumber(proposal.data.time)).toISOString().slice(0, 10)}
-				</p>
+				</p> -->
 				{#if !isDefaultDate(bnToDate(proposal.endTime))}
-					<p class="flex items-center">
-						End Date: {formatDate(bnToDate(proposal.endTime))}
-					</p>
+					<CountDownCard targetDate={bnToDate(proposal.endTime)} displayLabel={true} />
+				{:else}
+					<div>Created On: {new Date(proposal?.data?.time * 1000).toLocaleDateString()}</div>
 				{/if}
 			</div>
 			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
@@ -150,11 +207,11 @@
 	<div
 		class="-mx-4 my-2 flex h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
 	/>
-	{#if !isDefaultDate(bnToDate(proposal.endTime))}
+	<!-- {#if !isDefaultDate(bnToDate(proposal.endTime))}
 		<div class="mt-2">
 			<CountDownCard targetDate={bnToDate(proposal.endTime)} />
 		</div>
-	{/if}
+	{/if} -->
 </article>
 <div class="">
 	{#if showPdf}
@@ -221,7 +278,7 @@
 			>Vote
 		</button>
 	</div>
-	<NftGrid {nfts} />
+	<NftGrid nfts={nftsFiltered} />
 	{#if isOwner && proposal.voteOpen}
 		<CollapsableClickPanel title="Close Proposal">
 			<div class="mb-4 flex items-center justify-center">

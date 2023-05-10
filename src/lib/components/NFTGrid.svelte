@@ -3,8 +3,10 @@
 	import { selectedNfts } from '$lib/selectedNfts';
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	export let nfts: any[];
 	const nftSyncing = nftStoreUser(walletStore);
+	import type { NftMetadata } from '$lib/types';
+
+	export let nfts: NftMetadata[] | undefined;
 	let loading = true;
 	$: if (nfts && nfts.length >= 0) {
 		loading = false;
@@ -45,7 +47,7 @@
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div class="tooltip tooltip-info" data-tip={nft.collection.name}>
+				<div class="tooltip tooltip-info" data-tip={nft.collection?.name}>
 					<div
 						class="cursor-pointer rounded border border-gray-300 p-2 hover:border-blue-500 {$selectedNfts.includes(
 							nft
