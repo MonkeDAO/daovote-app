@@ -1,10 +1,17 @@
-<script>
+<script lang="ts">
 	import MobileMenu from './MobileMenu.svelte';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { VOTEBANK } from '$lib/siteConfig';
 	import NavLink from './NavLink.svelte';
 	import { WalletMultiButton } from '@svelte-on-solana/wallet-adapter-ui';
+	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
+
 	let isDark = false;
+	let isOwner: boolean;
+	$: {
+		isOwner = $ownerCheckStore.isOwner;
+		$ownerCheckSyncStore;
+	}
 	if (typeof localStorage !== 'undefined') {
 		if (
 			localStorage.theme === 'dark' ||
@@ -43,7 +50,7 @@
 		<li>
 			<NavLink href="/about">About</NavLink>
 		</li>
-		{#if $walletStore?.connected}
+		{#if $walletStore?.connected && isOwner}
 			<li>
 				<NavLink href="/votebank/{VOTEBANK}/create">Create Proposal</NavLink>
 			</li>
