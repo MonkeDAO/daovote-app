@@ -75,7 +75,7 @@
 				</div>
 			{:else if open_proposals.length > 0}
 				<div
-					class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+					class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-2 xl:grid-cols-3"
 				>
 					{#each open_proposals as item (item)}
 						<GeneralCard item={mapItemToCardItem(item)} />
