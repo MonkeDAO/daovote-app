@@ -64,22 +64,18 @@
 
 	async function fetchAccountIfExists(filteredNfts: NftMetadata[]) {
 		if (connection && proposal) {
-			const nftsVoteAccounts = (
-				await Promise.all(
-					filteredNfts.map(async (nft) => {
-						const res = await voteAccountPdaExists(
-							connection,
-							new PublicKey(proposal.votebank),
-							new PublicKey(nft.address),
-							proposal.proposalId
-						);
-						console.log('res', res);
-						return { nft, res };
-					})
-				)
-			);
-			nftsFiltered = nftsVoteAccounts.filter(({ res }) => !res).map(({ nft }) => nft);
-			ineligibleNfts = nftsVoteAccounts.filter(({ res }) => res).map(({ nft }) => nft);
+			async function checkVoteAccount(nft: NftMetadata) {
+				const accountExists = await voteAccountPdaExists(
+					connection,
+					new PublicKey(proposal.votebank),
+					new PublicKey(nft.address),
+					proposal.proposalId
+				);
+				return { nft, accountExists };
+			}
+			const nftsVoteAccounts = await Promise.all(filteredNfts.map(checkVoteAccount));
+			nftsFiltered = nftsVoteAccounts.filter(({ accountExists }) => !accountExists).map(({ nft }) => nft);
+			ineligibleNfts = nftsVoteAccounts.filter(({ accountExists }) => accountExists).map(({ nft }) => nft);
 			console.log('nftsFiltered', nftsFiltered, ineligibleNfts);
 		}
 	}
@@ -139,7 +135,7 @@
 		console.log('selectedOptions', dispatchedOptions);
 		voteConfirmationModal.closeModal();
 		dispatch('vote', { chosenOptions: dispatchedOptions, selectedNfts: $selectedNfts });
-		
+
 		options = options.map((option: any) => {
 			return {
 				...option,

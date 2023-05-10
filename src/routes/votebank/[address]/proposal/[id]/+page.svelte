@@ -377,14 +377,12 @@
 	</div>
 {:else}
 	<ProposalView
-		proposalData={
-			{
-				proposal: proposalItem,
-				isOwner,
-				nfts,
-				votebankSettings
-			}
-		}
+		proposalData={{
+			proposal: proposalItem,
+			isOwner,
+			nfts,
+			votebankSettings
+		}}
 		on:vote={handleVoteSubmit}
 		on:closeProposal={handleCloseProposal}
 	/>

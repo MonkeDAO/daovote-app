@@ -203,9 +203,12 @@ export async function voteAccountPdaExists(
 	votebank: anchor.web3.PublicKey,
 	nft: anchor.web3.PublicKey,
 	proposalId: number,
-	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID): Promise<boolean> {
+	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID
+): Promise<boolean> {
 	const [voteAccount] = voteAccountPda(votebank, nft, proposalId, programId);
-	const voteAccountStruct = await VoteAccount.fromAccountAddress(connection, voteAccount).catch((e) => console.log('voteAccount doesnt exist', e));
+	const voteAccountStruct = await VoteAccount.fromAccountAddress(connection, voteAccount).catch(
+		(e) => console.log('voteAccount doesnt exist', e)
+	);
 	console.log('voteAccountStruct', voteAccountStruct, nft.toBase58());
 	return voteAccountStruct !== undefined;
 }

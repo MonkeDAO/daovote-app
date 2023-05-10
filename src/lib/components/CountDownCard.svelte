@@ -38,18 +38,17 @@
 
 <div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
 	<span title="Clock countdown">
-	{#if !ended}
-	<span class="text-m countdown font-mono">
-		{#if displayLabel} Ending on &nbsp;{/if}
-		<span style="--value:{days};" />:
-		<span style="--value:{hours};" />:
-		<span style="--value:{minutes};" />:
-			<span style="--value:{seconds};" />
-
-		</span>
-	{:else}
-		<p class="text-sm font-semibold">Ended</p>
-	{/if}
+		{#if !ended}
+			<span class="text-m countdown font-mono">
+				{#if displayLabel} Ending on &nbsp;{/if}
+				<span style="--value:{days};" />:
+				<span style="--value:{hours};" />:
+				<span style="--value:{minutes};" />:
+				<span style="--value:{seconds};" />
+			</span>
+		{:else}
+			<p class="text-sm font-semibold">Ended</p>
+		{/if}
 	</span>
 </div>
 
