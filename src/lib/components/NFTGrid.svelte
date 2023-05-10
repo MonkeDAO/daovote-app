@@ -8,7 +8,7 @@
 
 	export let nfts: NftMetadata[] | undefined;
 	let loading = true;
-	$: if (nfts && nfts.length >= 0) {
+	$: if (nfts && nfts.length >= 0 && $nftSyncing.isCurrentWallet) {
 		loading = false;
 	}
 	$: if (!$nftSyncing.isCurrentWallet) {

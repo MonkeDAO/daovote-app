@@ -40,7 +40,7 @@
 	<span title="Clock countdown">
 		{#if !ended}
 			<span class="text-m countdown font-mono">
-				{#if displayLabel} Ending on &nbsp;{/if}
+				{#if displayLabel} Ending in &nbsp;{/if}
 				<span style="--value:{days};" />:
 				<span style="--value:{hours};" />:
 				<span style="--value:{minutes};" />:
