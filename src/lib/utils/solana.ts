@@ -1,4 +1,4 @@
-import { PublicKey, Connection, type AccountMeta } from '@solana/web3.js';
+import { PublicKey, Connection, type AccountMeta, type TransactionError } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
 import { Proposal, VoteAccount } from '$lib/anchor/accounts';
 import type { ProposalItem } from '$lib/types';
@@ -12,6 +12,7 @@ import {
 	type SettingsData,
 	type VoteRestrictionRule
 } from '$lib/anchor/types';
+import { errorFromCode } from '$lib/anchor/errors';
 
 export const CREATOR_SEED: string = 'monkedevs';
 export const VOTEBANK_SEED: string = 'votebank';
@@ -126,13 +127,40 @@ export async function fetchProposals(
 		// first sort by voteCount in descending order
 		if (a.voterCount > b.voterCount) return -1;
 		if (a.voterCount < b.voterCount) return 1;
-	
+
 		// if voteCount is equal, sort by proposalId in ascending order
 		if (a.proposalId > b.proposalId) return 1;
 		if (a.proposalId < b.proposalId) return -1;
-	
+
 		return 0; // if both voteCount and proposalId are equal
 	});
+}
+
+export function extractCustomCodes(err: TransactionError | string | null): string[] {
+	let customValues: number[] = [];
+
+	if (typeof err === 'object' && err !== null) {
+		findCustomValues(err); // find all "Custom" values
+	}
+
+	function findCustomValues(obj: any) {
+		for (let key in obj) {
+			if (key === 'Custom') {
+				customValues.push(obj[key]);
+			} else if (typeof obj[key] === 'object' && obj[key] !== null) {
+				findCustomValues(obj[key]);
+			}
+		}
+	}
+	const messages = customValues
+		.map((code) => errorFromCode(code))
+		.map((x) => {
+			if (x && x.message) return x.message;
+			else return '';
+		})
+		.filter((x) => x !== '');
+
+	return messages;
 }
 
 export function postDataToBuffer(proposalData: any): Buffer {

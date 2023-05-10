@@ -13,8 +13,7 @@
 	}
 	$: if (!$nftSyncing.isCurrentWallet) {
 		loading = true;
-	}
-	else {
+	} else {
 		setTimeout(() => {
 			loading = false;
 		}, 1500);

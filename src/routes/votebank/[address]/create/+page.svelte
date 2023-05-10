@@ -73,7 +73,7 @@
 		if ($nftWallet.nfts) {
 			nfts = $nftWallet.nfts;
 		}
-		$nftSyncStore;  // access nftSyncStore
+		$nftSyncStore; // access nftSyncStore
 	}
 
 	async function createProposal() {
@@ -134,10 +134,7 @@
 
 					// Find by collection id:
 					nfts.find((nft) => {
-						if (
-							nft.collection &&
-							nft.collection.address === restrictionMint.toBase58()
-						) {
+						if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
 							nftMint = new PublicKey(nft.metadataAddress); //(nft as any)['mintAddress'];
 							nftMintMetadata = new PublicKey(nft.address);
 							return true;

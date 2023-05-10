@@ -17,6 +17,7 @@
 	import type { SettingsData } from '$lib/anchor/types';
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
+	import LoadingOverlay from '../LoadingOverlay.svelte';
 
 	export let proposalData: {
 		proposal: ProposalItem;
@@ -37,6 +38,7 @@
 	let ineligibleNfts: NftMetadata[] | undefined;
 	let connection: Connection;
 	let isOwner: boolean;
+	let isNftRestricted: boolean;
 
 	$: {
 		isOwner = $ownerCheckStore.isOwner;
@@ -45,7 +47,7 @@
 	const dispatch = createEventDispatcher();
 	console.log('proposal view', proposalData.proposal, proposalData.nfts);
 
-	$: proposal = proposalData.proposal;;
+	$: proposal = proposalData.proposal;
 	$: nfts = proposalData.nfts;
 	$: votebankSettings = proposalData.votebankSettings;
 	$: if ($workSpace?.provider?.connection) {
@@ -61,12 +63,13 @@
 		if (nfts && votebankSettings && connection && proposal) {
 			const voteBankSetting = extractRestrictionData(votebankSettings);
 			if (voteBankSetting.isNftRestricted && voteBankSetting.restrictionMint) {
+				isNftRestricted = true;
 				filteredNftStore.filterNfts(connection, proposal, votebankSettings, nfts);
 			}
 		}
 	}
 	onDestroy(() => {
-    	filteredNftStore.clear();
+		filteredNftStore.clear();
 	});
 	// async function checkVoteAccount(nft: NftMetadata) {
 	// 	const accountExists = await voteAccountPdaExists(
@@ -128,7 +131,14 @@
 	function handleVote() {
 		const checkedOptions = options.filter((option) => option.checked);
 		if (checkedOptions.length >= 1 && checkedOptions.length <= proposal.maxOptionsSelectable) {
-			voteConfirmationModal.openModal();
+			//check nfts before opening the modal
+			if (isNftRestricted && $selectedNfts.length === 0) {
+				toast.push('You must select at least one NFT', {
+					duration: 3000
+				});
+			} else {
+				voteConfirmationModal.openModal();
+			}
 		} else if (checkedOptions.length > proposal.maxOptionsSelectable) {
 			toast.push(`You can only select ${proposal.maxOptionsSelectable} options`, {
 				duration: 3000
@@ -178,6 +188,7 @@
 	eventOnConfirm="closeProposal"
 	on:closeProposal={handleCloseProposal}
 />
+<LoadingOverlay />
 <article
 	class="votecontent prose mx-auto mb-5 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
 >

@@ -11,7 +11,7 @@ interface NftStore {
 const createNftStore = () => {
 	const { subscribe, set, update } = writable<NftStore>({
 		data: undefined,
-		owner: undefined,
+		owner: undefined
 	});
 
 	const fetchNftsFromServer = async (publicKey: string) => {
@@ -31,7 +31,7 @@ const createNftStore = () => {
 	return {
 		subscribe,
 		fetchNftsFromServer,
-		clear: () => set({ data: undefined, owner: undefined }),
+		clear: () => set({ data: undefined, owner: undefined })
 	};
 };
 
@@ -40,7 +40,11 @@ export const nftStore = createNftStore();
 export const nftSyncStore = derived(
 	walletStore,
 	($walletStore) => {
-		if ($walletStore.wallet?.connected && $walletStore.wallet.publicKey && $walletStore.wallet.publicKey.toBase58() !== get(nftStore).owner) {
+		if (
+			$walletStore.wallet?.connected &&
+			$walletStore.wallet.publicKey &&
+			$walletStore.wallet.publicKey.toBase58() !== get(nftStore).owner
+		) {
 			nftStore.fetchNftsFromServer($walletStore.wallet.publicKey.toBase58());
 		}
 	},
