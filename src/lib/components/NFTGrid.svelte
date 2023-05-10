@@ -10,7 +10,6 @@
 	let loading = true;
 	$: if (nfts && nfts.length >= 0 && $nftSyncing.isCurrentWallet) {
 		loading = false;
-		console.log("holy", nfts);
 	}
 	$: if (!$nftSyncing.isCurrentWallet) {
 		loading = true;
@@ -36,29 +35,31 @@
 
 {#if loading}
 	<div class="mb-6 flex flex-col items-center justify-center">
-		<div class="text-3xl font-bold leading-relaxed text-gray-900 dark:text-gray-100">
-			Loading nfts...
+		<div class="text-2xl font-bold leading-relaxed text-gray-900 dark:text-gray-100">
+			Loading NFTs...
 		</div>
-		<progress class="w-70 progress progress-primary" />
+		<progress class="w-70 progress dark:progress-primary" />
 	</div>
 	<!--TODO: Add grouping / sorting by collection based on the proposal/votebank restriction-->
 {:else if !loading && nfts}
+	<h3 id="latest" class="text-2xl font-bold tracking-tight text-black dark:text-white md:text-2xl">
+		Votes
+	</h3>
+	<div
+		class="mb-6 h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
+	/>
 	<div class="mb-4 grid grid-cols-4 gap-4">
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
-				<div
-					class="p-2"
-				>
-					<div class="avatar {nft.eligible
-						? 'offline cursor-pointer'
-						: 'online'}">
-						<div class="rounded-full {$selectedNfts.includes(
-							nft
-						)
-							? 'ring ring-primary-focus ring-offset-base-100 ring-offset-2'
-							: ''}"
-						on:click={() => nft.eligible ? toggleNftSelection(nft) : console.log("ineligible")}>
+				<div class="p-2">
+					<div class="avatar {nft.eligible ? 'offline cursor-pointer' : 'online'}">
+						<div
+							class="rounded-full {$selectedNfts.includes(nft)
+								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100'
+								: ''}"
+							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligible'))}
+						>
 							<img
 								class="mt-0 h-full w-full object-fill"
 								src={nft.json.image}
