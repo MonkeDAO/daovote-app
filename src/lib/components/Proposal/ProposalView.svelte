@@ -18,7 +18,37 @@
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
 	import LoadingOverlay from '../LoadingOverlay.svelte';
+	import { Bar } from 'svelte-chartjs';
+	import { Chart, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
+	let data = {
+		labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+		datasets: [
+			{
+				label: '% of Votes',
+				data: [12, 19, 3, 5, 2, 3],
+				backgroundColor: [
+					'rgba(255, 134,159,0.4)',
+					'rgba(98,  182, 239,0.4)',
+					'rgba(255, 218, 128,0.4)',
+					'rgba(113, 205, 205,0.4)',
+					'rgba(170, 128, 252,0.4)',
+					'rgba(255, 177, 101,0.4)'
+				],
+				borderWidth: 2,
+				borderColor: [
+					'rgba(255, 134, 159, 1)',
+					'rgba(98,  182, 239, 1)',
+					'rgba(255, 218, 128, 1)',
+					'rgba(113, 205, 205, 1)',
+					'rgba(170, 128, 252, 1)',
+					'rgba(255, 177, 101, 1)'
+				]
+			}
+		]
+	};
+
+	Chart.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 	export let proposalData: {
 		proposal: ProposalItem;
 		nfts?: NftMetadata[];
@@ -215,13 +245,10 @@
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
-				<!-- <p class="flex items-center">
-					Created Date: {bnToDate(toBigNumber(proposal.data.time)).toISOString().slice(0, 10)}
-				</p> -->
-				{#if !isDefaultDate(bnToDate(proposal.endTime))}
-					<CountDownCard targetDate={bnToDate(proposal.endTime)} displayLabel={true} />
-				{:else}
+				{#if ended}
 					<div>Created On: {new Date(proposal?.data?.time * 1000).toLocaleDateString()}</div>
+				{:else}
+					<CountDownCard targetDate={bnToDate(proposal.endTime)} displayLabel={true} />
 				{/if}
 			</div>
 			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
@@ -267,74 +294,87 @@
 		</div>
 	{/if}
 </div>
-<article
-	class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
->
-	<div
-		class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+{#if !ended}
+	<article
+		class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
 	>
-		<div class="flex items-center justify-between space-x-4 text-gray-900 dark:text-gray-100">
-			<p class="text-lg font-bold md:text-xl">Vote</p>
-			<p class="mx-0 my-0 text-sm text-gray-800 dark:text-gray-200">
-				Number of votes cast is <span class="font-bold">{proposal.voterCount}</span>
+		<div
+			class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+		>
+			<div class="flex items-center justify-between space-x-4 text-gray-900 dark:text-gray-100">
+				<p class="text-lg font-bold md:text-xl">Vote</p>
+				<p class="mx-0 my-0 text-sm text-gray-800 dark:text-gray-200">
+					Number of votes cast is <span class="font-bold">{proposal.voterCount}</span>
+				</p>
+			</div>
+			<p class="text-sm text-gray-800 dark:text-gray-200">
+				You can vote for a maximum of {proposal.maxOptionsSelectable} out of {proposal.options
+					.length}
 			</p>
-		</div>
-		<p class="text-sm text-gray-800 dark:text-gray-200">
-			You can vote for a maximum of {proposal.maxOptionsSelectable} out of {proposal.options.length}
-		</p>
-		<div class="list">
-			{#each options as option (option)}
-				<!-- <div class="mx-8 list-item text-gray-900 dark:text-gray-100">
+			<div class="list">
+				{#each options as option (option)}
+					<!-- <div class="mx-8 list-item text-gray-900 dark:text-gray-100">
 					<div>
 						<span class="list-item-title">{option.title}</span>
 					</div>
 				</div> -->
-				<div class="form-control">
-					<label class="label cursor-pointer">
-						<span class="label-text text-black dark:text-gray-200">{option.title}</span>
-						<input
-							type="checkbox"
-							bind:checked={option.checked}
-							class="checkbox-primary checkbox"
-						/>
-					</label>
-				</div>
-			{/each}
-		</div>
-		<button
-			class="btn-primary btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded bg-gray-100 px-4 pt-1 font-medium text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
-			on:click={handleVote}
-			disabled={ended}
-			>Vote
-		</button>
-	</div>
-	<NftGrid nfts={allNfts} />
-	{#if isOwner && proposal.voteOpen}
-		<div
-			class="relative m-px overflow-hidden rounded-md bg-slate-800 px-2 py-2 text-lg dark:bg-gray-300"
-		>
-			<div
-				class="absolute -left-[15px] -top-[50px] z-0 h-[140px] w-[140px] rounded-full border bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 blur-[60px] transition-all dark:blur-[80px]"
-			/>
-			<div class="relative z-10 text-center">
-				<p class="text-sm text-gray-300 dark:text-black">
-					<strong class="text-white dark:text-black">Note:</strong> You are the
-					<a class="font-semibold text-gray-300 dark:text-black">owner</a> of this
-					proposal. Close proposal
-					{#if ended}
-					<button
-						class="text-white text-white underline dark:text-gray-700"
-						on:click={closeProposal}
-						disabled={!isOwner || !proposal.voteOpen}>here</button
-					>
-					{:else}
-					once the time ends.
-					{/if}
-				</p>
+					<div class="form-control">
+						<label class="label cursor-pointer">
+							<span class="label-text text-black dark:text-gray-200">{option.title}</span>
+							<input
+								type="checkbox"
+								bind:checked={option.checked}
+								class="checkbox-primary checkbox"
+							/>
+						</label>
+					</div>
+				{/each}
 			</div>
+			<button
+				class="btn-primary btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded bg-gray-100 px-4 pt-1 font-medium text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
+				on:click={handleVote}
+				disabled={ended}
+				>Vote
+			</button>
 		</div>
-	{/if}
-</article>
+		<NftGrid nfts={allNfts} />
+		{#if isOwner && proposal.voteOpen}
+			<div
+				class="relative m-px overflow-hidden rounded-md bg-slate-800 px-2 py-2 text-lg dark:bg-gray-300"
+			>
+				<div
+					class="absolute -left-[15px] -top-[50px] z-0 h-[140px] w-[140px] rounded-full border bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 blur-[60px] transition-all dark:blur-[80px]"
+				/>
+				<div class="relative z-10 text-center">
+					<p class="text-sm text-gray-300 dark:text-black">
+						<strong class="text-white dark:text-black">Note:</strong> You are the
+						<a class="font-semibold text-gray-300 dark:text-black">owner</a> of this proposal. Close
+						proposal
+						{#if ended}
+							<button
+								class="text-white text-white underline dark:text-gray-700"
+								on:click={closeProposal}
+								disabled={!isOwner || !proposal.voteOpen}>here</button
+							>
+						{:else}
+							once the time ends.
+						{/if}
+					</p>
+				</div>
+			</div>
+		{/if}
+	</article>
+{:else}
+<article
+class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
+>
+<div
+	class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+>
+	<Bar {data} options={{ responsive: true }} />
+	</div>
+	</article>
+{/if}
 
 <style lang="postcss">
 	/* https://ryanmulligan.dev/blog/layout-breakouts/ */
