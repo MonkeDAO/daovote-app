@@ -183,6 +183,9 @@
 		confirmationModal.closeModal();
 		dispatch('closeProposal', e.detail);
 	}
+	onDestroy(() => {
+		selectedNfts.reset();
+	});
 </script>
 
 <VoteConfirmationModal
