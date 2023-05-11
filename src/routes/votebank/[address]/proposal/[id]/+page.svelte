@@ -287,8 +287,6 @@
 					},
 					'confirmed'
 				);
-				const voteCreatedAccount = await program.account.voteAccount.fetch(vote, 'confirmed');
-				console.log('vote created data', voteCreatedAccount);
 				message.set('Vote success!');
 				const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 				toast.push(`Voted! <a href="${explorerUrl}" target="_blank">${vote.toBase58()}</a>`, {
