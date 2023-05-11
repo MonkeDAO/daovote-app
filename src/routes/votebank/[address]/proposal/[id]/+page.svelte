@@ -273,9 +273,7 @@
 					}
 				}
 				message.set('Waiting for signature...');
-				var sig = await $walletStore.signTransaction(tx);
-				sig?.verifySignatures();
-				const signature = await connection.sendRawTransaction(tx.serialize());
+				const signature = await $walletStore.sendTransaction(tx, connection);
 				console.log('Signature', signature);
 				const latestBlockhash = await connection.getLatestBlockhash();
 
@@ -348,11 +346,7 @@
 					}
 				}
 				message.set('Waiting for signature...');
-				var sig = await $walletStore.signTransaction(tx);
-
-				sig?.verifySignatures();
-
-				const signature = await connection.sendRawTransaction(tx.serialize());
+				const signature = await $walletStore.sendTransaction(tx, connection);
 
 				console.log('Signature', signature);
 				const latestBlockhash = await connection.getLatestBlockhash();
