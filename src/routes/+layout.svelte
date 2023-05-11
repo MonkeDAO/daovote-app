@@ -4,13 +4,12 @@
 	globalThis.Buffer = Buffer;
 </script> -->
 
-<script>
+<script lang="ts">
 	import '../tailwind.css';
 	import Nav from '$lib/components/Nav.svelte';
 	import { MY_TWITTER_HANDLE, REPO_URL } from '$lib/siteConfig';
-	import { clusterApiUrl } from '@solana/web3.js';
 	import { WalletProvider } from '@svelte-on-solana/wallet-adapter-ui';
-	import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+	import type { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 	import { getLocalStorage, walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { AnchorConnectionProvider, workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import idl from '$lib/anchor/omcvote/omcvote.json';
@@ -28,10 +27,11 @@
 	import { balanceStore } from '$lib/balance';
 	import { shdwBalanceStore } from '$lib/shdwbalance';
 	import { forcedConnection } from '$lib/drive';
+	import { PUBLIC_RPC_URL, PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	const localStorageKey = 'walletAdapter';
 	//TODO: Configurable or env variable
-	const endpoint = WalletAdapterNetwork.Devnet;
-	const network = clusterApiUrl(endpoint); //'https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/' ;
+	const endpoint = PUBLIC_SOLANA_NETWORK as WalletAdapterNetwork;
+	const network = PUBLIC_RPC_URL;
 	let wallets = [
 		new PhantomWalletAdapter(),
 		new GlowWalletAdapter(),
