@@ -102,7 +102,11 @@
 								</p>
 								<p class="text-gray-900 dark:text-gray-100">
 									Gate value: <a
-										href={getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'address', restriction.restrictionValue.address)}
+										href={getExplorerUrl(
+											PUBLIC_SOLANA_NETWORK,
+											'address',
+											restriction.restrictionValue.address
+										)}
 										target="_blank">{trimAddress(restriction.restrictionValue.address)}</a
 									>
 								</p>
@@ -128,8 +132,9 @@
 								<ul class="ml-2 list-disc">
 									{#each owners as owner}
 										<li class="text-gray-100 dark:text-gray-100">
-											<a href={getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'address', owner)} target="_blank"
-												>{trimAddress(owner)}</a
+											<a
+												href={getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'address', owner)}
+												target="_blank">{trimAddress(owner)}</a
 											>
 										</li>
 									{/each}

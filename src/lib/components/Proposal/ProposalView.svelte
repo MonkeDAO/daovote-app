@@ -1,14 +1,13 @@
 <script lang="ts">
 	import type { Connection } from '@solana/web3.js';
 	import CollapsablePanelButton from '$lib/components/CollapsablePanelButton.svelte';
-	import CollapsableClickPanel from '$lib/components/CollapsableClickPanel.svelte';
 	import VoteConfirmationModal from '$lib/components//Vote/Voting/VoteConfirmationModal.svelte';
 	import PdfViewer from '$lib/components/PDFViewer.svelte';
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { toast } from '@zerodevx/svelte-toast';
 	import type { NftMetadata, ProposalItem } from '$lib/types';
-	import { bnToDate, extractRestrictionData, voteAccountPdaExists } from '$lib/utils/solana';
-	import { formatDate, getRemainingTime, isDefaultDate } from '$lib/utils/date';
+	import { bnToDate, extractRestrictionData } from '$lib/utils/solana';
+	import { getRemainingTime, isDefaultDate } from '$lib/utils/date';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import CountDownCard from '../CountDownCard.svelte';
 	import ConfirmationModal from '../ConfirmationModal.svelte';
@@ -365,14 +364,14 @@
 		{/if}
 	</article>
 {:else}
-<article
-class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
->
-<div
-	class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
->
-	<Bar {data} options={{ responsive: true }} />
-	</div>
+	<article
+		class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
+	>
+		<div
+			class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+		>
+			<Bar {data} options={{ responsive: true }} />
+		</div>
 	</article>
 {/if}
 

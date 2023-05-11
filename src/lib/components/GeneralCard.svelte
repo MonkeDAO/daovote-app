@@ -5,11 +5,10 @@
 	import { onMount } from 'svelte';
 	export let item: CardItem;
 	function truncateDescription(description: string) {
-    const words = description.split(' ');
-    const truncated = words.slice(0, 5).join(' ');
-    return truncated + (words.length > 8 ? '...' : ''); // add ellipsis if truncated
-}
-
+		const words = description.split(' ');
+		const truncated = words.slice(0, 5).join(' ');
+		return truncated + (words.length > 8 ? '...' : ''); // add ellipsis if truncated
+	}
 </script>
 
 <a
@@ -24,7 +23,7 @@
 				{item.title}
 			</h4>
 		</div>
-		<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200 mb-2">
+		<div class="capsize card-content mb-2 flex items-center text-gray-800 dark:text-gray-200">
 			{truncateDescription(item.description)}
 		</div>
 		<CountDownCard targetDate={bnToDate(item.endtime)} displayLabel={false} />
@@ -35,7 +34,7 @@
 	.card-wrapper {
 		width: 100%; /* Adjust this value to your preference */
 		max-width: 300px; /* Adjust this value to your preference */
-		text-decoration-line: none;		
+		text-decoration-line: none;
 		height: 215px;
 	}
 	.card-content {

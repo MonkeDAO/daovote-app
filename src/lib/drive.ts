@@ -9,10 +9,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { PUBLIC_MAINNET_RPC_URL } from '$env/static/public';
 
 export const driveStore: Writable<ShdwDrive | null> = writable(null);
-export const forcedConnection = new Connection(
-	PUBLIC_MAINNET_RPC_URL,
-	'confirmed'
-); //shadow drive only works on mainnet
+export const forcedConnection = new Connection(PUBLIC_MAINNET_RPC_URL, 'confirmed'); //shadow drive only works on mainnet
 export async function uploadToShadowDrive(
 	connection: any,
 	wallet: any,

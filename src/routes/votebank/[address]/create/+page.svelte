@@ -25,7 +25,7 @@
 	import type { Program } from '@project-serum/anchor';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import { Votebank } from '$lib/anchor/accounts';
-	import type { SettingsData, VoteRestrictionRule } from '$lib/anchor/types';
+	import type { SettingsData } from '$lib/anchor/types';
 	import type { NftMetadata } from '$lib/types';
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
 	import { nftSyncStore } from '$lib/stores/nftStore';
@@ -132,10 +132,6 @@
 				let tokenAccount = getDefaultPublicKey();
 				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
 				if (isNftRestricted) {
-					//TODO: Move this to a store or something.
-					// const nfts = await metaplex.nfts().findAllByOwner({
-					// 	owner: currentUser
-					// });
 
 					// Find by collection id:
 					nfts.find((nft) => {
@@ -267,7 +263,7 @@
 						pausable: true
 					}
 				);
-				setTimeout(() => reset(), 2000);
+				setTimeout(() => reset(), 1500);
 			}
 		} catch (err) {
 			console.log('Transaction error: ', err);
@@ -294,23 +290,23 @@
 						return false;
 					}
 				} else {
-					message.set('No storage account found, creating one...')
+					message.set('No storage account found, creating one...');
 					const createResponse = await createStorageAccount(connection, wallet);
 					if (!createResponse.shdw_bucket) {
 						toast.push('Error creating storage account!', { target: 'new' });
 						return false;
 					}
-					message.set('Storage account created, uploading file...')
+					message.set('Storage account created, uploading file...');
 					const test = await uploadToShadowDrive(
 						connection,
 						wallet,
 						new PublicKey(createResponse.shdw_bucket),
 						file
 					);
-					
+
 					console.log('Upload response', test);
 					if (test.finalized_locations.length > 0) {
-						message.set('File uploaded!')
+						message.set('File uploaded!');
 						shadowDriveUrl = test.finalized_locations[0];
 						return true;
 					} else {
@@ -330,7 +326,7 @@
 		file = event.detail.file;
 		proposal = event.detail.proposal;
 		const skipUpload = event.detail.skipUpload;
-		loadingStore.set(true)
+		loadingStore.set(true);
 		if (skipUpload) {
 			await createProposal();
 		} else {

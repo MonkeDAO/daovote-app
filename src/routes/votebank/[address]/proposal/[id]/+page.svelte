@@ -9,15 +9,22 @@
 		extractRestrictionData,
 		getDefaultPublicKey,
 		getExplorerUrl,
+		getTxSize,
 		isDefaultPublicKey,
 		proposalAccountPda,
+		sleep,
 		toAccountMetadata,
 		voteAccountPda
 	} from '$lib/utils/solana';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import { PublicKey, type Connection, type AccountMeta, Transaction } from '@solana/web3.js';
+	import {
+		PublicKey,
+		type Connection,
+		Transaction,
+		TransactionInstruction
+	} from '@solana/web3.js';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { Metaplex } from '@metaplex-foundation/js';
 	import type { Program } from '@project-serum/anchor';
@@ -26,7 +33,7 @@
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import type { Adapter } from '@solana/wallet-adapter-base';
-	import { getRemainingSeconds, getRemainingTime, isDefaultDate } from '$lib/utils/date';
+	import { getRemainingSeconds, getRemainingTime } from '$lib/utils/date';
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
 	import { nftSyncStore, nftWalletDisconnectListener } from '$lib/stores/nftStore';
@@ -107,8 +114,15 @@
 		});
 		return votedFor;
 	}
-
-	async function buildVoteTxn(votedFor: VoteEntry[], nfts: NftMetadata[]) {
+	
+	async function buildVoteTxn(
+		votedFor: VoteEntry[],
+		votebankAccountAddress: PublicKey,
+		voteBankAccountRaw: Votebank,
+		proposalAccount: PublicKey,
+		proposalSettings: SettingsData[],
+		nft?: NftMetadata
+	): Promise<TransactionInstruction | undefined> {
 		if (
 			connection &&
 			wallet &&
@@ -118,38 +132,7 @@
 			$walletStore.signTransaction
 		) {
 			try {
-				message.set('Voting for proposal...');
-				loadingStore.set(true);
 				console.log('proposalItem', proposalItem);
-				const endTime = bnToDate(proposalItem.endTime);
-				const isDefault = isDefaultDate(endTime);
-				if (!isDefault) {
-					const remainingTime = getRemainingTime(endTime);
-					const totalSecondsRemaining = getRemainingSeconds(remainingTime);
-					if (totalSecondsRemaining < 30 && !ended) {
-						toast.push('Less than 30 seconds remaining. This vote might fail!', { target: 'new' });
-					}
-					if (remainingTime.ended) {
-						toast.pop({ target: 'new' });
-						toast.push('Vote has ended.', { target: 'new' });
-						ended = true;
-						return;
-					}
-				}
-				const votebankAccountAddress = new PublicKey(data.address);
-				const voteBankAccountRaw = await Votebank.fromAccountAddress(
-					connection,
-					votebankAccountAddress
-				);
-				const votebank = voteBankAccountRaw?.pretty();
-				const [proposalAccount] = proposalAccountPda(
-					votebankAccountAddress,
-					proposalItem.proposalId,
-					program.programId
-				);
-				//let accountIndicies: AdditionalAccountIndices[] = [];
-				const accountsMeta: AccountMeta[] = [];
-				const proposalSettings = proposalItem.settings as SettingsData[];
 				const {
 					restrictionMint: proposalRestrictionMint,
 					isNftRestricted: proposalIsNftRestricted,
@@ -163,21 +146,13 @@
 				let nftMintMetadata = getDefaultPublicKey();
 				let tokenAccount = getDefaultPublicKey();
 				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
-				//TODO: Break up into multiple IX per NFTs passed in. important!
-				if (isNftRestricted) {
-					if (nfts.length === 0) {
-						toast.push('You must select at least one NFT to vote.', { target: 'new' });
-						return;
-					}
+
+				if (isNftRestricted && nft) {
 					// Find by collection id:
-					nfts.find((nft) => {
-						if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
-							mint = new PublicKey(nft.address);
-							nftMintMetadata = new PublicKey(nft.metadataAddress);
-							return true;
-						}
-						return false;
-					});
+					if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
+						mint = new PublicKey(nft.address);
+						nftMintMetadata = new PublicKey(nft.metadataAddress);
+					}
 					additionalAccountOffsets = [
 						{
 							nftOwnership: {
@@ -234,14 +209,7 @@
 					}, 1500);
 					return;
 				}
-				console.log('vote', {
-					voteAccount: vote.toBase58(),
-					Nftmint: mint.toBase58(),
-					mint: mint.toBase58(),
-					accountOffsets: additionalAccountOffsets,
-					accountsMeta,
-					tokenToAccountMetaFormat
-				});
+
 				const ix = await program.methods
 					.vote(proposalItem.proposalId, votedFor, additionalAccountOffsets)
 					.accounts({
@@ -255,52 +223,142 @@
 					})
 					.remainingAccounts(tokenToAccountMetaFormat)
 					.instruction();
-				const tx = new Transaction().add(ix);
-				tx.feePayer = currentUser;
-				tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-				message.set('Simulating transaction...');
-				//const test = VersionedTransaction.deserialize(tx.serialize());
-				const t = await connection.simulateTransaction(tx);
-				if (t.value.err) {
-					const messages = extractCustomCodes(t.value.err);
-					if (messages.length > 0) {
-						const msgString = messages.join(', ');
-						message.set(`Error: ${msgString}`);
-						setTimeout(() => {
-							reset();
-						}, 2000);
-						return;
-					}
-				}
-				message.set('Waiting for signature...');
-				const signature = await $walletStore.sendTransaction(tx, connection);
-				console.log('Signature', signature);
-				const latestBlockhash = await connection.getLatestBlockhash();
-
-				await connection.confirmTransaction(
-					{
-						signature: signature,
-						lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-						blockhash: latestBlockhash.blockhash
-					},
-					'confirmed'
-				);
-				message.set('Vote success!');
-				const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
-				toast.push(`Voted! <a href="${explorerUrl}" target="_blank">${vote.toBase58()}</a>`, {
-					duration: 3000,
-					pausable: true
-				});
-				data.proposal.voterCount = data.proposal.voterCount + 1;
-				reset();
-				return { proposalAccount, votedFor, settings, votebank };
+				return ix;
 			} catch (e: any) {
-				message.set(`Error: ${e?.message ?? e}`); //clear message
-				setTimeout(() => {
-					reset();
-				}, 1200);
+				console.error('Error building vote transaction', e);
+				message.set(`Error: ${e?.message ?? e}. Skipping this transaction.`); //clear message
+				return undefined;
 			}
 		}
+	}
+
+	async function buildVoteTransactions(
+		votedFor: VoteEntry[],
+		nfts: NftMetadata[]
+	): Promise<Transaction[]> {
+		const transactions: Transaction[] = [];
+		const endTime = bnToDate(proposalItem.endTime);
+		const remainingTime = getRemainingTime(endTime);
+		const totalSecondsRemaining = getRemainingSeconds(remainingTime);
+		if (totalSecondsRemaining < 30 && !ended) {
+			toast.push('Less than 30 seconds remaining. This vote might fail!', { target: 'new' });
+		}
+		if (remainingTime.ended) {
+			toast.pop({ target: 'new' });
+			toast.push('Vote has ended.', { target: 'new' });
+			ended = true;
+			return transactions;
+		}
+		loadingStore.set(true);
+
+		const votebankAccountAddress = new PublicKey(data.address);
+		const voteBankAccountRaw = await Votebank.fromAccountAddress(
+			connection,
+			votebankAccountAddress
+		);
+		const [proposalAccount] = proposalAccountPda(
+			votebankAccountAddress,
+			proposalItem.proposalId,
+			program.programId
+		);
+		const proposalSettings = proposalItem.settings as SettingsData[];
+		const settings = voteBankAccountRaw.settings as SettingsData[];
+		const { isNftRestricted } = extractRestrictionData(settings);
+		let transaction = new Transaction();
+		transaction.feePayer = currentUser;
+		if (!isNftRestricted) {
+			// Add the vote instruction
+			const instruction = await buildVoteTxn(
+				votedFor,
+				votebankAccountAddress,
+				voteBankAccountRaw,
+				proposalAccount,
+				proposalSettings
+			);
+			if (!instruction) {
+				message.set('Error building vote transaction');
+				return transactions;
+			}
+			transaction.add(instruction);
+			transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			transactions.push(transaction);
+			return transactions;
+		}
+		// If the vote is restricted to an nft, we need to build a transaction for each nft
+		for (let nft of nfts) {
+			await setMessageSlow('Building vote transaction for ' + nft.json.name);
+			const instruction = await buildVoteTxn(
+				votedFor,
+				votebankAccountAddress,
+				voteBankAccountRaw,
+				proposalAccount,
+				proposalSettings,
+				nft
+			);
+			console.log('instruction', instruction);
+			if (!instruction) continue;
+
+			transaction.add(instruction);
+			transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			const txnSize = getTxSize(transaction, currentUser);
+			console.log('txnSize', txnSize);
+			if (txnSize > 1282) {
+				// Remove the last instruction that caused the size to exceed limit
+				transaction.instructions.pop();
+
+				// Finalize the current transaction and start a new one
+				transactions.push(transaction);
+				transaction = new Transaction();
+				transaction.feePayer = currentUser;
+				transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+				transaction.add(instruction); // Add the instruction to the new transaction
+			}
+		}
+		console.log('done looping', transaction, transaction.instructions.length, transactions);
+		if (transaction.instructions.length > 0) {
+			transactions.push(transaction);
+		}
+
+		return transactions;
+	}
+
+	async function finalizeAndSendTransactions(txns: Transaction[]) {
+		const signatures = [];
+		for (let txn of txns) {
+			const t = await connection.simulateTransaction(txn);
+			if (t.value.err) {
+				const messages = extractCustomCodes(t.value.err);
+				if (messages.length > 0) {
+					const msgString = messages.join(', ');
+					message.set(`Error: ${msgString}`);
+					continue; //dont fail on simulation error just move on.
+				}
+			}
+			message.set('Waiting for signature...');
+			const signature = await $walletStore.sendTransaction(txn, connection);
+			signatures.push(signature);
+		}
+
+		const latestBlockhash = await connection.getLatestBlockhash();
+
+		for (let signature of signatures) {
+			await connection.confirmTransaction(
+				{
+					signature: signature,
+					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+					blockhash: latestBlockhash.blockhash
+				},
+				'confirmed'
+			);
+			message.set('Vote success!');
+			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
+			toast.push(`Voted! <a href="${explorerUrl}" target="_blank">${signature}</a>`, {
+				duration: 3000,
+				pausable: true
+			});
+		}
+		data.proposal.voterCount = data.proposal.voterCount + 1;
+		reset();
 	}
 
 	async function closeProposal(proposalId: number, votebank: string) {
@@ -379,6 +437,10 @@
 		}
 	}
 
+	async function setMessageSlow(msg: string) {
+		message.set(msg);
+		await sleep(500);
+	}
 	function reset() {
 		loadingStore.set(false);
 		message.set('');
@@ -386,8 +448,13 @@
 
 	async function handleVoteSubmit(event: CustomEvent) {
 		const voteOptions = buildVotedFor(event.detail.chosenOptions);
-		const voteTxn = await buildVoteTxn(voteOptions, event.detail.selectedNfts);
-		console.log('vote', event, voteTxn);
+		const voteTxns = await buildVoteTransactions(voteOptions, event.detail.selectedNfts);
+		if (voteTxns.length === 0) {
+			toast.push(`No votes to submit`, { target: 'new' });
+			reset();
+			return;
+		}
+		await finalizeAndSendTransactions(voteTxns);
 	}
 
 	async function handleCloseProposal(e: CustomEvent<any>): Promise<void> {
