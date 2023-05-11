@@ -270,6 +270,7 @@
 						pausable: true
 					}
 				);
+				setTimeout(() => reset(), 2000);
 			}
 		} catch (err) {
 			console.log('Transaction error: ', err);
