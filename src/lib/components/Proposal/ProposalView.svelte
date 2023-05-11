@@ -84,6 +84,36 @@
 	$: if ($workSpace?.provider?.connection) {
 		connection = $workSpace?.provider?.connection;
 	}
+	$: {
+		if (proposal) {
+			data = {
+		labels: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.title),
+		datasets: [
+			{
+				label: '% of Votes',
+				data: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.voteCount ? option.voteCount/proposal.voterCount : 0), //is this percentage?
+				backgroundColor: [
+					'rgba(255, 134,159,0.4)',
+					'rgba(98,  182, 239,0.4)',
+					'rgba(255, 218, 128,0.4)',
+					'rgba(113, 205, 205,0.4)',
+					'rgba(170, 128, 252,0.4)',
+					'rgba(255, 177, 101,0.4)'
+				],
+				borderWidth: 2,
+				borderColor: [
+					'rgba(255, 134, 159, 1)',
+					'rgba(98,  182, 239, 1)',
+					'rgba(255, 218, 128, 1)',
+					'rgba(113, 205, 205, 1)',
+					'rgba(170, 128, 252, 1)',
+					'rgba(255, 177, 101, 1)'
+				]
+			}
+		]
+	};
+		}
+	}
 
 	filteredNftStore.subscribe(($filteredNftStore) => {
 		eligibleNfts = $filteredNftStore.eligible;
