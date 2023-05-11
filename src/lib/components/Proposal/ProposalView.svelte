@@ -377,7 +377,7 @@
 				<div class="relative z-10 text-center">
 					<p class="text-sm text-gray-300 dark:text-black">
 						<strong class="text-white dark:text-black">Note:</strong> You are the
-						<a class="font-semibold text-gray-300 dark:text-black">owner</a> of this proposal. Close
+						<span class="font-semibold text-gray-300 dark:text-black">owner</span> of this proposal. Close
 						proposal
 						{#if ended}
 							<button
@@ -412,7 +412,7 @@
 				<div class="relative z-10 text-center">
 					<p class="text-sm text-gray-300 dark:text-black">
 						<strong class="text-white dark:text-black">Note:</strong> You are the
-						<a class="font-semibold text-gray-300 dark:text-black">owner</a> of this proposal. Close
+						<span class="font-semibold text-gray-300 dark:text-black">owner</span> of this proposal. Close
 						proposal
 						{#if ended}
 							<button
