@@ -1,10 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { web3 } from '@project-serum/anchor';
-import { PublicKey, clusterApiUrl } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { VOTEBANK } from '$lib/siteConfig';
 import { Votebank } from '$lib/anchor/accounts';
 import type { VoteBankProposals } from '$lib/types';
-import { fetchProposals } from '$lib/utils/solana';
+import { fetchProposals, getEnvNetwork } from '$lib/utils/solana';
 // export const prerender = true; // turned off bc it causes errors
 
 export async function load({ setHeaders }: any) {
@@ -14,7 +14,7 @@ export async function load({ setHeaders }: any) {
 
 	try {
 		//TODO: Configurable/env variable
-		const connection = new web3.Connection(clusterApiUrl('devnet'));
+		const connection = getEnvNetwork();
 		data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(address));
 		let open_proposals: any[] = [];
 		let closed_proposals: any[] = [];

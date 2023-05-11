@@ -1,5 +1,6 @@
 import { Votebank } from '$lib/anchor/accounts';
 import type { VoteBankProposalsNumeric } from '$lib/types';
+import { getEnvNetwork as getEnvConnection } from '$lib/utils/solana';
 import { web3 } from '@project-serum/anchor';
 import { error } from '@sveltejs/kit';
 /**
@@ -12,7 +13,7 @@ export async function GET({ params }: any) {
 	let data: Votebank;
 	let responseData: VoteBankProposalsNumeric;
 	try {
-		const connection = new web3.Connection(web3.clusterApiUrl('devnet'));
+		const connection = getEnvConnection();
 		data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(address));
 		responseData = {
 			votebank: address,

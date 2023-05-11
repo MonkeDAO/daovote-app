@@ -6,10 +6,11 @@ import {
 	type ShadowUploadResponse
 } from '@shadow-drive/sdk';
 import { Connection, PublicKey } from '@solana/web3.js';
+import { PUBLIC_MAINNET_RPC_URL } from '$env/static/public';
 
 export const driveStore: Writable<ShdwDrive | null> = writable(null);
 export const forcedConnection = new Connection(
-	'https://monkecbe3a1fff727446fa5fcd091ca9b7c02.xyz2.hyperplane.dev/',
+	PUBLIC_MAINNET_RPC_URL,
 	'confirmed'
 ); //shadow drive only works on mainnet
 export async function uploadToShadowDrive(

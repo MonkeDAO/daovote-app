@@ -31,6 +31,7 @@
 	import { nftSyncStore } from '$lib/stores/nftStore';
 	import { message } from '$lib/stores/messageStore';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
+	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -260,7 +261,7 @@
 				);
 				console.log('Proposal created data', proposalCreatedAccount);
 				message.set('Proposal created!');
-				const explorerUrl = `${getExplorerUrl('devnet', 'transaction', signature)}`;
+				const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 				toast.push(
 					`Proposal created <a href="/votebank/${votebankAddress}/proposal/${proposalId}" target="_blank">View proposal</a> </br> <a href="${explorerUrl}" target="_blank">View on Solana Explorer</a>`,
 					{

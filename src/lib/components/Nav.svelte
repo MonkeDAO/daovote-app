@@ -1,7 +1,7 @@
 <script lang="ts">
 	import MobileMenu from './MobileMenu.svelte';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { VOTEBANK } from '$lib/siteConfig';
+	import { PUBLIC_VOTEBANK } from '$env/static/public';
 	import NavLink from './NavLink.svelte';
 	import { WalletMultiButton } from '@svelte-on-solana/wallet-adapter-ui';
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
@@ -52,7 +52,7 @@
 		</li>
 		{#if $walletStore?.connected && isOwner}
 			<li>
-				<NavLink href="/votebank/{VOTEBANK}/create">Create Proposal</NavLink>
+				<NavLink href="/votebank/{PUBLIC_VOTEBANK}/create">Create Proposal</NavLink>
 			</li>
 		{/if}
 	</ul>

@@ -1,4 +1,4 @@
-import { PublicKey, Connection, type AccountMeta, type TransactionError } from '@solana/web3.js';
+import { PublicKey, Connection, type AccountMeta, type TransactionError, clusterApiUrl, type Cluster } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
 import { Proposal, VoteAccount } from '$lib/anchor/accounts';
 import type { ProposalItem } from '$lib/types';
@@ -13,6 +13,7 @@ import {
 	type VoteRestrictionRule
 } from '$lib/anchor/types';
 import { errorFromCode } from '$lib/anchor/errors';
+import { PUBLIC_SOLANA_NETWORK, PUBLIC_RPC_URL } from '$env/static/public';
 
 export const CREATOR_SEED: string = 'monkedevs';
 export const VOTEBANK_SEED: string = 'votebank';
@@ -249,6 +250,16 @@ export async function voteAccountPdaExists(
 	);
 	console.log('voteAccountStruct', voteAccountStruct, nft.toBase58());
 	return voteAccountStruct !== undefined;
+}
+
+
+export function getEnvNetwork(commitment: anchor.web3.Commitment = 'confirmed'): anchor.web3.Connection {
+	const network = PUBLIC_SOLANA_NETWORK as Cluster;
+	const rpcUrl = PUBLIC_RPC_URL;
+	if (!rpcUrl) {
+		return new anchor.web3.Connection(clusterApiUrl(network), commitment);
+	}
+	return new anchor.web3.Connection(rpcUrl, commitment);
 }
 
 export function getExplorerUrl(

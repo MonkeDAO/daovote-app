@@ -2,12 +2,12 @@
 import { Metaplex, guestIdentity, type Metadata, PublicKey } from '@metaplex-foundation/js';
 import type { RequestHandler } from '@sveltejs/kit';
 import { web3 } from '@project-serum/anchor';
-import { clusterApiUrl } from '@solana/web3.js';
 import type { NftMetadata } from '$lib/types';
+import { getEnvNetwork } from '$lib/utils/solana';
 
 export const GET: RequestHandler = async (request) => {
 	const publicKey = request.params.publicKey;
-	const connection = new web3.Connection(clusterApiUrl('devnet'));
+	const connection = getEnvNetwork();
 	const metaplex = Metaplex.make(connection).use(guestIdentity());
 	if (!publicKey) {
 		return new Response(JSON.stringify({ error: 'Public key is required' }), {

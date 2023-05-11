@@ -3,6 +3,7 @@
 	import type { VoteBank } from '$lib/anchor/omcvote/types';
 	import * as anchor from '@project-serum/anchor';
 	import { goto } from '$app/navigation';
+	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 
 	export let voteData: { voteBank: VoteBank; address: string };
 	let voteBankInfo: {
@@ -78,7 +79,7 @@
 					</p>
 					<p class="text-gray-900 dark:text-gray-100">
 						Address: <a
-							href={getExplorerUrl('devnet', 'address', voteBankInfo.address)}
+							href={getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'address', voteBankInfo.address)}
 							target="_blank">{trimAddress(voteBankInfo.address)}</a
 						>
 					</p>
@@ -101,7 +102,7 @@
 								</p>
 								<p class="text-gray-900 dark:text-gray-100">
 									Gate value: <a
-										href={getExplorerUrl('devnet', 'address', restriction.restrictionValue.address)}
+										href={getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'address', restriction.restrictionValue.address)}
 										target="_blank">{trimAddress(restriction.restrictionValue.address)}</a
 									>
 								</p>
@@ -127,7 +128,7 @@
 								<ul class="ml-2 list-disc">
 									{#each owners as owner}
 										<li class="text-gray-100 dark:text-gray-100">
-											<a href={getExplorerUrl('devnet', 'address', owner)} target="_blank"
+											<a href={getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'address', owner)} target="_blank"
 												>{trimAddress(owner)}</a
 											>
 										</li>

@@ -1,8 +1,8 @@
 import { Votebank } from '$lib/anchor/accounts';
 import type { VoteBankProposals } from '$lib/types';
-import { fetchProposals } from '$lib/utils/solana';
+import { fetchProposals, getEnvNetwork } from '$lib/utils/solana';
 import { web3 } from '@project-serum/anchor';
-import { PublicKey, clusterApiUrl } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, setHeaders }: any) {
@@ -14,7 +14,7 @@ export async function load({ params, setHeaders }: any) {
 	let responseData: VoteBankProposals;
 	try {
 		//TODO: Configurable/env variable
-		const connection = new web3.Connection(clusterApiUrl('devnet'));
+		const connection = getEnvNetwork();
 		data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(address));
 		let open_proposals: any[] = [];
 		let closed_proposals: any[] = [];

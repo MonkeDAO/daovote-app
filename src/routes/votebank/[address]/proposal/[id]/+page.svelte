@@ -33,6 +33,7 @@
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
 	import { message } from '$lib/stores/messageStore';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
+	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -289,7 +290,7 @@
 				const voteCreatedAccount = await program.account.voteAccount.fetch(vote, 'confirmed');
 				console.log('vote created data', voteCreatedAccount);
 				message.set('Vote success!');
-				const explorerUrl = `${getExplorerUrl('devnet', 'transaction', signature)}`;
+				const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 				toast.push(`Voted! <a href="${explorerUrl}" target="_blank">${vote.toBase58()}</a>`, {
 					duration: 3000,
 					pausable: true
@@ -368,7 +369,7 @@
 				);
 				//Force close refresh data on page
 				data.proposal.voteOpen = false;
-				const explorerUrl = `${getExplorerUrl('devnet', 'transaction', signature)}`;
+				const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 				reset();
 				toast.push(
 					`Proposal closed! <a href="${explorerUrl}" target="_blank">${voteBankAddress.toBase58()}</a>`,
