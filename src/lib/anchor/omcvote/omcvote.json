@@ -372,6 +372,10 @@
           {
             "name": "title",
             "type": "string"
+          },
+          {
+            "name": "voteCount",
+            "type": "u32"
           }
         ]
       }
@@ -387,7 +391,7 @@
           },
           {
             "name": "votedFor",
-            "type": "u32"
+            "type": "u8"
           }
         ]
       }

@@ -9,6 +9,7 @@ import * as beet from '@metaplex-foundation/beet'
 export type VoteOption = {
   id: number
   title: string
+  voteCount: number
 }
 
 /**
@@ -19,6 +20,7 @@ export const voteOptionBeet = new beet.FixableBeetArgsStruct<VoteOption>(
   [
     ['id', beet.u8],
     ['title', beet.utf8String],
+    ['voteCount', beet.u32],
   ],
   'VoteOption'
 )

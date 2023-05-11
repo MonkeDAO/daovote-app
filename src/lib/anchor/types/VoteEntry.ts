@@ -18,7 +18,7 @@ export type VoteEntry = {
 export const voteEntryBeet = new beet.BeetArgsStruct<VoteEntry>(
   [
     ['proposalId', beet.u32],
-    ['votedFor', beet.u32],
+    ['votedFor', beet.u8],
   ],
   'VoteEntry'
 )
