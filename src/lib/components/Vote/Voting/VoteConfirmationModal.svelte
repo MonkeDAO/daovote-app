@@ -4,7 +4,8 @@
 
 	export let options: any[] = [];
 	let modalInput: any;
-
+	let optionsFormatted: string;
+	$: optionsFormatted = options?.length ? options.filter((option) => option.checked).map((option) => option.title).join(', ') : '';
 	export function openModal() {
 		modalInput.checked = true;
 	}
@@ -26,6 +27,9 @@
 		<h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Vote Confirmation</h3>
 		<p class="py-4 text-xl text-gray-900 dark:text-gray-100">
 			Are you sure you want to cast your vote with the selected options?
+		</p>
+		<p class="py-4 text-xl text-gray-900 dark:text-gray-100">
+			Selected options: {optionsFormatted}
 		</p>
 		<div class="modal-action">
 			<label for="vote-confirmation-modal" class="btn">Cancel</label>

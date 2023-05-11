@@ -64,7 +64,7 @@ export type ProposalItem = {
 	votebank: string;
 	poster: string;
 	data: ProposalData;
-	options: { id: number; title: string }[];
+	options: { id: number; title: string, voteCount?: number }[];
 	maxOptionsSelectable: number;
 	settings: any[];
 	voterCount: number;
