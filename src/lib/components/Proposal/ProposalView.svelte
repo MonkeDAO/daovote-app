@@ -275,13 +275,13 @@
 	>
 		<div class="flex items-center justify-between space-x-4 text-gray-900 dark:text-gray-100">
 			<p class="text-lg font-bold md:text-xl">Vote</p>
-			<!-- <p class="text-sm text-gray-800 dark:text-gray-200">
-			You can vote for a maximum of {proposal.maxOptionsSelectable} out of {proposal.options.length}
-		</p> -->
 			<p class="mx-0 my-0 text-sm text-gray-800 dark:text-gray-200">
 				Number of votes cast is <span class="font-bold">{proposal.voterCount}</span>
 			</p>
 		</div>
+		<p class="text-sm text-gray-800 dark:text-gray-200">
+			You can vote for a maximum of {proposal.maxOptionsSelectable} out of {proposal.options.length}
+		</p>
 		<div class="list">
 			{#each options as option (option)}
 				<!-- <div class="mx-8 list-item text-gray-900 dark:text-gray-100">
@@ -319,13 +319,17 @@
 			<div class="relative z-10 text-center">
 				<p class="text-sm text-gray-300 dark:text-black">
 					<strong class="text-white dark:text-black">Note:</strong> You are the
-					<a href="/pricing" class="font-semibold text-gray-300 dark:text-black">owner</a> of this
+					<a class="font-semibold text-gray-300 dark:text-black">owner</a> of this
 					proposal. Close proposal
+					{#if ended}
 					<button
 						class="text-white text-white underline dark:text-gray-700"
 						on:click={closeProposal}
 						disabled={!isOwner || !proposal.voteOpen}>here</button
 					>
+					{:else}
+					once the time ends.
+					{/if}
 				</p>
 			</div>
 		</div>
