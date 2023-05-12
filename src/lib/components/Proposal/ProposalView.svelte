@@ -90,8 +90,8 @@
 		labels: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.title),
 		datasets: [
 			{
-				label: '% of Votes',
-				data: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.voteCount ? option.voteCount/proposal.voterCount : 0), //is this percentage?
+				label: '# of Votes',
+				data: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.voteCount ? option.voteCount : 0),
 				backgroundColor: [
 					'rgba(255, 134,159,0.4)',
 					'rgba(98,  182, 239,0.4)',
