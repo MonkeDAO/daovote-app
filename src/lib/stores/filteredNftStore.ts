@@ -51,7 +51,7 @@ const createFilteredNftStore = () => {
 	) {
 		if (connection && proposal) {
 			const chunkSize = 25; // Define your chunk size
-			const delayBetweenChunks = 300; // Define delay in milliseconds
+			const delayBetweenChunks = 100; // Define delay in milliseconds
 
 			const chunks = await chunkArray(filteredNfts, chunkSize);
 
