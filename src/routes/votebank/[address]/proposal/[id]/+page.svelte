@@ -3,35 +3,23 @@
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import type { NftMetadata, ProposalItem } from '$lib/types';
 	import {
-		TREASURY_ADDRESS,
 		bnToDate,
 		extractCustomCodes,
 		extractRestrictionData,
-		getDefaultPublicKey,
 		getExplorerUrl,
 		getTxSize,
-		isDefaultPublicKey,
 		proposalAccountPda,
-		sleep,
-		toAccountMetadata,
-		voteAccountPda
-	} from '$lib/utils/solana';
+		sleep	} from '$lib/utils/solana';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import {
-		PublicKey,
-		type Connection,
-		Transaction,
-		TransactionInstruction
-	} from '@solana/web3.js';
+	import { PublicKey, type Connection, Transaction, TransactionInstruction } from '@solana/web3.js';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { Metaplex } from '@metaplex-foundation/js';
 	import type { Program } from '@project-serum/anchor';
 	import { walletProgramConnection } from '$lib/wallet';
 	import type { SettingsData, VoteEntry } from '$lib/anchor/types';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
-	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { getRemainingSeconds, getRemainingTime } from '$lib/utils/date';
 	import { createCloseProposalInstruction } from '$lib/anchor/instructions/closeProposal';
@@ -41,6 +29,7 @@
 	import { message } from '$lib/stores/messageStore';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
+	import { buildNftVoteIx, buildTokenVoteIx } from '$lib/utils/votehelpers';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -114,121 +103,31 @@
 		});
 		return votedFor;
 	}
-	
-	async function buildVoteTxn(
+
+	async function buildVoteTokenTxn(
 		votedFor: VoteEntry[],
 		votebankAccountAddress: PublicKey,
-		voteBankAccountRaw: Votebank,
-		proposalAccount: PublicKey,
-		proposalSettings: SettingsData[],
-		nft?: NftMetadata
-	): Promise<TransactionInstruction | undefined> {
-		if (
-			connection &&
-			wallet &&
-			metaplex &&
-			program &&
-			currentUser &&
-			$walletStore.signTransaction
-		) {
-			try {
-				console.log('proposalItem', proposalItem);
-				const {
-					restrictionMint: proposalRestrictionMint,
-					isNftRestricted: proposalIsNftRestricted,
-					restrictionIx: proposalRestrictionIx,
-					ruleKind: proposalRulekind
-				} = extractRestrictionData(proposalSettings);
-				const settings = voteBankAccountRaw.settings as SettingsData[];
-				const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
-					extractRestrictionData(settings);
-				let mint = getDefaultPublicKey();
-				let nftMintMetadata = getDefaultPublicKey();
-				let tokenAccount = getDefaultPublicKey();
-				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
+	): Promise<TransactionInstruction | null> {
+		try {
+			return await buildTokenVoteIx(connection, currentUser, votebankAccountAddress, votedFor, proposalItem.proposalId, proposalItem);
+		} catch (e: any) {
+			console.error('Error building vote transaction', e);
+			message.set(`Error: ${e?.message ?? e}. Skipping this transaction.`); //clear message
+			return null;
+		}
+	}
 
-				if (isNftRestricted && nft) {
-					// Find by collection id:
-					if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
-						mint = new PublicKey(nft.address);
-						nftMintMetadata = new PublicKey(nft.metadataAddress);
-					}
-					additionalAccountOffsets = [
-						{
-							nftOwnership: {
-								tokenIdx: 0,
-								metaIdx: 1,
-								collectionIdx: 2
-							}
-						}
-					];
-					tokenAccount = await getAssociatedTokenAddress(mint, currentUser);
-				} else if (restrictionIx && !isNftRestricted) {
-					tokenAccount = await getAssociatedTokenAddress(restrictionMint, currentUser);
-					/**
-					 * Set the mint to the restriction mint since its a token. this needs to be passed as the nftVoteMint for ix
-					 */
-					mint = restrictionMint;
-					console.log('Token account', tokenAccount.toBase58());
-					additionalAccountOffsets = [
-						{
-							tokenOwnership: {
-								tokenIdx: 0
-							}
-						}
-					];
-				}
-
-				if (restrictionIx && isDefaultPublicKey(tokenAccount)) {
-					toast.push(
-						`You need to have this token ${restrictionMint.toBase58()} to create a proposal`,
-						{ target: 'new' }
-					);
-					return;
-				}
-				const tokenToAccountMetaFormat = isNftRestricted
-					? [
-							toAccountMetadata(tokenAccount),
-							toAccountMetadata(nftMintMetadata),
-							toAccountMetadata(restrictionMint)
-					  ]
-					: restrictionIx
-					? [toAccountMetadata(tokenAccount)]
-					: [];
-				const [vote] = voteAccountPda(votebankAccountAddress, mint, proposalItem.proposalId);
-				const voteAccountCheck = await program.account.voteAccount
-					.fetch(vote, 'confirmed')
-					.catch((e) => {
-						console.log('voteAccountCheck', e);
-					});
-				if (voteAccountCheck) {
-					console.log('voteAccountCheck', voteAccountCheck);
-					message.set('You have already voted for this proposal');
-					setTimeout(() => {
-						reset();
-					}, 1500);
-					return;
-				}
-
-				const ix = await program.methods
-					.vote(proposalItem.proposalId, votedFor, additionalAccountOffsets)
-					.accounts({
-						voter: currentUser,
-						votebank: votebankAccountAddress,
-						proposal: proposalAccount,
-						votes: vote,
-						nftVoteMint: mint,
-						treasury: TREASURY_ADDRESS,
-						systemProgram: new PublicKey('11111111111111111111111111111111')
-					})
-					.remainingAccounts(tokenToAccountMetaFormat)
-					.instruction();
-				return ix;
-			} catch (e: any) {
-				console.error('Error building vote transaction', e);
-				message.set(`Error: ${e?.message ?? e}. Skipping this transaction.`); //clear message
-				return undefined;
-			}
+	async function buildNftVoteTxn(
+		votedFor: VoteEntry[],
+		votebankAccountAddress: PublicKey,
+		nft: NftMetadata
+	): Promise<TransactionInstruction | null> {
+		try {
+			return await buildNftVoteIx(connection, currentUser, votebankAccountAddress, votedFor, proposalItem.proposalId, nft, proposalItem)
+		} catch (e: any) {
+			console.error('Error building vote transaction', e);
+			await setMessageSlow(`Error: ${e?.message ?? e}. Skipping this transaction.`); //clear message
+			return null;
 		}
 	}
 
@@ -268,12 +167,9 @@
 		transaction.feePayer = currentUser;
 		if (!isNftRestricted) {
 			// Add the vote instruction
-			const instruction = await buildVoteTxn(
+			const instruction = await buildVoteTokenTxn(
 				votedFor,
 				votebankAccountAddress,
-				voteBankAccountRaw,
-				proposalAccount,
-				proposalSettings
 			);
 			if (!instruction) {
 				message.set('Error building vote transaction');
@@ -287,12 +183,9 @@
 		// If the vote is restricted to an nft, we need to build a transaction for each nft
 		for (let nft of nfts) {
 			await setMessageSlow('Building vote transaction for ' + nft.json.name);
-			const instruction = await buildVoteTxn(
+			const instruction = await buildNftVoteTxn(
 				votedFor,
 				votebankAccountAddress,
-				voteBankAccountRaw,
-				proposalAccount,
-				proposalSettings,
 				nft
 			);
 			console.log('instruction', instruction);
@@ -362,78 +255,69 @@
 	}
 
 	async function closeProposal(proposalId: number, votebank: string) {
-		if (
-			connection &&
-			wallet &&
-			metaplex &&
-			program &&
-			currentUser &&
-			$walletStore.signTransaction
-		) {
-			try {
-				loadingStore.set(true);
-				message.set('Closing proposal...');
-				const voteBankAddress = new PublicKey(votebank);
-				const [proposalAccount] = proposalAccountPda(new PublicKey(votebank), proposalId);
-				const ix = createCloseProposalInstruction(
-					{
-						proposal: proposalAccount,
-						proposalOwner: currentUser,
-						votebank: voteBankAddress,
-						systemProgram: new PublicKey('11111111111111111111111111111111')
-					},
-					{
-						proposalId: proposalId
-					}
-				);
-				const tx = new Transaction().add(ix);
-				tx.feePayer = currentUser;
-				tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-				message.set('Simulating transaction...');
-				//const test = VersionedTransaction.deserialize(tx.serialize());
-				const t = await connection.simulateTransaction(tx);
-				if (t.value.err) {
-					const messages = extractCustomCodes(t.value.err);
-					if (messages.length > 0) {
-						const msgString = messages.join(', ');
-						message.set(`Error: ${msgString}`);
-						setTimeout(() => {
-							reset();
-						}, 2000);
-						return;
-					}
+		try {
+			loadingStore.set(true);
+			message.set('Closing proposal...');
+			const voteBankAddress = new PublicKey(votebank);
+			const [proposalAccount] = proposalAccountPda(new PublicKey(votebank), proposalId);
+			const ix = createCloseProposalInstruction(
+				{
+					proposal: proposalAccount,
+					proposalOwner: currentUser,
+					votebank: voteBankAddress,
+					systemProgram: new PublicKey('11111111111111111111111111111111')
+				},
+				{
+					proposalId: proposalId
 				}
-				message.set('Waiting for signature...');
-				const signature = await $walletStore.sendTransaction(tx, connection);
-
-				console.log('Signature', signature);
-				const latestBlockhash = await connection.getLatestBlockhash();
-
-				await connection.confirmTransaction(
-					{
-						signature: signature,
-						lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-						blockhash: latestBlockhash.blockhash
-					},
-					'confirmed'
-				);
-				//Force close refresh data on page
-				data.proposal.voteOpen = false;
-				const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
-				reset();
-				toast.push(
-					`Proposal closed! <a href="${explorerUrl}" target="_blank">${voteBankAddress.toBase58()}</a>`,
-					{
-						duration: 3000,
-						pausable: true
-					}
-				);
-			} catch (e: any) {
-				message.set(`Error: ${e?.message ?? e}`); //clear message
-				setTimeout(() => {
-					reset();
-				}, 1200);
+			);
+			const tx = new Transaction().add(ix);
+			tx.feePayer = currentUser;
+			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			message.set('Simulating transaction...');
+			//const test = VersionedTransaction.deserialize(tx.serialize());
+			const t = await connection.simulateTransaction(tx);
+			if (t.value.err) {
+				const messages = extractCustomCodes(t.value.err);
+				if (messages.length > 0) {
+					const msgString = messages.join(', ');
+					message.set(`Error: ${msgString}`);
+					setTimeout(() => {
+						reset();
+					}, 2000);
+					return;
+				}
 			}
+			message.set('Waiting for signature...');
+			const signature = await $walletStore.sendTransaction(tx, connection);
+
+			console.log('Signature', signature);
+			const latestBlockhash = await connection.getLatestBlockhash();
+
+			await connection.confirmTransaction(
+				{
+					signature: signature,
+					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+					blockhash: latestBlockhash.blockhash
+				},
+				'confirmed'
+			);
+			//Force close refresh data on page
+			data.proposal.voteOpen = false;
+			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
+			reset();
+			toast.push(
+				`Proposal closed! <a href="${explorerUrl}" target="_blank">${voteBankAddress.toBase58()}</a>`,
+				{
+					duration: 3000,
+					pausable: true
+				}
+			);
+		} catch (e: any) {
+			message.set(`Error: ${e?.message ?? e}`); //clear message
+			setTimeout(() => {
+				reset();
+			}, 1200);
 		}
 	}
 
@@ -448,17 +332,34 @@
 
 	async function handleVoteSubmit(event: CustomEvent) {
 		const voteOptions = buildVotedFor(event.detail.chosenOptions);
-		const voteTxns = await buildVoteTransactions(voteOptions, event.detail.selectedNfts);
-		if (voteTxns.length === 0) {
-			toast.push(`No votes to submit`, { target: 'new' });
-			reset();
-			return;
+		if (
+			connection &&
+			wallet &&
+			metaplex &&
+			program &&
+			currentUser &&
+			$walletStore.signTransaction
+		) {
+			const voteTxns = await buildVoteTransactions(voteOptions, event.detail.selectedNfts);
+			if (voteTxns.length === 0) {
+				toast.push(`No votes to submit`, { target: 'new' });
+				reset();
+				return;
+			}
+			await finalizeAndSendTransactions(voteTxns);
 		}
-		await finalizeAndSendTransactions(voteTxns);
 	}
 
 	async function handleCloseProposal(e: CustomEvent<any>): Promise<void> {
-		if (isOwner) {
+		if (
+			isOwner &&
+			connection &&
+			wallet &&
+			metaplex &&
+			program &&
+			currentUser &&
+			$walletStore.signTransaction
+		) {
 			console.log('close proposal', e.detail);
 			const { proposalId, votebank } = e.detail;
 			await closeProposal(proposalId, votebank);

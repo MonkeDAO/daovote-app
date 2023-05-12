@@ -87,31 +87,33 @@
 	$: {
 		if (proposal) {
 			data = {
-		labels: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.title),
-		datasets: [
-			{
-				label: '# of Votes',
-				data: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.voteCount ? option.voteCount : 0),
-				backgroundColor: [
-					'rgba(255, 134,159,0.4)',
-					'rgba(98,  182, 239,0.4)',
-					'rgba(255, 218, 128,0.4)',
-					'rgba(113, 205, 205,0.4)',
-					'rgba(170, 128, 252,0.4)',
-					'rgba(255, 177, 101,0.4)'
-				],
-				borderWidth: 2,
-				borderColor: [
-					'rgba(255, 134, 159, 1)',
-					'rgba(98,  182, 239, 1)',
-					'rgba(255, 218, 128, 1)',
-					'rgba(113, 205, 205, 1)',
-					'rgba(170, 128, 252, 1)',
-					'rgba(255, 177, 101, 1)'
+				labels: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.title),
+				datasets: [
+					{
+						label: '# of Votes',
+						data: proposal.options
+							.sort((a, b) => b.id - a.id)
+							.map((option) => (option.voteCount ? option.voteCount : 0)),
+						backgroundColor: [
+							'rgba(255, 134,159,0.4)',
+							'rgba(98,  182, 239,0.4)',
+							'rgba(255, 218, 128,0.4)',
+							'rgba(113, 205, 205,0.4)',
+							'rgba(170, 128, 252,0.4)',
+							'rgba(255, 177, 101,0.4)'
+						],
+						borderWidth: 2,
+						borderColor: [
+							'rgba(255, 134, 159, 1)',
+							'rgba(98,  182, 239, 1)',
+							'rgba(255, 218, 128, 1)',
+							'rgba(113, 205, 205, 1)',
+							'rgba(170, 128, 252, 1)',
+							'rgba(255, 177, 101, 1)'
+						]
+					}
 				]
-			}
-		]
-	};
+			};
 		}
 	}
 
@@ -377,8 +379,8 @@
 				<div class="relative z-10 text-center">
 					<p class="text-sm text-gray-300 dark:text-black">
 						<strong class="text-white dark:text-black">Note:</strong> You are the
-						<span class="font-semibold text-gray-300 dark:text-black">owner</span> of this proposal. Close
-						proposal
+						<span class="font-semibold text-gray-300 dark:text-black">owner</span> of this proposal.
+						Close proposal
 						{#if ended}
 							<button
 								class="text-white text-white underline dark:text-gray-700"
@@ -412,8 +414,8 @@
 				<div class="relative z-10 text-center">
 					<p class="text-sm text-gray-300 dark:text-black">
 						<strong class="text-white dark:text-black">Note:</strong> You are the
-						<span class="font-semibold text-gray-300 dark:text-black">owner</span> of this proposal. Close
-						proposal
+						<span class="font-semibold text-gray-300 dark:text-black">owner</span> of this proposal.
+						Close proposal
 						{#if ended}
 							<button
 								class="text-white text-white underline dark:text-gray-700"

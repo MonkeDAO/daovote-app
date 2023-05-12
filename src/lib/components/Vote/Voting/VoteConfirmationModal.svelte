@@ -5,7 +5,12 @@
 	export let options: any[] = [];
 	let modalInput: any;
 	let optionsFormatted: string;
-	$: optionsFormatted = options?.length ? options.filter((option) => option.checked).map((option) => option.title).join(', ') : '';
+	$: optionsFormatted = options?.length
+		? options
+				.filter((option) => option.checked)
+				.map((option) => option.title)
+				.join(', ')
+		: '';
 	export function openModal() {
 		modalInput.checked = true;
 	}

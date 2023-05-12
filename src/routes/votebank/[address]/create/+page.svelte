@@ -132,7 +132,6 @@
 				let tokenAccount = getDefaultPublicKey();
 				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
 				if (isNftRestricted) {
-
 					// Find by collection id:
 					nfts.find((nft) => {
 						if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
