@@ -416,3 +416,11 @@ const compactHeader = (n: number) => (n <= LOW_VALUE ? 1 : n <= HIGH_VALUE ? 2 :
  * @returns size in bytes of array
  */
 const compactArraySize = (n: number, size: number) => compactHeader(n) + n * size;
+
+export async function chunkArray<T>(array: T[], chunkSize: number): Promise<T[][]> {
+	const results = [];
+	while (array.length) {
+		results.push(array.splice(0, chunkSize));
+	}
+	return results;
+}

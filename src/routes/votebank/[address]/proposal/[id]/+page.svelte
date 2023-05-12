@@ -240,8 +240,7 @@
 			}
 			if (txns.length > 1) {
 				await setMessageSlow(`Waiting for signature ${i} of ${txns.length}...`, 300);
-			}
-			else {
+			} else {
 				message.set('Waiting for signature...');
 			}
 			const signature = await $walletStore.sendTransaction(txn, connection);
@@ -364,8 +363,8 @@
 				return;
 			}
 			await finalizeAndSendTransactions(voteTxns);
-			data.proposal.voterCount = data.proposal.voterCount + event.detail.selectedNfts ?  event.detail.selectedNfts.length : 1;
-
+			data.proposal.voterCount =
+				data.proposal.voterCount + event.detail.selectedNfts ? event.detail.selectedNfts.length : 1;
 		}
 	}
 

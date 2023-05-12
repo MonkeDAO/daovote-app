@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import type { NftMetadata, ProposalItem } from '$lib/types';
 import { PublicKey, type Connection } from '@solana/web3.js';
 import type { SettingsData } from '$lib/anchor/types';
-import { extractRestrictionData, voteAccountPdaExists } from '$lib/utils/solana';
+import { chunkArray, extractRestrictionData, sleep, voteAccountPdaExists } from '$lib/utils/solana';
 
 interface FilteredNftStore {
 	eligible: NftMetadata[] | undefined;
@@ -50,15 +50,28 @@ const createFilteredNftStore = () => {
 		filteredNfts: NftMetadata[]
 	) {
 		if (connection && proposal) {
-			const nftsVoteAccounts = await Promise.all(
-				filteredNfts.map((nft) => checkVoteAccount(connection, proposal, nft))
-			);
+			const chunkSize = 25; // Define your chunk size
+			const delayBetweenChunks = 300; // Define delay in milliseconds
+
+			const chunks = await chunkArray(filteredNfts, chunkSize);
+
+			let nftsVoteAccounts: any[] = [];
+			for (const chunk of chunks) {
+				const chunkResult = await Promise.all(
+					chunk.map((nft) => checkVoteAccount(connection, proposal, nft))
+				);
+				nftsVoteAccounts = [...nftsVoteAccounts, ...chunkResult];
+				await sleep(delayBetweenChunks); // Delay between chunks
+			}
+
 			const nftsFiltered = nftsVoteAccounts
 				.filter(({ accountExists }) => !accountExists)
 				.map(({ nft }) => nft);
+
 			const ineligibleNfts = nftsVoteAccounts
 				.filter(({ accountExists }) => accountExists)
 				.map(({ nft }) => nft);
+
 			update((store) => {
 				store.eligible = nftsFiltered;
 				store.ineligible = ineligibleNfts;
