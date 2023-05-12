@@ -226,6 +226,7 @@
 
 	async function finalizeAndSendTransactions(txns: Transaction[]) {
 		const signatures = [];
+		await setMessageSlow('Simulating transactions...', 300);
 		for (let txn of txns) {
 			const t = await connection.simulateTransaction(txn);
 			if (t.value.err) {
@@ -252,7 +253,7 @@
 				},
 				'confirmed'
 			);
-			message.set('Vote success!');
+			await setMessageSlow('Vote success!');
 			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 			toast.push(`Voted! <a href="${explorerUrl}" target="_blank">${signature}</a>`, {
 				duration: 3000,
@@ -330,9 +331,9 @@
 		}
 	}
 
-	async function setMessageSlow(msg: string) {
+	async function setMessageSlow(msg: string, delay = 500) {
 		message.set(msg);
-		await sleep(500);
+		await sleep(delay);
 	}
 	function reset() {
 		loadingStore.set(false);
