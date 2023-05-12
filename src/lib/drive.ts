@@ -37,6 +37,7 @@ export async function createStorageAccount(
 	name?: string
 ): Promise<CreateStorageResponse> {
 	const drive = await new ShdwDrive(forcedConnection, wallet).init();
+	console.log(forcedConnection, wallet, 'hi\n');
 	const response = await drive.createStorageAccount(
 		name ? name : `daovote_${wallet.publicKey}`,
 		'100MB',
