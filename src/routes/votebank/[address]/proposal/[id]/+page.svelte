@@ -227,6 +227,7 @@
 	async function finalizeAndSendTransactions(txns: Transaction[]) {
 		const signatures = [];
 		await setMessageSlow('Simulating transactions...', 300);
+		let i = 1;
 		for (let txn of txns) {
 			const t = await connection.simulateTransaction(txn);
 			if (t.value.err) {
@@ -237,8 +238,14 @@
 					continue; //dont fail on simulation error just move on.
 				}
 			}
-			message.set('Waiting for signature...');
+			if (txns.length > 1) {
+				await setMessageSlow(`Waiting for signature ${i} of ${txns.length}...`, 300);
+			}
+			else {
+				message.set('Waiting for signature...');
+			}
 			const signature = await $walletStore.sendTransaction(txn, connection);
+			i++;
 			signatures.push(signature);
 		}
 
@@ -261,7 +268,6 @@
 				target: 'new'
 			});
 		}
-		data.proposal.voterCount = data.proposal.voterCount + 1;
 		reset();
 	}
 
@@ -358,6 +364,8 @@
 				return;
 			}
 			await finalizeAndSendTransactions(voteTxns);
+			data.proposal.voterCount = data.proposal.voterCount + event.detail.selectedNfts ?  event.detail.selectedNfts.length : 1;
+
 		}
 	}
 
