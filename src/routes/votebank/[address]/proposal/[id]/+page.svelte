@@ -257,7 +257,8 @@
 			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 			toast.push(`Voted! <a href="${explorerUrl}" target="_blank">${signature}</a>`, {
 				duration: 3000,
-				pausable: true
+				pausable: true,
+				target: 'new'
 			});
 		}
 		data.proposal.voterCount = data.proposal.voterCount + 1;
