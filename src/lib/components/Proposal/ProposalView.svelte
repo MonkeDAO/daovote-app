@@ -13,12 +13,20 @@
 	import ConfirmationModal from '../ConfirmationModal.svelte';
 	import NftGrid from '../NFTGrid.svelte';
 	import { selectedNfts } from '$lib/selectedNfts';
-	import type { SettingsData } from '$lib/anchor/types';
+	import type { SettingsData, VoteOption } from '$lib/anchor/types';
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
 	import LoadingOverlay from '../LoadingOverlay.svelte';
 	import { Bar } from 'svelte-chartjs';
 	import { Chart, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
+	import { onMount } from 'svelte';
+
+	let isMobile = false;
+	onMount(() => {
+		if (typeof window !== 'undefined') {
+			isMobile = window.matchMedia('(max-width: 768px)').matches;
+		}
+	});
 
 	let data = {
 		labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
@@ -198,6 +206,10 @@
 		ended = true;
 	}
 
+	function getDate(timestamp: number) {
+		return new Date(timestamp * 1000).toLocaleString();
+	}
+
 	function handleVote() {
 		const checkedOptions = options.filter((option) => option.checked);
 		if (checkedOptions.length >= 1 && checkedOptions.length <= proposal.maxOptionsSelectable) {
@@ -234,9 +246,24 @@
 		});
 		selectedNfts.reset();
 	}
-	// function getBadgeClass(isOpen: boolean) {
-	// 	return isOpen ? 'bg-green-500' : 'bg-red-500';
-	// }
+
+	function findWinningVoteOptions(voteOptions: any) {
+		let winningOptionTitles = [];
+		let maxVotes = 0;
+
+		for (let i = 0; i < voteOptions.length; i++) {
+			const option = voteOptions[i];
+			if (option.voteCount > maxVotes) {
+				maxVotes = option.voteCount;
+				winningOptionTitles = [option.title];
+			} else if (option.voteCount === maxVotes) {
+				winningOptionTitles.push(option.title);
+			}
+		}
+
+		return winningOptionTitles;
+	}
+
 	function closeProposal() {
 		confirmationModal.openModal();
 	}
@@ -400,10 +427,48 @@
 		class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
 	>
 		<div
-			class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+			class="relative ml-6 mr-6 block overflow-hidden rounded-lg bg-gray-100 p-8 dark:bg-gray-700"
 		>
-			<Bar {data} options={{ responsive: true }} />
+			<span
+				class="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"
+			/>
+
+			<div class="justify-between sm:flex">
+				<div>
+					<h5 class="text-xl font-bold text-slate-900 dark:text-white">
+						This proposal ended on {getDate(proposalData.proposal?.endTime)}
+					</h5>
+					<!-- <p class="mt-1 text-xs font-medium text-slate-600">It was made by {own}</p> -->
+				</div>
+			</div>
+
+			<dl class="mt-6 flex">
+				<div class="flex flex-col-reverse">
+					<dt class="text-sm font-medium text-slate-600 dark:text-white">
+						{proposal.maxOptionsSelectable}
+					</dt>
+					<dd class="text-xs text-slate-500 dark:text-white">Options Selectable</dd>
+				</div>
+
+				<div class="ml-3 flex flex-col-reverse sm:ml-6">
+					<dt class="text-sm font-medium text-slate-600 dark:text-white">{proposal.voterCount}</dt>
+					<dd class="text-xs text-slate-500 dark:text-white">Number of Votes</dd>
+				</div>
+				<div class="ml-3 flex flex-col-reverse sm:ml-6">
+					<dt class="text-sm font-medium text-slate-600 dark:text-white">
+						{findWinningVoteOptions(proposal?.options)}
+					</dt>
+					<dd class="text-xs text-slate-500 dark:text-white">Winning Option(s)</dd>
+				</div>
+			</dl>
 		</div>
+		{#if !isMobile}
+			<div
+				class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+			>
+				<Bar {data} options={{ responsive: true }} />
+			</div>
+		{/if}
 		{#if isOwner && proposal.voteOpen}
 			<div
 				class="relative m-px overflow-hidden rounded-md bg-slate-800 px-2 py-2 text-lg dark:bg-gray-300"
