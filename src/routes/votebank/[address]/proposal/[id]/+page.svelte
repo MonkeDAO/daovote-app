@@ -9,7 +9,8 @@
 		getExplorerUrl,
 		getTxSize,
 		proposalAccountPda,
-		sleep	} from '$lib/utils/solana';
+		sleep
+	} from '$lib/utils/solana';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
@@ -106,10 +107,17 @@
 
 	async function buildVoteTokenTxn(
 		votedFor: VoteEntry[],
-		votebankAccountAddress: PublicKey,
+		votebankAccountAddress: PublicKey
 	): Promise<TransactionInstruction | null> {
 		try {
-			return await buildTokenVoteIx(connection, currentUser, votebankAccountAddress, votedFor, proposalItem.proposalId, proposalItem);
+			return await buildTokenVoteIx(
+				connection,
+				currentUser,
+				votebankAccountAddress,
+				votedFor,
+				proposalItem.proposalId,
+				proposalItem
+			);
 		} catch (e: any) {
 			console.error('Error building vote transaction', e);
 			message.set(`Error: ${e?.message ?? e}. Skipping this transaction.`); //clear message
@@ -123,7 +131,15 @@
 		nft: NftMetadata
 	): Promise<TransactionInstruction | null> {
 		try {
-			return await buildNftVoteIx(connection, currentUser, votebankAccountAddress, votedFor, proposalItem.proposalId, nft, proposalItem)
+			return await buildNftVoteIx(
+				connection,
+				currentUser,
+				votebankAccountAddress,
+				votedFor,
+				proposalItem.proposalId,
+				nft,
+				proposalItem
+			);
 		} catch (e: any) {
 			console.error('Error building vote transaction', e);
 			await setMessageSlow(`Error: ${e?.message ?? e}. Skipping this transaction.`); //clear message
@@ -167,10 +183,7 @@
 		transaction.feePayer = currentUser;
 		if (!isNftRestricted) {
 			// Add the vote instruction
-			const instruction = await buildVoteTokenTxn(
-				votedFor,
-				votebankAccountAddress,
-			);
+			const instruction = await buildVoteTokenTxn(votedFor, votebankAccountAddress);
 			if (!instruction) {
 				message.set('Error building vote transaction');
 				return transactions;
@@ -183,11 +196,7 @@
 		// If the vote is restricted to an nft, we need to build a transaction for each nft
 		for (let nft of nfts) {
 			await setMessageSlow('Building vote transaction for ' + nft.json.name);
-			const instruction = await buildNftVoteTxn(
-				votedFor,
-				votebankAccountAddress,
-				nft
-			);
+			const instruction = await buildNftVoteTxn(votedFor, votebankAccountAddress, nft);
 			console.log('instruction', instruction);
 			if (!instruction) continue;
 

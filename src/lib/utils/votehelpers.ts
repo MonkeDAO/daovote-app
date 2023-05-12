@@ -1,164 +1,203 @@
-import { PUBLIC_VOTE_PROGRAM } from "$env/static/public";
-import { Proposal, VoteAccount, Votebank } from "$lib/anchor/accounts";
-import { createVoteInstruction, type VoteInstructionAccounts, type VoteInstructionArgs } from "$lib/anchor/instructions";
-import type { NftMetadata, ProposalItem } from "$lib/types";
-import { PublicKey } from "@metaplex-foundation/js";
-import { web3 } from "@project-serum/anchor";
-import type { Connection, TransactionInstruction } from "@solana/web3.js";
-import { TREASURY_ADDRESS, extractRestrictionData, fetchProposalById, getDefaultPublicKey, proposalAccountPda, toAccountMetadata, voteAccountPda } from "./solana";
-import type { SettingsData, VoteEntry } from "$lib/anchor/types";
+import { PUBLIC_VOTE_PROGRAM } from '$env/static/public';
+import { Proposal, VoteAccount, Votebank } from '$lib/anchor/accounts';
+import {
+	createVoteInstruction,
+	type VoteInstructionAccounts,
+	type VoteInstructionArgs
+} from '$lib/anchor/instructions';
+import type { NftMetadata, ProposalItem } from '$lib/types';
+import { PublicKey } from '@metaplex-foundation/js';
+import { web3 } from '@project-serum/anchor';
+import type { Connection, TransactionInstruction } from '@solana/web3.js';
+import {
+	TREASURY_ADDRESS,
+	extractRestrictionData,
+	fetchProposalById,
+	getDefaultPublicKey,
+	proposalAccountPda,
+	toAccountMetadata,
+	voteAccountPda
+} from './solana';
+import type { SettingsData, VoteEntry } from '$lib/anchor/types';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import type { AdditionalAccountIndices } from '../anchor/types/AdditionalAccountIndices';
 
-export async function buildNftVoteIx(connection: Connection, voter: PublicKey, votebank: PublicKey, voteEntries: VoteEntry[], proposalId: number,  nft: NftMetadata, proposalItem?: ProposalItem, programId: PublicKey = new PublicKey(PUBLIC_VOTE_PROGRAM)): Promise<TransactionInstruction | null> {
-    const votebankAccount = await Votebank.fromAccountAddress(connection, votebank)
-    let proposal: ProposalItem | null;
-    if (!proposalItem) {
-        proposal = await fetchProposalById(connection, votebank, proposalId)
-    }
-    else {
-        proposal = proposalItem;
-    }
-    if (!proposal) {
-        return null;
-    }
+export async function buildNftVoteIx(
+	connection: Connection,
+	voter: PublicKey,
+	votebank: PublicKey,
+	voteEntries: VoteEntry[],
+	proposalId: number,
+	nft: NftMetadata,
+	proposalItem?: ProposalItem,
+	programId: PublicKey = new PublicKey(PUBLIC_VOTE_PROGRAM)
+): Promise<TransactionInstruction | null> {
+	const votebankAccount = await Votebank.fromAccountAddress(connection, votebank);
+	let proposal: ProposalItem | null;
+	if (!proposalItem) {
+		proposal = await fetchProposalById(connection, votebank, proposalId);
+	} else {
+		proposal = proposalItem;
+	}
+	if (!proposal) {
+		return null;
+	}
 
-    const {
-        restrictionMint: proposalRestrictionMint,
-        isNftRestricted: proposalIsNftRestricted,
-        restrictionIx: proposalRestrictionIx,
-        ruleKind: proposalRulekind
-    } = extractRestrictionData(proposal.settings);
-    const votebankSettings = votebankAccount.settings as SettingsData[];
-    const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
-        extractRestrictionData(votebankSettings);
-    let mint = getDefaultPublicKey();
-    let nftMintMetadata = getDefaultPublicKey();
-    let tokenAccount = getDefaultPublicKey();
-    let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
+	const {
+		restrictionMint: proposalRestrictionMint,
+		isNftRestricted: proposalIsNftRestricted,
+		restrictionIx: proposalRestrictionIx,
+		ruleKind: proposalRulekind
+	} = extractRestrictionData(proposal.settings);
+	const votebankSettings = votebankAccount.settings as SettingsData[];
+	const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
+		extractRestrictionData(votebankSettings);
+	let mint = getDefaultPublicKey();
+	let nftMintMetadata = getDefaultPublicKey();
+	let tokenAccount = getDefaultPublicKey();
+	let additionalAccountOffsets: AdditionalAccountIndices[] = [
+		{
+			__kind: 'Null'
+		}
+	];
 
-    if (isNftRestricted) {
-        // Find by collection id:
-        if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
-            mint = new PublicKey(nft.address);
-            nftMintMetadata = new PublicKey(nft.metadataAddress);
-        }
-        tokenAccount = await getAssociatedTokenAddress(mint, voter);
-    }
-    const [proposalPda] = proposalAccountPda(votebank, proposalId);
-    
-    const tokenToAccountMetaFormat = isNftRestricted
-				? [
-						toAccountMetadata(tokenAccount),
-						toAccountMetadata(nftMintMetadata),
-						toAccountMetadata(restrictionMint)
-				  ]
-				: [];
-    const [votepda] = voteAccountPda(votebank, mint, proposalId);
-    const voteAccountFetched = await VoteAccount.fromAccountAddress(connection, votepda).catch((err) => {
-        console.log("vote account not found", err);
-        return null;
-    });
-    if (voteAccountFetched) {
-        return null;
-    }
-    let voteInstructionAccounts: VoteInstructionAccounts = {
-        voter: voter,
-        votebank: votebank,
-        proposal: proposalPda,
-        votes: votepda,
-        nftVoteMint: mint,
-        treasury: TREASURY_ADDRESS,
-        systemProgram: web3.SystemProgram.programId,
-    }
-    if (isNftRestricted) {
-        const accountIndices: AdditionalAccountIndices = {
-            __kind: "NftOwnership",
-            tokenIdx: 0,
-            metaIdx: 1,
-            collectionIdx: 2,
-        }
-        additionalAccountOffsets = [accountIndices];
-    }
-    voteInstructionAccounts.anchorRemainingAccounts = [...tokenToAccountMetaFormat];
-    const voteInstructionArgs: VoteInstructionArgs = {
-        proposalId: proposalId,
-        voteEntries,
-        additionalAccountOffsets,
-    }
-    return createVoteInstruction(voteInstructionAccounts, voteInstructionArgs, programId)
+	if (isNftRestricted) {
+		// Find by collection id:
+		if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
+			mint = new PublicKey(nft.address);
+			nftMintMetadata = new PublicKey(nft.metadataAddress);
+		}
+		tokenAccount = await getAssociatedTokenAddress(mint, voter);
+	}
+	const [proposalPda] = proposalAccountPda(votebank, proposalId);
+
+	const tokenToAccountMetaFormat = isNftRestricted
+		? [
+				toAccountMetadata(tokenAccount),
+				toAccountMetadata(nftMintMetadata),
+				toAccountMetadata(restrictionMint)
+		  ]
+		: [];
+	const [votepda] = voteAccountPda(votebank, mint, proposalId);
+	const voteAccountFetched = await VoteAccount.fromAccountAddress(connection, votepda).catch(
+		(err) => {
+			console.log('vote account not found', err);
+			return null;
+		}
+	);
+	if (voteAccountFetched) {
+		return null;
+	}
+	let voteInstructionAccounts: VoteInstructionAccounts = {
+		voter: voter,
+		votebank: votebank,
+		proposal: proposalPda,
+		votes: votepda,
+		nftVoteMint: mint,
+		treasury: TREASURY_ADDRESS,
+		systemProgram: web3.SystemProgram.programId
+	};
+	if (isNftRestricted) {
+		const accountIndices: AdditionalAccountIndices = {
+			__kind: 'NftOwnership',
+			tokenIdx: 0,
+			metaIdx: 1,
+			collectionIdx: 2
+		};
+		additionalAccountOffsets = [accountIndices];
+	}
+	voteInstructionAccounts.anchorRemainingAccounts = [...tokenToAccountMetaFormat];
+	const voteInstructionArgs: VoteInstructionArgs = {
+		proposalId: proposalId,
+		voteEntries,
+		additionalAccountOffsets
+	};
+	return createVoteInstruction(voteInstructionAccounts, voteInstructionArgs, programId);
 }
 
-export async function buildTokenVoteIx(connection: Connection, voter: PublicKey, votebank: PublicKey, voteEntries: VoteEntry[], proposalId: number, proposalItem?: ProposalItem, programId: PublicKey = new PublicKey(PUBLIC_VOTE_PROGRAM)): Promise<TransactionInstruction | null> {
-    const votebankAccount = await Votebank.fromAccountAddress(connection, votebank)
-    let proposal: ProposalItem | null;
-    if (!proposalItem) {
-        proposal = await fetchProposalById(connection, votebank, proposalId)
-    }
-    else {
-        proposal = proposalItem;
-    }
-    if (!proposal) {
-        return null;
-    }
+export async function buildTokenVoteIx(
+	connection: Connection,
+	voter: PublicKey,
+	votebank: PublicKey,
+	voteEntries: VoteEntry[],
+	proposalId: number,
+	proposalItem?: ProposalItem,
+	programId: PublicKey = new PublicKey(PUBLIC_VOTE_PROGRAM)
+): Promise<TransactionInstruction | null> {
+	const votebankAccount = await Votebank.fromAccountAddress(connection, votebank);
+	let proposal: ProposalItem | null;
+	if (!proposalItem) {
+		proposal = await fetchProposalById(connection, votebank, proposalId);
+	} else {
+		proposal = proposalItem;
+	}
+	if (!proposal) {
+		return null;
+	}
 
-    const {
-        restrictionMint: proposalRestrictionMint,
-        isNftRestricted: proposalIsNftRestricted,
-        restrictionIx: proposalRestrictionIx,
-        ruleKind: proposalRulekind
-    } = extractRestrictionData(proposal.settings);
-    const votebankSettings = votebankAccount.settings as SettingsData[];
-    const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
-        extractRestrictionData(votebankSettings);
-    let mint = getDefaultPublicKey();
-    let nftMintMetadata = getDefaultPublicKey();
-    let tokenAccount = getDefaultPublicKey();
-    let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
+	const {
+		restrictionMint: proposalRestrictionMint,
+		isNftRestricted: proposalIsNftRestricted,
+		restrictionIx: proposalRestrictionIx,
+		ruleKind: proposalRulekind
+	} = extractRestrictionData(proposal.settings);
+	const votebankSettings = votebankAccount.settings as SettingsData[];
+	const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
+		extractRestrictionData(votebankSettings);
+	let mint = getDefaultPublicKey();
+	let nftMintMetadata = getDefaultPublicKey();
+	let tokenAccount = getDefaultPublicKey();
+	let additionalAccountOffsets: AdditionalAccountIndices[] = [
+		{
+			__kind: 'Null'
+		}
+	];
 
-    if (restrictionIx && !isNftRestricted) {
-        tokenAccount = await getAssociatedTokenAddress(restrictionMint, voter);
-        /**
-         * Set the mint to the restriction mint since its a token. this needs to be passed as the nftVoteMint for ix
-         */
-        mint = restrictionMint;
-        tokenAccount = await getAssociatedTokenAddress(mint, voter);
-    }
-    const [proposalPda] = proposalAccountPda(votebank, proposalId);
-    
-    const tokenToAccountMetaFormat =
-				restrictionIx && !isNftRestricted ? [toAccountMetadata(tokenAccount)] : [];
-    //TODO: use voteTokenAccountPda when instruction is introduced
-    const [votepda] = voteAccountPda(votebank, mint, proposalId);
-    const voteAccountFetched = await VoteAccount.fromAccountAddress(connection, votepda).catch((err) => {
-        console.log("vote account not found, creating new one");
-        return null;
-    });
-    if (voteAccountFetched) {
-        return null;
-    }
-    let voteInstructionAccounts: VoteInstructionAccounts = {
-        voter: voter,
-        votebank: votebank,
-        proposal: proposalPda,
-        votes: votepda,
-        nftVoteMint: mint,
-        treasury: TREASURY_ADDRESS,
-        systemProgram: web3.SystemProgram.programId,
-    }
-    if (!isNftRestricted) {
-        const accountIndices: AdditionalAccountIndices = {
-            __kind: "TokenOwnership",
-            tokenIdx: 0,
-        }
-        additionalAccountOffsets = [accountIndices];
-    }
-    voteInstructionAccounts.anchorRemainingAccounts = [...tokenToAccountMetaFormat];
-    const voteInstructionArgs: VoteInstructionArgs = {
-        proposalId: proposalId,
-        voteEntries,
-        additionalAccountOffsets,
-    }
-    //TODO: Make this the create VoteTokenInstruction when its introduced from the contract.
-    return createVoteInstruction(voteInstructionAccounts, voteInstructionArgs, programId)
+	if (restrictionIx && !isNftRestricted) {
+		tokenAccount = await getAssociatedTokenAddress(restrictionMint, voter);
+		/**
+		 * Set the mint to the restriction mint since its a token. this needs to be passed as the nftVoteMint for ix
+		 */
+		mint = restrictionMint;
+		tokenAccount = await getAssociatedTokenAddress(mint, voter);
+	}
+	const [proposalPda] = proposalAccountPda(votebank, proposalId);
+
+	const tokenToAccountMetaFormat =
+		restrictionIx && !isNftRestricted ? [toAccountMetadata(tokenAccount)] : [];
+	//TODO: use voteTokenAccountPda when instruction is introduced
+	const [votepda] = voteAccountPda(votebank, mint, proposalId);
+	const voteAccountFetched = await VoteAccount.fromAccountAddress(connection, votepda).catch(
+		(err) => {
+			console.log('vote account not found, creating new one');
+			return null;
+		}
+	);
+	if (voteAccountFetched) {
+		return null;
+	}
+	let voteInstructionAccounts: VoteInstructionAccounts = {
+		voter: voter,
+		votebank: votebank,
+		proposal: proposalPda,
+		votes: votepda,
+		nftVoteMint: mint,
+		treasury: TREASURY_ADDRESS,
+		systemProgram: web3.SystemProgram.programId
+	};
+	if (!isNftRestricted) {
+		const accountIndices: AdditionalAccountIndices = {
+			__kind: 'TokenOwnership',
+			tokenIdx: 0
+		};
+		additionalAccountOffsets = [accountIndices];
+	}
+	voteInstructionAccounts.anchorRemainingAccounts = [...tokenToAccountMetaFormat];
+	const voteInstructionArgs: VoteInstructionArgs = {
+		proposalId: proposalId,
+		voteEntries,
+		additionalAccountOffsets
+	};
+	//TODO: Make this the create VoteTokenInstruction when its introduced from the contract.
+	return createVoteInstruction(voteInstructionAccounts, voteInstructionArgs, programId);
 }
