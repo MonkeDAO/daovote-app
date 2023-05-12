@@ -3,8 +3,7 @@ import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 import { Connection, PublicKey, clusterApiUrl, type Cluster } from '@solana/web3.js';
 import { Votebank } from '$lib/anchor/accounts';
 import { isSettingsDataOwnerInfo } from '$lib/anchor/types';
-import { VOTEBANK } from '$lib/siteConfig';
-import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
+import { PUBLIC_SOLANA_NETWORK, PUBLIC_VOTEBANK } from '$env/static/public';
 
 interface OwnerCheckStore {
 	isOwner: boolean;
@@ -19,7 +18,7 @@ const createOwnerCheckStore = () => {
 		const connection = new Connection(clusterApiUrl(PUBLIC_SOLANA_NETWORK as Cluster), 'confirmed');
 		const voteBankAccountRaw = await Votebank.fromAccountAddress(
 			connection,
-			new PublicKey(VOTEBANK)
+			new PublicKey(PUBLIC_VOTEBANK)
 		);
 		const votebank = voteBankAccountRaw?.pretty();
 		const ownerInfo = votebank?.settings.find((x) => isSettingsDataOwnerInfo(x));

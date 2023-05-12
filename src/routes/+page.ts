@@ -1,15 +1,15 @@
 import { error } from '@sveltejs/kit';
 import { web3 } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
-import { VOTEBANK } from '$lib/siteConfig';
 import { Votebank } from '$lib/anchor/accounts';
 import type { VoteBankProposals } from '$lib/types';
 import { fetchProposals, getEnvNetwork } from '$lib/utils/solana';
+import { PUBLIC_VOTEBANK } from '$env/static/public';
 // export const prerender = true; // turned off bc it causes errors
 
 export async function load({ setHeaders }: any) {
 	let data: Votebank;
-	const address = VOTEBANK;
+	const address = PUBLIC_VOTEBANK;
 	let responseData: VoteBankProposals;
 
 	try {
