@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import type { NftMetadata, ProposalItem } from '$lib/types';
-import { PublicKey, type Connection } from '@solana/web3.js';
+import type { Connection } from '@solana/web3.js';
 import type { SettingsData } from '$lib/anchor/types';
 import { chunkArray, extractRestrictionData, sleep, voteAccountPdaExists } from '$lib/utils/solana';
 
@@ -30,40 +30,27 @@ const createFilteredNftStore = () => {
 		}
 	};
 
-	async function checkVoteAccount(
-		connection: Connection,
-		proposal: ProposalItem,
-		nft: NftMetadata
-	) {
-		const accountExists = await voteAccountPdaExists(
-			connection,
-			new PublicKey(proposal.votebank),
-			new PublicKey(nft.address),
-			proposal.proposalId
-		);
-		return { nft, accountExists };
-	}
-
 	async function fetchAccountIfExists(
 		connection: Connection,
 		proposal: ProposalItem,
 		filteredNfts: NftMetadata[]
 	) {
 		if (connection && proposal) {
-			const chunkSize = 25; // Define your chunk size
-			const delayBetweenChunks = 100; // Define delay in milliseconds
-
-			const chunks = await chunkArray(filteredNfts, chunkSize);
-
-			let nftsVoteAccounts: any[] = [];
-			for (const chunk of chunks) {
-				const chunkResult = await Promise.all(
-					chunk.map((nft) => checkVoteAccount(connection, proposal, nft))
-				);
-				nftsVoteAccounts = [...nftsVoteAccounts, ...chunkResult];
-				await sleep(delayBetweenChunks); // Delay between chunks
+			console.log('fetching', filteredNfts)
+			const response = await fetch("/api/filterNfts", {
+				method: "POST",
+				body: JSON.stringify({ nfts: filteredNfts, proposal })
+			})
+			const data = await response.json();
+			if (data.error) {
+				console.log('problem', data.error, data)
+				update((store) => {
+					store.eligible = [];
+					store.ineligible = [];
+					return store;
+				});
 			}
-
+			const nftsVoteAccounts: { nft: NftMetadata, accountExists: boolean }[] = data;
 			const nftsFiltered = nftsVoteAccounts
 				.filter(({ accountExists }) => !accountExists)
 				.map(({ nft }) => nft);

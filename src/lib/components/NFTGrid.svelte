@@ -7,6 +7,7 @@
 	import type { NftMetadata } from '$lib/types';
 
 	export let nfts: NftMetadata[] | undefined;
+	export let isFiltering: boolean;
 	let loading = true;
 	$: if (nfts && nfts.length >= 0 && $nftSyncing.isCurrentWallet) {
 		loading = false;
@@ -33,7 +34,7 @@
 	}
 </script>
 
-{#if loading}
+{#if loading || isFiltering}
 	<div class="mb-6 flex flex-col items-center justify-center">
 		<div class="text-2xl font-bold leading-relaxed text-gray-900 dark:text-gray-100">
 			Loading NFTs...

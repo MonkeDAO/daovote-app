@@ -42,9 +42,11 @@ export const nftSyncStore = derived(
 	($walletStore) => {
 		if (
 			$walletStore.wallet?.connected &&
+			!$walletStore.connecting &&
 			$walletStore.wallet.publicKey &&
 			$walletStore.wallet.publicKey.toBase58() !== get(nftStore).owner
 		) {
+			console.log('fetching nfts', $walletStore.wallet.publicKey.toBase58());
 			nftStore.fetchNftsFromServer($walletStore.wallet.publicKey.toBase58());
 		}
 	},

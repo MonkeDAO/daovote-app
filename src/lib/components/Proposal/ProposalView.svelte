@@ -77,7 +77,8 @@
 	let connection: Connection;
 	let isOwner: boolean;
 	let isNftRestricted: boolean;
-
+	let isFiltering: boolean;
+	
 	let modalOpen = false;
 	$: {
 		isOwner = $ownerCheckStore.isOwner;
@@ -142,7 +143,10 @@
 			const voteBankSetting = extractRestrictionData(votebankSettings);
 			if (voteBankSetting.isNftRestricted && voteBankSetting.restrictionMint) {
 				isNftRestricted = true;
-				filteredNftStore.filterNfts(connection, proposal, votebankSettings, nfts);
+				isFiltering = true;
+				filteredNftStore.filterNfts(connection, proposal, votebankSettings, nfts).then(() => {
+					isFiltering = false;
+				});
 			}
 		}
 	}
@@ -395,7 +399,7 @@
 				>Vote
 			</button>
 		</div>
-		<NftGrid nfts={allNfts} />
+		<NftGrid nfts={allNfts} isFiltering={isFiltering} />
 		{#if isOwner && proposal.voteOpen}
 			<div
 				class="relative m-px overflow-hidden rounded-md bg-slate-800 px-2 py-2 text-lg dark:bg-gray-300"
