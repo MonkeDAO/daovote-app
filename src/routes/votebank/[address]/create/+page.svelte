@@ -20,6 +20,7 @@
 		isDefaultPublicKey,
 		postDataToBuffer,
 		proposalAccountPda,
+		sleep,
 		toAccountMetadata
 	} from '$lib/utils/solana';
 	import type { Program } from '@project-serum/anchor';
@@ -32,6 +33,7 @@
 	import { message } from '$lib/stores/messageStore';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
+	import { reset, setMessageSlow } from '$lib/utils/common';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -326,24 +328,29 @@
 		proposal = event.detail.proposal;
 		const skipUpload = event.detail.skipUpload;
 		loadingStore.set(true);
+		if (file && shdwBalance < 0.05) {
+			setMessageSlow('You do not have enough shdw to upload a file. You need at least 0.05 SHDW', 1000);
+			reset();
+			return;
+		} 
 		if (skipUpload) {
 			await createProposal();
 		} else {
 			await uploadFile(file).then(async (res) => {
-				toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, {
-					target: 'new'
-				});
 				if (res) {
+					toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, {
+					target: 'new'
+					});
 					await createProposal();
+				}
+				else {
+					message.set('Error uploading file!');
 				}
 			});
 		}
 		//TODO: Figure a way to combine two methods so its atomic?
 	}
-	function reset() {
-		loadingStore.set(false);
-		message.set('');
-	}
+	
 	onDestroy(unsubscribe);
 </script>
 

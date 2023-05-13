@@ -145,7 +145,6 @@ export async function buildTokenVoteIx(
 	const { restrictionMint, isNftRestricted, restrictionIx, ruleKind } =
 		extractRestrictionData(votebankSettings);
 	let mint = getDefaultPublicKey();
-	let nftMintMetadata = getDefaultPublicKey();
 	let tokenAccount = getDefaultPublicKey();
 	let additionalAccountOffsets: AdditionalAccountIndices[] = [
 		{
