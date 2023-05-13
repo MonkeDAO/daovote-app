@@ -7,6 +7,7 @@ export const nftStoreUser = (walletStore: Readable<WalletStore>) => {
 		return {
 			walletAddress: $walletStore?.publicKey?.toBase58() || null,
 			nfts: $nftStore.data,
+			isFetching: $nftStore.isFetching,
 			isCurrentWallet: $walletStore?.publicKey
 				? $walletStore.publicKey.toBase58() === $nftStore.owner
 				: false

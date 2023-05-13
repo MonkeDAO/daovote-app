@@ -1,24 +1,19 @@
 <!-- src/components/NftGrid.svelte -->
 <script lang="ts">
 	import { selectedNfts } from '$lib/selectedNfts';
-	import { nftStoreUser } from '$lib/stores/nftStoreUser';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	const nftSyncing = nftStoreUser(walletStore);
 	import type { NftMetadata } from '$lib/types';
+	import { nftStore } from '$lib/stores/nftStore';
+	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 
 	export let nfts: NftMetadata[] | undefined;
-	export let isFiltering: boolean;
+	let isFiltering: boolean;
 	let loading = true;
-	$: if (nfts && nfts.length >= 0 && $nftSyncing.isCurrentWallet) {
-		loading = false;
-	}
-	$: if (!$nftSyncing.isCurrentWallet) {
-		loading = true;
-	} else {
-		setTimeout(() => {
-			loading = false;
-		}, 1500);
-	}
+	nftStore.subscribe(store => {
+		loading = store.isFetching;
+	});
+	filteredNftStore.subscribe(store => {
+		isFiltering = store.isFetching;
+	});
 	function toggleNftSelection(nft: any) {
 		if (isSelected(nft)) {
 			selectedNfts.remove(nft.address);

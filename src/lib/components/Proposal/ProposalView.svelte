@@ -78,7 +78,7 @@
 	let isOwner: boolean;
 	let isNftRestricted: boolean;
 	let isFiltering: boolean;
-	
+
 	let modalOpen = false;
 	$: {
 		isOwner = $ownerCheckStore.isOwner;
@@ -399,7 +399,7 @@
 				>Vote
 			</button>
 		</div>
-		<NftGrid nfts={allNfts} isFiltering={isFiltering} />
+		<NftGrid nfts={allNfts} />
 		{#if isOwner && proposal.voteOpen}
 			<div
 				class="relative m-px overflow-hidden rounded-md bg-slate-800 px-2 py-2 text-lg dark:bg-gray-300"

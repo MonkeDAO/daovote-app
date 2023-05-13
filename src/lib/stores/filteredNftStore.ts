@@ -7,12 +7,14 @@ import { chunkArray, extractRestrictionData, sleep, voteAccountPdaExists } from 
 interface FilteredNftStore {
 	eligible: NftMetadata[] | undefined;
 	ineligible: NftMetadata[] | undefined;
+	isFetching: boolean;
 }
 
 const createFilteredNftStore = () => {
 	const { subscribe, set, update } = writable<FilteredNftStore>({
 		eligible: undefined,
-		ineligible: undefined
+		ineligible: undefined,
+		isFetching: false
 	});
 
 	const filterNfts = async (
@@ -26,6 +28,7 @@ const createFilteredNftStore = () => {
 			const filteredNfts = nfts.filter((nft) => {
 				return nft.collection?.address === voteBankSetting.restrictionMint.toBase58();
 			});
+			update(store => ({ ...store, isFetching: true }));
 			await fetchAccountIfExists(connection, proposal, filteredNfts);
 		}
 	};
@@ -62,6 +65,7 @@ const createFilteredNftStore = () => {
 			update((store) => {
 				store.eligible = nftsFiltered;
 				store.ineligible = ineligibleNfts;
+				store.isFetching = false;
 				return store;
 			});
 		}
@@ -70,7 +74,7 @@ const createFilteredNftStore = () => {
 	return {
 		subscribe,
 		filterNfts,
-		clear: () => set({ eligible: undefined, ineligible: undefined })
+		clear: () => set({ eligible: undefined, ineligible: undefined, isFetching: false })
 	};
 };
 

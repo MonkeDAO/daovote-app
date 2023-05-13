@@ -6,23 +6,26 @@ import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 interface NftStore {
 	data: NftMetadata[] | undefined;
 	owner: string | undefined;
+	isFetching: boolean;
 }
 
 const createNftStore = () => {
 	const { subscribe, set, update } = writable<NftStore>({
 		data: undefined,
-		owner: undefined
+		owner: undefined,
+		isFetching: false
 	});
 
 	const fetchNftsFromServer = async (publicKey: string) => {
 		try {
+			update(store => ({ ...store, isFetching: true }));
 			const res = await fetch(`/api/fetchNfts/${publicKey}`);
 			const data = await res.json();
 			if (data.error) {
 				throw new Error(data.error);
 			}
 
-			set({ data: data.nfts, owner: publicKey });
+			set({ data: data.nfts, owner: publicKey, isFetching: false });
 		} catch (err) {
 			console.error(err);
 		}
@@ -31,7 +34,7 @@ const createNftStore = () => {
 	return {
 		subscribe,
 		fetchNftsFromServer,
-		clear: () => set({ data: undefined, owner: undefined })
+		clear: () => set({ data: undefined, owner: undefined, isFetching: false })
 	};
 };
 
