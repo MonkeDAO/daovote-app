@@ -268,7 +268,7 @@
 			}
 		} catch (err) {
 			console.log('Transaction error: ', err);
-			message.set(`Error creating proposal! ${err} ${(err as any)?.message ?? (err as any)?.msg ?? ''}`);
+			message.set(`Error creating proposal! ${(err as any)?.message ?? (err as any)?.msg ?? ''}`);
 			setTimeout(() => reset(), 2000);
 		}
 	}
