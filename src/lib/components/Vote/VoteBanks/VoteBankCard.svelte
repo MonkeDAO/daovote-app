@@ -1,11 +1,16 @@
 <script lang="ts">
-	import { getExplorerUrl, trimAddress } from '$lib/utils/solana';
-	import type { VoteBank } from '$lib/anchor/omcvote/types';
-	import * as anchor from '@project-serum/anchor';
+	import {
+		extractDescriptionSettingsData,
+		extractOwnersSettingsData,
+		extractRestrictionData,
+		getExplorerUrl,
+		trimAddress
+	} from '$lib/utils/solana';
 	import { goto } from '$app/navigation';
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
+	import type { VotebankArgs } from '$lib/anchor/accounts';
 
-	export let voteData: { voteBank: VoteBank; address: string };
+	export let voteData: { voteBank: VotebankArgs; address: string };
 	let voteBankInfo: {
 		name: string;
 		description: string;
@@ -13,6 +18,7 @@
 	};
 	let owners: string[] = [];
 	let currentProposals = 0;
+	let closedProposals = 0;
 	let restriction: {
 		restrictionType: 'nft' | 'token' | 'none';
 		restrictionValue: {
@@ -21,36 +27,26 @@
 		};
 	};
 	$: if (voteData) {
+		const descriptionInfo = extractDescriptionSettingsData(voteData.voteBank.settings);
 		voteBankInfo = {
-			name: voteData.voteBank.settings?.find((x) => x.description)?.description?.title || '',
-			description: voteData.voteBank.settings?.find((x) => x.description)?.description?.desc || '',
+			name: descriptionInfo.title,
+			description: descriptionInfo.description,
 			address: voteData.address
 		};
-		owners = voteData.voteBank.settings?.find((x) => x.ownerInfo)?.ownerInfo?.owners || [];
+		owners = extractOwnersSettingsData(voteData.voteBank.settings);
+		const restrictionSettings = extractRestrictionData(voteData.voteBank.settings);
 		currentProposals = voteData.voteBank.openProposals?.length ?? 0;
+		closedProposals = voteData.voteBank.closedProposals?.length ?? 0;
 		restriction = {
-			restrictionType: voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
-				?.voteRestriction?.tokenOwnership
-				? 'token'
-				: voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
-						?.voteRestriction?.nftOwnership
+			restrictionType: restrictionSettings.isNftRestricted
 				? 'nft'
+				: !restrictionSettings.isNftRestricted
+				? 'token'
 				: 'none',
 			restrictionValue: {
-				address:
-					voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
-						?.voteRestriction?.tokenOwnership?.mint ||
-					voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
-						?.voteRestriction?.nftOwnership?.collectionId ||
-					'',
+				address: restrictionSettings.restrictionMint.toBase58(),
 				//This BN conversion is not correct, its just the string version of the BN e.g. 64 = 100
-				amount: voteData.voteBank.settings?.find((x) => x.voteRestriction)?.voteRestriction
-					?.voteRestriction?.tokenOwnership?.amount
-					? new anchor.BN(
-							voteData.voteBank.settings.find((x) => x.voteRestriction)?.voteRestriction
-								?.voteRestriction?.tokenOwnership?.amount as string
-					  )?.toNumber()
-					: 1
+				amount: restrictionSettings.restrictionAmount
 			}
 		};
 	}
@@ -65,9 +61,9 @@
 
 <div>
 	{#if voteData}
-		<div class="my-4 flex justify-center">
+		<!-- <div class="my-4 flex justify-center">
 			<button class="btn-primary btn" on:click={createProposal}>Create a Proposal</button>
-		</div>
+		</div> -->
 		<div class="card-container">
 			<div class="custom-card card bg-gray-200 shadow-xl dark:bg-gray-700">
 				<div class="card-content card-body">
@@ -75,7 +71,10 @@
 					<h3 class="text-gray-900 dark:text-gray-100">{voteBankInfo.description}</h3>
 					<div class="divider" />
 					<p class="text-gray-900 dark:text-gray-100">
-						Proposals:<span class="badge badge-lg ml-2">{currentProposals}</span>
+						Open Proposals:<span class="badge badge-lg ml-2">{currentProposals}</span>
+					</p>
+					<p class="text-gray-900 dark:text-gray-100">
+						Closed Proposals:<span class="badge badge-lg ml-2">{closedProposals}</span>
 					</p>
 					<p class="text-gray-900 dark:text-gray-100">
 						Address: <a

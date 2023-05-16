@@ -363,7 +363,7 @@
 				return;
 			}
 			await finalizeAndSendTransactions(voteTxns);
-			data.proposal.voterCount += (event.detail.selectedNfts ? event.detail.selectedNfts.length : 1);
+			data.proposal.voterCount += event.detail.selectedNfts ? event.detail.selectedNfts.length : 1;
 		}
 	}
 

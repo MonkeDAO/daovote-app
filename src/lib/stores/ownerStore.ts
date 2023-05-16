@@ -41,7 +41,11 @@ export const ownerCheckStore = createOwnerCheckStore();
 export const ownerCheckSyncStore = derived(
 	walletStore,
 	($walletStore, set) => {
-		if ($walletStore.wallet?.connected && !$walletStore.connecting && $walletStore.wallet.publicKey) {
+		if (
+			$walletStore.wallet?.connected &&
+			!$walletStore.connecting &&
+			$walletStore.wallet.publicKey
+		) {
 			ownerCheckStore.checkIsOwner($walletStore.wallet.publicKey);
 		} else {
 			set({ isOwner: false });

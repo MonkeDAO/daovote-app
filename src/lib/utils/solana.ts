@@ -11,6 +11,8 @@ import * as anchor from '@project-serum/anchor';
 import { Proposal, VoteAccount } from '$lib/anchor/accounts';
 import type { ProposalItem } from '$lib/types';
 import {
+	isSettingsDataDescription,
+	isSettingsDataOwnerInfo,
 	isSettingsDataVoteRestriction,
 	isVoteRestrictionRuleNftListAnyOwnership,
 	isVoteRestrictionRuleNftOwnership,
@@ -309,6 +311,7 @@ export function extractRestrictionData(settings: SettingsData[]) {
 	let restrictionMint = getDefaultPublicKey();
 	let isNftRestricted = false;
 	let restrictionIx = false;
+	let restrictionAmount = 0;
 	if (voteRestriction) {
 		const voteRestrictionValue = isSettingsDataVoteRestriction(voteRestriction)
 			? voteRestriction.voteRestriction
@@ -319,11 +322,13 @@ export function extractRestrictionData(settings: SettingsData[]) {
 				ruleKind = VoteRestrictionRuleKindMap.TokenOwnership;
 				restrictionIx = true;
 				restrictionMint = voteRestrictionValue.mint;
+				restrictionAmount = Number(voteRestrictionValue.amount.toString());
 			} else if (isVoteRestrictionRuleNftOwnership(voteRestrictionValue)) {
 				ruleKind = VoteRestrictionRuleKindMap.NftOwnership;
 				restrictionIx = true;
 				restrictionMint = voteRestrictionValue.collectionId;
 				isNftRestricted = true;
+				restrictionAmount = 1;
 			} else if (isVoteRestrictionRuleTokenOrNftAnyOwnership(voteRestrictionValue)) {
 				ruleKind = VoteRestrictionRuleKindMap.TokenOrNftAnyOwnership;
 				//TODO: handle this
@@ -340,8 +345,36 @@ export function extractRestrictionData(settings: SettingsData[]) {
 		restrictionMint,
 		isNftRestricted,
 		restrictionIx,
-		ruleKind
+		ruleKind,
+		restrictionAmount
 	};
+}
+
+export function extractDescriptionSettingsData(settings: SettingsData[]) {
+	const descriptionSettings = settings.find(isSettingsDataDescription);
+	let title = '';
+	let description = '';
+	if (descriptionSettings && isSettingsDataDescription(descriptionSettings)) {
+		title = descriptionSettings.title;
+		description = descriptionSettings.desc;
+		return {
+			title,
+			description
+		};
+	}
+	return {
+		title,
+		description
+	};
+}
+
+export function extractOwnersSettingsData(settings: SettingsData[]) {
+	const ownerInfoSettings = settings.find(isSettingsDataOwnerInfo);
+	let owners: string[] = [];
+	if (ownerInfoSettings && isSettingsDataOwnerInfo(ownerInfoSettings)) {
+		owners = ownerInfoSettings.owners.map((owner) => owner.toBase58());
+	}
+	return owners;
 }
 
 export enum VoteRestrictionRuleKindMap {

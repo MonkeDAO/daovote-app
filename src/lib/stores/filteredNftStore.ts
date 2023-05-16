@@ -28,7 +28,7 @@ const createFilteredNftStore = () => {
 			const filteredNfts = nfts.filter((nft) => {
 				return nft.collection?.address === voteBankSetting.restrictionMint.toBase58();
 			});
-			update(store => ({ ...store, isFetching: true }));
+			update((store) => ({ ...store, isFetching: true }));
 			await fetchAccountIfExists(connection, proposal, filteredNfts);
 		}
 	};
@@ -39,21 +39,21 @@ const createFilteredNftStore = () => {
 		filteredNfts: NftMetadata[]
 	) {
 		if (connection && proposal) {
-			console.log('fetching', filteredNfts)
-			const response = await fetch("/api/filterNfts", {
-				method: "POST",
+			console.log('fetching', filteredNfts);
+			const response = await fetch('/api/filterNfts', {
+				method: 'POST',
 				body: JSON.stringify({ nfts: filteredNfts, proposal })
-			})
+			});
 			const data = await response.json();
 			if (data.error) {
-				console.log('problem', data.error, data)
+				console.log('problem', data.error, data);
 				update((store) => {
 					store.eligible = [];
 					store.ineligible = [];
 					return store;
 				});
 			}
-			const nftsVoteAccounts: { nft: NftMetadata, accountExists: boolean }[] = data;
+			const nftsVoteAccounts: { nft: NftMetadata; accountExists: boolean }[] = data;
 			const nftsFiltered = nftsVoteAccounts
 				.filter(({ accountExists }) => !accountExists)
 				.map(({ nft }) => nft);

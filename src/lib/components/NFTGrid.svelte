@@ -8,10 +8,10 @@
 	export let nfts: NftMetadata[] | undefined;
 	let isFiltering: boolean;
 	let loading = true;
-	nftStore.subscribe(store => {
+	nftStore.subscribe((store) => {
 		loading = store.isFetching;
 	});
-	filteredNftStore.subscribe(store => {
+	filteredNftStore.subscribe((store) => {
 		isFiltering = store.isFetching;
 	});
 	function toggleNftSelection(nft: any) {

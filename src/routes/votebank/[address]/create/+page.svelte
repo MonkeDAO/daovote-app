@@ -329,28 +329,30 @@
 		const skipUpload = event.detail.skipUpload;
 		loadingStore.set(true);
 		if (file && shdwBalance < 0.05) {
-			setMessageSlow('You do not have enough shdw to upload a file. You need at least 0.05 SHDW', 1000);
+			setMessageSlow(
+				'You do not have enough shdw to upload a file. You need at least 0.05 SHDW',
+				1000
+			);
 			reset();
 			return;
-		} 
+		}
 		if (skipUpload) {
 			await createProposal();
 		} else {
 			await uploadFile(file).then(async (res) => {
 				if (res) {
 					toast.push(`File generated! <a href="${shadowDriveUrl}" target="_blank">here</a>`, {
-					target: 'new'
+						target: 'new'
 					});
 					await createProposal();
-				}
-				else {
+				} else {
 					message.set('Error uploading file!');
 				}
 			});
 		}
 		//TODO: Figure a way to combine two methods so its atomic?
 	}
-	
+
 	onDestroy(unsubscribe);
 </script>
 

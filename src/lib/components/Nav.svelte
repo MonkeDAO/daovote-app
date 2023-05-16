@@ -55,6 +55,11 @@
 				<NavLink href="/votebank/{PUBLIC_VOTEBANK}/create">Create Proposal</NavLink>
 			</li>
 		{/if}
+		{#if $walletStore?.connected && isOwner}
+			<li>
+				<NavLink href="/votebank/{PUBLIC_VOTEBANK}">Info</NavLink>
+			</li>
+		{/if}
 	</ul>
 	<div class="flex items-center space-x-4">
 		<WalletMultiButton maxNumberOfWallets={5} />
