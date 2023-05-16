@@ -256,7 +256,7 @@ export async function voteAccountPdaExists(
 ): Promise<boolean> {
 	const [voteAccount] = voteAccountPda(votebank, nft, proposalId, programId);
 	const voteAccountStruct = await VoteAccount.fromAccountAddress(connection, voteAccount).catch(
-		(e) => console.log('voteAccount doesnt exist', e)
+		(e) => console.log('voteAccount doesnt exist', e?.message)
 	);
 	console.log('voteAccountStruct', voteAccountStruct, nft.toBase58());
 	return voteAccountStruct !== undefined;

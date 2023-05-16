@@ -9,7 +9,10 @@
 		getExplorerUrl,
 		getTxSize,
 		proposalAccountPda,
-		sleep
+		sleep,
+
+		trimAddress
+
 	} from '$lib/utils/solana';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
@@ -195,7 +198,7 @@
 		}
 		// If the vote is restricted to an nft, we need to build a transaction for each nft
 		for (let nft of nfts) {
-			await setMessageSlow('Building vote transaction for ' + nft.json.name);
+			await setMessageSlow('Building vote transaction for ' + nft.json.name, 300);
 			const instruction = await buildNftVoteTxn(votedFor, votebankAccountAddress, nft);
 			console.log('instruction', instruction);
 			if (!instruction) continue;
@@ -229,27 +232,38 @@
 		await setMessageSlow('Simulating transactions...', 300);
 		let i = 1;
 		for (let txn of txns) {
-			const t = await connection.simulateTransaction(txn);
-			if (t.value.err) {
-				const messages = extractCustomCodes(t.value.err);
-				if (messages.length > 0) {
-					const msgString = messages.join(', ');
-					message.set(`Error: ${msgString}`);
-					continue; //dont fail on simulation error just move on.
+			try {
+				const t = await connection.simulateTransaction(txn);
+				if (t.value.err) {
+					const messages = extractCustomCodes(t.value.err);
+					if (messages.length > 0) {
+						const msgString = messages.join(', ');
+						i++;
+						await setMessageSlow(`Simulation Error: ${msgString}`);
+						continue; //dont fail on simulation error just move on.
+					}
 				}
+				if (txns.length > 1) {
+					await setMessageSlow(`Waiting for signature ${i} of ${txns.length}...`, 300);
+				} else {
+					message.set('Waiting for signature...');
+				}
+				const txnSize = getTxSize(txn, currentUser);
+				console.log('txnSize', txnSize);
+				const signature = await $walletStore.sendTransaction(txn, connection);
+				signatures.push(signature);
+				i++;
 			}
-			if (txns.length > 1) {
-				await setMessageSlow(`Waiting for signature ${i} of ${txns.length}...`, 300);
-			} else {
-				message.set('Waiting for signature...');
+			catch(err) {
+				i++;
+				console.error(err);
+				await setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
+				continue;
 			}
-			const signature = await $walletStore.sendTransaction(txn, connection);
-			i++;
-			signatures.push(signature);
 		}
 
 		const latestBlockhash = await connection.getLatestBlockhash();
-
+		const voteUrls: string [] = [];
 		for (let signature of signatures) {
 			await connection.confirmTransaction(
 				{
@@ -261,12 +275,14 @@
 			);
 			await setMessageSlow('Vote success!');
 			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
-			toast.push(`Voted! <a href="${explorerUrl}" target="_blank">${signature}</a>`, {
+			const voteTxUrl = `<a href="${explorerUrl}" target="_blank">${trimAddress(signature)}</a> <br/>`
+			voteUrls.push(voteTxUrl);
+		}
+		toast.push(`Voted! ${voteUrls.join(' ')}`, {
 				duration: 3000,
 				pausable: true,
 				target: 'new'
 			});
-		}
 		reset();
 	}
 
