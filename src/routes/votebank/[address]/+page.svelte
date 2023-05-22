@@ -16,7 +16,6 @@
 		voteBankData = data.votebank;
 		loading = false;
 	}
-
 </script>
 
 <div class="mx-auto mb-16 flex max-w-2xl">

@@ -1,13 +1,15 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { DateInput } from 'date-picker-svelte';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import type { Connection } from '@solana/web3.js';
 	import { toast } from '@zerodevx/svelte-toast';
 	import Fa from 'svelte-fa';
-	import { faCancel } from '@fortawesome/free-solid-svg-icons';
+	import { faCancel, faRefresh } from '@fortawesome/free-solid-svg-icons';
 	import LoadingOverlay from '../LoadingOverlay.svelte';
+	import { uploadRequestStore } from '$lib/stores/uploadRequestStore';
+	import { nftStore } from '$lib/stores/nftStore';
 
 	const dispatch = createEventDispatcher();
 	let generatedFile: File;
@@ -37,7 +39,21 @@
 	function handleSkipUpload() {
 		skipFileUpload = !skipFileUpload;
 	}
-
+	const unsub = uploadRequestStore.subscribe((value) => {
+		if (value.isSuccess) {
+			resetForm();
+			uploadRequestStore.clear();
+		}
+	});
+	function resetForm() {
+		title = '';
+		description = '';
+		settingsType = '';
+		settingsValue = '';
+		endDate = null;
+		options = [{ id: 0, name: '' }];
+		maxOptions = 1;
+	}
 	function isSelectedDateValid(selectedDate: Date): boolean {
 		// Create a new Date object representing the current date and time
 		const currentDate = new Date();
@@ -47,6 +63,13 @@
 
 		// Compare the selected date with the current date
 		return selectedDate >= currentDate;
+	}
+
+	async function refetchNfts() {
+		const publicKey = $walletStore?.wallet?.publicKey?.toBase58();
+		if (publicKey) {
+			await nftStore.fetchNftsFromServer(publicKey);
+		}
 	}
 
 	function submitForm() {
@@ -86,13 +109,6 @@
 			file: generatedFile
 		});
 		localStorage.removeItem('editorContent');
-		title = '';
-		description = '';
-		settingsType = '';
-		settingsValue = '';
-		endDate = null;
-		options = [{ id: 0, name: '' }];
-		maxOptions = 1;
 	}
 	function addOption() {
 		if (options.length >= 16) {
@@ -123,17 +139,20 @@
 		generatedFile = selectedFile;
 		console.log('Selected file:', selectedFile);
 	}
-
-	function handleFileGenerated(event: any) {
-		console.log('event', event);
-		generatedFile = event.detail;
+	function handleKeyPress(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			// If you want to add the new option when Enter key is pressed
+			addOption();
+		}
 	}
+	onDestroy(unsub);
 </script>
 
 <LoadingOverlay />
 <div>
 	<div class="divide-y divide-gray-200">
-		<div class="space-y-4 py-8 text-base leading-6 text-gray-700 sm:text-lg sm:leading-7">
+		<div class="relative space-y-4 py-8 text-base leading-6 text-gray-700 sm:text-lg sm:leading-7">
 			<form on:submit|preventDefault={submitForm} class="space-y-4">
 				<div class="flex flex-col">
 					<label for="title" class="leading-loose">Title</label>
@@ -217,8 +236,13 @@
 								class="custom-input max-ws-xs input-primary input mt-1 block w-full rounded"
 								placeholder=" Option"
 								required
+								on:keypress={(event) => handleKeyPress(event)}
 							/>
-							<button class="btn-square btn-sm btn" on:click={() => removeOption(option.id)}>
+							<button
+								type="button"
+								class="btn-square btn-sm btn"
+								on:click={() => removeOption(option.id)}
+							>
 								<Fa icon={faCancel} />
 							</button>
 						</div>
@@ -270,9 +294,11 @@
 				{/if}
 				<div class="flex items-center space-x-4 pt-4">
 					<button
+						type="button"
 						class="flex w-full items-center justify-center rounded-md px-4 py-3 text-gray-900 focus:outline-none"
+						on:click={() => resetForm()}
 					>
-						Cancel
+						Reset
 					</button>
 					<button
 						type="submit"
@@ -281,6 +307,16 @@
 					>
 				</div>
 			</form>
+			<div class="flex justify-end">
+				<!-- Added a wrapper div -->
+				<a
+					href="#"
+					class="mt-8 inline-flex cursor-pointer items-center text-blue-500 hover:underline"
+					on:click|preventDefault={refetchNfts}
+				>
+					<Fa icon={faRefresh} class="mr-2" />Refetch NFTs
+				</a>
+			</div>
 		</div>
 
 		<!-- {#if useEditor}

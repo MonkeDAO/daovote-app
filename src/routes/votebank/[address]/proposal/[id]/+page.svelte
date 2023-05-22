@@ -10,9 +10,7 @@
 		getTxSize,
 		proposalAccountPda,
 		sleep,
-
 		trimAddress
-
 	} from '$lib/utils/solana';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
@@ -253,8 +251,7 @@
 				const signature = await $walletStore.sendTransaction(txn, connection);
 				signatures.push(signature);
 				i++;
-			}
-			catch(err) {
+			} catch (err) {
 				i++;
 				console.error(err);
 				await setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
@@ -263,7 +260,7 @@
 		}
 
 		const latestBlockhash = await connection.getLatestBlockhash();
-		const voteUrls: string [] = [];
+		const voteUrls: string[] = [];
 		for (let signature of signatures) {
 			await connection.confirmTransaction(
 				{
@@ -275,14 +272,16 @@
 			);
 			await setMessageSlow('Vote success!');
 			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
-			const voteTxUrl = `<a href="${explorerUrl}" target="_blank">${trimAddress(signature)}</a> <br/>`
+			const voteTxUrl = `<a href="${explorerUrl}" target="_blank">${trimAddress(
+				signature
+			)}</a> <br/>`;
 			voteUrls.push(voteTxUrl);
 		}
 		toast.push(`Voted! ${voteUrls.join(' ')}`, {
-				duration: 3000,
-				pausable: true,
-				target: 'new'
-			});
+			duration: 3000,
+			pausable: true,
+			target: 'new'
+		});
 		reset();
 	}
 

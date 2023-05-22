@@ -31,6 +31,7 @@
 	import { nftStoreUser } from '$lib/stores/nftStoreUser';
 	import { nftSyncStore } from '$lib/stores/nftStore';
 	import { message } from '$lib/stores/messageStore';
+	import { uploadRequestStore } from '$lib/stores/uploadRequestStore';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { reset, setMessageSlow } from '$lib/utils/common';
@@ -152,6 +153,13 @@
 							}
 						}
 					];
+					if (isDefaultPublicKey(nftMint)) {
+						toast.push(
+							`You need to have an NFT from this collection ${restrictionMint.toBase58()} to create a proposal`,
+							{ target: 'new' }
+						);
+						return;
+					}
 					tokenAccount = await getAssociatedTokenAddress(nftMint, currentUser);
 				} else if (restrictionIx && !isNftRestricted) {
 					tokenAccount = await getAssociatedTokenAddress(restrictionMint, currentUser);
@@ -232,7 +240,7 @@
 						message.set(`Error: ${msgString}`);
 						setTimeout(() => {
 							reset();
-						}, 2000);
+						}, 5000);
 						return;
 					}
 				}
@@ -264,9 +272,11 @@
 						pausable: true
 					}
 				);
+				uploadRequestStore.submitSuccess();
 				setTimeout(() => reset(), 1500);
 			}
 		} catch (err) {
+			uploadRequestStore.submitError('Transaction error');
 			console.log('Transaction error: ', err);
 			message.set(`Error creating proposal! ${(err as any)?.message ?? (err as any)?.msg ?? ''}`);
 			setTimeout(() => reset(), 2000);
@@ -323,15 +333,19 @@
 		return false;
 	}
 	async function handleProposalSubmitted(event: any) {
-		console.log('filegenerated', event);
+		console.log('filegenerated', event, shdwBalance);
 		file = event.detail.file;
 		proposal = event.detail.proposal;
 		const skipUpload = event.detail.skipUpload;
 		loadingStore.set(true);
+		uploadRequestStore.submitRequest();
 		if (file && shdwBalance < 0.05) {
-			setMessageSlow(
+			await setMessageSlow(
 				'You do not have enough shdw to upload a file. You need at least 0.05 SHDW',
-				1000
+				5000
+			);
+			uploadRequestStore.submitError(
+				'You do not have enough shdw to upload a file. You need at least 0.05 SHDW'
 			);
 			reset();
 			return;
@@ -346,7 +360,9 @@
 					});
 					await createProposal();
 				} else {
+					uploadRequestStore.submitError('Error uploading file!');
 					message.set('Error uploading file!');
+					setTimeout(() => reset(), 3000);
 				}
 			});
 		}

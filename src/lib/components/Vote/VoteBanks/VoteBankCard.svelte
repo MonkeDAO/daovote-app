@@ -71,10 +71,10 @@
 					<h3 class="text-gray-900 dark:text-gray-100">{voteBankInfo.description}</h3>
 					<div class="divider" />
 					<p class="text-gray-900 dark:text-gray-100">
-						Open Proposals:<span class="badge badge-success badge-lg ml-2">{currentProposals}</span>
+						Open Proposals:<span class="badge-success badge badge-lg ml-2">{currentProposals}</span>
 					</p>
 					<p class="text-gray-900 dark:text-gray-100">
-						Closed Proposals:<span class="badge badge-error badge-lg ml-2">{closedProposals}</span>
+						Closed Proposals:<span class="badge-error badge badge-lg ml-2">{closedProposals}</span>
 					</p>
 					<p class="text-gray-900 dark:text-gray-100">
 						Address: <a
