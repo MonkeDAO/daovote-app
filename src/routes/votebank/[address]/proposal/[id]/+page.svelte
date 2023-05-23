@@ -191,7 +191,6 @@
 				return transactions;
 			}
 			transaction.add(instruction);
-			transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 			transactions.push(transaction);
 			return transactions;
 		}
@@ -203,7 +202,6 @@
 			if (!instruction) continue;
 
 			transaction.add(instruction);
-			transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 			const txnSize = getTxSize(transaction, currentUser);
 			console.log('txnSize', txnSize);
 			if (txnSize > 1280) {
@@ -214,7 +212,6 @@
 				transactions.push(transaction);
 				transaction = new Transaction();
 				transaction.feePayer = currentUser;
-				transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 				transaction.add(instruction); // Add the instruction to the new transaction
 			}
 		}
@@ -241,6 +238,7 @@
 				} else {
 					message.set('Waiting for signature...');
 				}
+				txn.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 				const signature = await $walletStore.sendTransaction(txn, connection);
 				signatures.push(signature);
 				i++;
@@ -278,31 +276,33 @@
 				txnsToSend.push(txn);
 			}
 			await setMessageSlow(`Waiting for signature for ${txnsToSend.length} ${txnsToSend.length > 1 ? 'transactions' : 'transaction'}...`, 300);
+			//For large clusters of txn sizes refresh the blockhash
+			for (var txn of txnsToSend) {
+				txn.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			}
 			const signedTxns = await $walletStore.signAllTransactions(txnsToSend);
-			const txnsSent = signedTxns.map((x: Transaction) => {
-				const serializedTxn = x.serialize();
-				const sig = connection
-					.sendRawTransaction(serializedTxn, {
+			const sendPromises = signedTxns.map(async (txn: Transaction) => {
+				const res = await connection
+					.sendRawTransaction(txn.serialize(), {
 						skipPreflight: true
-					})
-					.then((res) => {
-						return {
-							error: false,
-							sig: res
-						};
-					})
-					.catch((err) => {
+					}).catch((err) => {
 						console.error(err);
 						setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
-						return {
-							error: true,
-							sig: ''
-						};
+						return '';
 					});
-				return sig;
+				return {
+					error: res === '',
+					sig: res
+				};
 			});
-			await setMessageSlow(`Waiting for ${txnsSent.length} ${txnsSent.length > 1 ? 'transactions' : 'transaction'} to be confirmed...`, 300);
-			const txnsSentSignatures = await Promise.all(txnsSent);
+			
+			await setMessageSlow(`Waiting for ${sendPromises.length} ${sendPromises.length > 1 ? 'transactions' : 'transaction'} to be confirmed...`, 300);
+			const txnsSentSignatures = await Promise.all(sendPromises).catch(err => {
+				console.error(err);
+				setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
+				return [{ error: true, sig: ''}];
+			})
+			console.log('sigs',txnsSentSignatures)
 			signatures = txnsSentSignatures.filter((x) => !x.error).map((x) => x.sig);
 		}
 		return signatures;
