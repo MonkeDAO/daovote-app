@@ -206,7 +206,7 @@
 			transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 			const txnSize = getTxSize(transaction, currentUser);
 			console.log('txnSize', txnSize);
-			if (txnSize > 1282) {
+			if (txnSize > 1280) {
 				// Remove the last instruction that caused the size to exceed limit
 				transaction.instructions.pop();
 
