@@ -32,6 +32,7 @@
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { buildNftVoteIx, buildTokenVoteIx } from '$lib/utils/votehelpers';
+	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
 
 	export let data: any;
 	console.log('proposal page', data);
@@ -224,30 +225,22 @@
 
 		return transactions;
 	}
-
-	async function finalizeAndSendTransactions(txns: Transaction[]) {
+	async function sendEachTxn(txns: Transaction[]) {
 		const signatures = [];
 		await setMessageSlow('Simulating transactions...', 300);
 		let i = 1;
 		for (let txn of txns) {
 			try {
-				const t = await connection.simulateTransaction(txn);
-				if (t.value.err) {
-					const messages = extractCustomCodes(t.value.err);
-					if (messages.length > 0) {
-						const msgString = messages.join(', ');
-						i++;
-						await setMessageSlow(`Simulation Error: ${msgString}`);
-						continue; //dont fail on simulation error just move on.
-					}
+				const simulated = await simulateTxn(connection, txn);
+				if (!simulated) {
+					i++;
+					continue;
 				}
 				if (txns.length > 1) {
 					await setMessageSlow(`Waiting for signature ${i} of ${txns.length}...`, 300);
 				} else {
 					message.set('Waiting for signature...');
 				}
-				const txnSize = getTxSize(txn, currentUser);
-				console.log('txnSize', txnSize);
 				const signature = await $walletStore.sendTransaction(txn, connection);
 				signatures.push(signature);
 				i++;
@@ -258,7 +251,71 @@
 				continue;
 			}
 		}
+		return signatures;
+	}
 
+	async function simulateTxn(connection: Connection, txn: Transaction) {
+		const t = await connection.simulateTransaction(txn);
+		if (t.value.err) {
+			const messages = extractCustomCodes(t.value.err);
+			if (messages.length > 0) {
+				const msgString = messages.join(', ');
+				await setMessageSlow(`Simulation Error: ${msgString}`);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	async function signAllTxns(txns: Transaction[]) {
+		const txnsToSend = [];
+		let signatures: string[] = [];
+		if ($walletStore.signAllTransactions) {
+			await setMessageSlow('Simulating transactions...', 300);
+			for (let txn of txns) {
+				const simulated = await simulateTxn(connection, txn);
+				if (!simulated) continue;
+				txnsToSend.push(txn);
+			}
+			await setMessageSlow(`Waiting for signature for ${txnsToSend.length} ${txnsToSend.length > 1 ? 'transactions' : 'transaction'}...`, 300);
+			const signedTxns = await $walletStore.signAllTransactions(txnsToSend);
+			const txnsSent = signedTxns.map((x: Transaction) => {
+				const serializedTxn = x.serialize();
+				const sig = connection
+					.sendRawTransaction(serializedTxn, {
+						skipPreflight: true
+					})
+					.then((res) => {
+						return {
+							error: false,
+							sig: res
+						};
+					})
+					.catch((err) => {
+						console.error(err);
+						setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
+						return {
+							error: true,
+							sig: ''
+						};
+					});
+				return sig;
+			});
+			await setMessageSlow(`Waiting for ${txnsSent.length} ${txnsSent.length > 1 ? 'transactions' : 'transaction'} to be confirmed...`, 300);
+			const txnsSentSignatures = await Promise.all(txnsSent);
+			signatures = txnsSentSignatures.filter((x) => !x.error).map((x) => x.sig);
+		}
+		return signatures;
+	}
+
+	async function finalizeAndSendTransactions(txns: Transaction[]) {
+		let signatures: string[] = [];
+		if ($walletStore.signAllTransactions) {
+			signatures = await  signAllTxns(txns);
+		}
+		else {
+			signatures = await sendEachTxn(txns);
+		}
 		const latestBlockhash = await connection.getLatestBlockhash();
 		const voteUrls: string[] = [];
 		for (let signature of signatures) {
