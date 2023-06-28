@@ -20,6 +20,9 @@
 	import { Bar } from 'svelte-chartjs';
 	import { Chart, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 	import { onMount } from 'svelte';
+	import type { Adapter } from '@solana/wallet-adapter-base';
+	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+
 
 	let isMobile = false;
 	onMount(() => {
@@ -78,6 +81,14 @@
 	let isOwner: boolean;
 	let isNftRestricted: boolean;
 	let isFiltering: boolean;
+
+	let wallet: Adapter;
+
+	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
+		wallet = $walletStore.wallet;
+  } else {
+		wallet = null;
+	}
 
 	let modalOpen = false;
 	$: {
@@ -369,6 +380,11 @@
 					Number of votes cast is <span class="font-bold">{proposal.voterCount}</span>
 				</p>
 			</div>
+			{#if !wallet}
+				<p class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+					Please connect your wallet to vote.
+				</p>
+			{/if}
 			<p class="text-sm text-gray-800 dark:text-gray-200">
 				You can vote for a maximum of {proposal.maxOptionsSelectable} out of {proposal.options
 					.length}
@@ -381,10 +397,11 @@
 					</div>
 				</div> -->
 					<div class="form-control">
-						<label class="label cursor-pointer">
+						<label class="label" class:cursor-pointer={wallet} class:cursor-not-allowed={!wallet}>
 							<span class="label-text text-black dark:text-gray-200">{option.title}</span>
 							<input
 								type="checkbox"
+								disabled={!wallet}
 								bind:checked={option.checked}
 								class="checkbox-primary checkbox"
 							/>
@@ -395,7 +412,7 @@
 			<button
 				class="btn-primary btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded bg-gray-100 px-4 pt-1 font-medium text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
 				on:click={handleVote}
-				disabled={ended}
+				disabled={ended || !wallet}
 				>Vote
 			</button>
 		</div>
