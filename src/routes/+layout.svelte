@@ -28,10 +28,11 @@
 	import { shdwBalanceStore } from '$lib/shdwbalance';
 	import { forcedConnection } from '$lib/drive';
 	import { PUBLIC_RPC_URL, PUBLIC_SOLANA_NETWORK } from '$env/static/public';
+	import { clusterApiUrl } from '@solana/web3.js';
 	const localStorageKey = 'walletAdapter';
 	//TODO: Configurable or env variable
 	const endpoint = PUBLIC_SOLANA_NETWORK as WalletAdapterNetwork;
-	const network = PUBLIC_RPC_URL;
+	const network = PUBLIC_RPC_URL ?? clusterApiUrl(endpoint);
 	let wallets = [
 		new PhantomWalletAdapter(),
 		new GlowWalletAdapter(),

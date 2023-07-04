@@ -30,14 +30,14 @@ export const VOTEBANK_SEED: string = 'votebank';
 export const PROPOSAL_SEED: string = 'proposal';
 export const VOTE_SEED: string = 'votes';
 export const VOTE_PROGRAM_ID: anchor.web3.PublicKey = new anchor.web3.PublicKey(
-	'mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu'
+	'mdVo394XANGMrVXZCVAaX3AMHYvtTxXwg1sQmDSY1W1'
 );
 export const SYSTEM_PROGRAM_ID: anchor.web3.PublicKey = new anchor.web3.PublicKey(
 	'11111111111111111111111111111111'
 );
 
 export const TREASURY_ADDRESS = new anchor.web3.PublicKey(
-	'C9AYHDRn2GEhFjdNRZgHF2Ld7yCbJsGSE7RzUqyRiueC'
+	'MDevHRDjYZDR565BQCpwVxFc5DQhQ22dEjDsST9Ycqm'
 );
 export function isValidSolAddress(key: string): boolean {
 	try {
