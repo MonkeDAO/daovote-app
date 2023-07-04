@@ -134,66 +134,68 @@
 				let nftMintMetadata = getDefaultPublicKey();
 				let tokenAccount = getDefaultPublicKey();
 				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
-				if (isNftRestricted) {
-					// Find by collection id:
-					nfts.find((nft) => {
-						if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
-							nftMint = new PublicKey(nft.address); //(nft as any)['mintAddress'];
-							nftMintMetadata = new PublicKey(nft.metadataAddress);
-							return true;
-						}
-						return false;
-					});
-					additionalAccountOffsets = [
-						{
-							nftOwnership: {
-								tokenIdx: 0,
-								metaIdx: 1,
-								collectionIdx: 2
-							}
-						}
-					];
-					if (isDefaultPublicKey(nftMint)) {
-						toast.push(
-							`You need to have an NFT from this collection ${restrictionMint.toBase58()} to create a proposal`,
-							{ target: 'new' }
-						);
-						return;
-					}
-					tokenAccount = await getAssociatedTokenAddress(nftMint, currentUser);
-				} else if (restrictionIx && !isNftRestricted) {
-					tokenAccount = await getAssociatedTokenAddress(restrictionMint, currentUser);
-					console.log('Token account', tokenAccount.toBase58());
-					additionalAccountOffsets = [
-						{
-							tokenOwnership: {
-								tokenIdx: 0
-							}
-						}
-					];
-				}
+				// if (isNftRestricted) {
+				// 	// Find by collection id:
+				// 	nfts.find((nft) => {
+				// 		if (nft.collection && nft.collection.address === restrictionMint.toBase58()) {
+				// 			nftMint = new PublicKey(nft.address); //(nft as any)['mintAddress'];
+				// 			nftMintMetadata = new PublicKey(nft.metadataAddress);
+				// 			return true;
+				// 		}
+				// 		return false;
+				// 	});
+				// 	additionalAccountOffsets = [
+				// 		{
+				// 			nftOwnership: {
+				// 				tokenIdx: 0,
+				// 				metaIdx: 1,
+				// 				collectionIdx: 2
+				// 			}
+				// 		}
+				// 	];
+				// 	if (isDefaultPublicKey(nftMint)) {
+				// 		toast.push(
+				// 			`You need to have an NFT from this collection ${restrictionMint.toBase58()} to create a proposal`,
+				// 			{ target: 'new' }
+				// 		);
+				// 		return;
+				// 	}
+				// 	tokenAccount = await getAssociatedTokenAddress(nftMint, currentUser);
+				// } else if (restrictionIx && !isNftRestricted) {
+				// 	tokenAccount = await getAssociatedTokenAddress(restrictionMint, currentUser);
+				// 	console.log('Token account', tokenAccount.toBase58());
+				// 	additionalAccountOffsets = [
+				// 		{
+				// 			tokenOwnership: {
+				// 				tokenIdx: 0
+				// 			}
+				// 		}
+				// 	];
+				// }
 
-				if (restrictionIx && isDefaultPublicKey(tokenAccount)) {
-					toast.push(
-						`You need to have this token ${restrictionMint.toBase58()} to create a proposal`,
-						{ target: 'new' }
-					);
-					return;
-				}
+				// if (restrictionIx && isDefaultPublicKey(tokenAccount)) {
+				// 	toast.push(
+				// 		`You need to have this token ${restrictionMint.toBase58()} to create a proposal`,
+				// 		{ target: 'new' }
+				// 	);
+				// 	return;
+				// }
 
 				const options = proposal.options.map((option: any) => {
 					return { id: option.id, title: option.name };
 				});
 
-				const tokenToAccountMetaFormat = isNftRestricted
-					? [
-							toAccountMetadata(tokenAccount),
-							toAccountMetadata(nftMintMetadata),
-							toAccountMetadata(restrictionMint)
-					  ]
-					: restrictionIx
-					? [toAccountMetadata(tokenAccount)]
-					: [];
+				// const tokenToAccountMetaFormat = isNftRestricted
+				// 	? [
+				// 			toAccountMetadata(tokenAccount),
+				// 			toAccountMetadata(nftMintMetadata),
+				// 			toAccountMetadata(restrictionMint)
+				// 	  ]
+				// 	: restrictionIx
+				// 	? [toAccountMetadata(tokenAccount)]
+				// 	: [];
+
+				const tokenToAccountMetaFormat: any[] = [];
 
 				const postData = {
 					title: proposal.title,
