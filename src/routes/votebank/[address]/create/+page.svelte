@@ -133,7 +133,7 @@
 				let nftMint = getDefaultPublicKey();
 				let nftMintMetadata = getDefaultPublicKey();
 				let tokenAccount = getDefaultPublicKey();
-				let additionalAccountOffsets: any = null; //needs to be null to serialize if offsets not needed
+				let additionalAccountOffsets: any = []; //needs to be null to serialize if offsets not needed
 				// if (isNftRestricted) {
 				// 	// Find by collection id:
 				// 	nfts.find((nft) => {
