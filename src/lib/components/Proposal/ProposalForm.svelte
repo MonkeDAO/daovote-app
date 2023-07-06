@@ -111,10 +111,6 @@
 		localStorage.removeItem('editorContent');
 	}
 	function addOption() {
-		if (options.length >= 16) {
-			toast.push('You cannot add more than 16 options');
-			return;
-		}
 		const newOptionID = options.length;
 		options = [...options, { id: newOptionID, name: '' }];
 	}
