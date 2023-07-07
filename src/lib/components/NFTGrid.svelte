@@ -39,11 +39,8 @@
 	<!--TODO: Add grouping / sorting by collection based on the proposal/votebank restriction-->
 {:else if !loading && nfts}
 	<h3 id="latest" class="text-2xl font-bold tracking-tight text-black dark:text-white md:text-2xl">
-		Votes
+		Select NFTs for Voting
 	</h3>
-	<div
-		class="mb-6 h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
-	/>
 	<div class="mb-4 grid grid-cols-4 gap-4">
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
