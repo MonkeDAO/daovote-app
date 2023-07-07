@@ -98,7 +98,7 @@ export const GET: RequestHandler = async (request) => {
 					owner: ownerPk.toBase58(),
 					json: {
 						name: nftRaw.content.metadata.name,
-						image: nftRaw.content.files.find(x => x.mime == 'image/png')?.uri,
+						image: nftRaw.content.files.find(x => x.mime.includes('image/'))?.uri,
 					},
 					collection: {
 						address: collectionAddress,
