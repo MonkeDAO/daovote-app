@@ -19,7 +19,7 @@ const createNftStore = () => {
 	const fetchNftsFromServer = async (publicKey: string) => {
 		try {
 			update((store) => ({ ...store, isFetching: true }));
-			const res = await fetch(`/api/fetchNfts/${publicKey}`);
+			const res = await fetch(`/api/fetchNftsV2/${publicKey}`);
 			const data = await res.json();
 			if (data.error) {
 				throw new Error(data.error);
