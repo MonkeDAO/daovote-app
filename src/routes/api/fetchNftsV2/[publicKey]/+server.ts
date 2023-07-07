@@ -3,8 +3,13 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { web3 } from '@project-serum/anchor';
 import type { HeliusDigitalAsset, NftMetadata } from '$lib/types';
 import { PRIVATE_HELIUS_URL } from '$env/static/private';
+import { findProgramAddress } from '$lib/utils/solana';
 // import { Metaplex, guestIdentity } from '@metaplex-foundation/js';
 // import { Connection, PublicKey } from '@solana/web3.js';
+
+const METADATA_PROGRAM_ID = new web3.PublicKey(
+  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+);
 
 export const GET: RequestHandler = async (request) => {
 	const publicKey = request.params.publicKey;
@@ -73,13 +78,22 @@ export const GET: RequestHandler = async (request) => {
             //skip compressed nfts
             continue;
         }
-		
+
 			if (nftRaw.grouping.length > 0 && nftRaw.grouping[0].group_key === 'collection') {
+
+				const [metadataAddress] = findProgramAddress(
+					[
+						Buffer.from('metadata'),
+						METADATA_PROGRAM_ID.toBuffer(),
+						new web3.PublicKey(nftRaw.id).toBuffer()
+					],
+					METADATA_PROGRAM_ID
+				);
+
                 const collectionAddress = nftRaw.grouping[0].group_value;
 				//const collection = await getCollection(collectionAddress);
 				nfts.push({
-                    //TODO: GET METADATA ADDRESS FROM METAPLEX OR SOMETHING
-					metadataAddress: nftRaw.id,
+					metadataAddress: metadataAddress.toBase58(),
 					address: nftRaw.id,
 					owner: ownerPk.toBase58(),
 					json: {
