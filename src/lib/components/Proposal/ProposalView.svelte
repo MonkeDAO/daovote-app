@@ -369,8 +369,9 @@
 </div>
 {#if !ended}
 	<article
-		class="votecontent prose mx-auto mb-32 mt-4 w-full max-w-none items-start justify-center dark:prose-invert"
+		class="votecontent prose mx-auto mb-32 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
 	>
+		<NftGrid nfts={allNfts} />
 		<div
 			class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
 		>
@@ -416,7 +417,6 @@
 				>Vote
 			</button>
 		</div>
-		<NftGrid nfts={allNfts} />
 		{#if isOwner && proposal.voteOpen}
 			<div
 				class="relative m-px overflow-hidden rounded-md bg-slate-800 px-2 py-2 text-lg dark:bg-gray-300"
