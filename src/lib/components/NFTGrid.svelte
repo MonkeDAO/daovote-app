@@ -39,7 +39,13 @@
 	<!--TODO: Add grouping / sorting by collection based on the proposal/votebank restriction-->
 {:else if !loading && nfts}
 	<h3 id="latest" class="text-2xl font-bold tracking-tight text-black dark:text-white md:text-2xl">
-		Select NFTs for Voting
+		Select NFTs for Voting (
+		<div class="badge badge-xs bg-gray-200 badge-outline" />
+		<span class="text-sm">&nbsp;Not Voted</span>
+		<div class="badge badge-success badge-xs"></div><span class="text-sm"
+			>&nbsp;Voted</span
+		>
+		)
 	</h3>
 	<div class="mb-4 grid grid-cols-4 gap-4">
 		{#each nfts as nft (nft.address)}
