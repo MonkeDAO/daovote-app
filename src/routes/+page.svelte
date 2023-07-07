@@ -74,7 +74,7 @@
 					<progress class="progress w-56" />
 				</div>
 			{:else if open_proposals.length > 0}
-				<div class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-2 xl:grid-cols-3">
+				<div class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-1 xl:grid-cols-2">
 					{#each open_proposals as item (item)}
 						<GeneralCard item={mapItemToCardItem(item)} />
 					{/each}
