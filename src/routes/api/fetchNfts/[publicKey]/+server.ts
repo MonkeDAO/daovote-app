@@ -32,11 +32,12 @@ export const GET: RequestHandler = async (request) => {
 		} else {
 			// Collection has not been fetched, fetch and cache it
 			try {
-				const collection = await metaplex.nfts().findByMint({ mintAddress: new PublicKey(address) });
+				const collection = await metaplex
+					.nfts()
+					.findByMint({ mintAddress: new PublicKey(address) });
 				collections[address] = collection;
 				return collection;
-			}
-			catch (err) {
+			} catch (err) {
 				console.log('bad collection', err, address);
 			}
 		}

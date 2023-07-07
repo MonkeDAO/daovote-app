@@ -23,7 +23,6 @@
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 
-
 	let isMobile = false;
 	onMount(() => {
 		if (typeof window !== 'undefined') {
@@ -86,7 +85,7 @@
 
 	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
 		wallet = $walletStore.wallet;
-  } else {
+	} else {
 		wallet = null;
 	}
 
@@ -382,7 +381,7 @@
 				</p>
 			</div>
 			{#if !wallet}
-				<p class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+				<p class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700">
 					Please connect your wallet to vote.
 				</p>
 			{/if}

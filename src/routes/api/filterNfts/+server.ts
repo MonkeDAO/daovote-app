@@ -1,7 +1,6 @@
 // src/routes/+your-page/fetchNfts.ts
-import { Metaplex, guestIdentity, type Metadata, PublicKey } from '@metaplex-foundation/js';
+import { PublicKey } from '@metaplex-foundation/js';
 import type { RequestHandler } from '@sveltejs/kit';
-import { web3 } from '@project-serum/anchor';
 import type { NftMetadata, ProposalItem } from '$lib/types';
 import { chunkArray, getEnvNetwork, sleep, voteAccountPdaExists } from '$lib/utils/solana';
 import type { Connection } from '@solana/web3.js';

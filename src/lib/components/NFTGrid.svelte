@@ -40,11 +40,10 @@
 {:else if !loading && nfts}
 	<h3 id="latest" class="text-2xl font-bold tracking-tight text-black dark:text-white md:text-2xl">
 		Select NFTs for Voting (
-		<div class="badge badge-xs bg-gray-200 badge-outline" />
+		<div class="badge-outline badge badge-xs bg-gray-200" />
 		<span class="text-sm">Not Voted&nbsp;</span>
-		<div class="badge badge-success badge-xs"></div><span class="text-sm"
-			>&nbsp;Voted</span
-		>
+		<div class="badge-success badge badge-xs" />
+		<span class="text-sm">&nbsp;Voted</span>
 		)
 	</h3>
 	<div class="mb-4 grid grid-cols-4 gap-4">
@@ -55,7 +54,7 @@
 					<div class="avatar {nft.eligible ? 'offline cursor-pointer' : 'online'}">
 						<div
 							class="rounded-full {$selectedNfts.includes(nft)
-								? 'ring ring-primary-focus dark:ring-offset-4 ring-offset-2 ring-offset-base-100'
+								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100 dark:ring-offset-4'
 								: ''}"
 							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligible'))}
 						>

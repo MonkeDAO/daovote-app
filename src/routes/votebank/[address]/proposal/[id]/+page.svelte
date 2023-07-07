@@ -275,7 +275,12 @@
 				if (!simulated) continue;
 				txnsToSend.push(txn);
 			}
-			await setMessageSlow(`Waiting for signature for ${txnsToSend.length} ${txnsToSend.length > 1 ? 'transactions' : 'transaction'}...`, 300);
+			await setMessageSlow(
+				`Waiting for signature for ${txnsToSend.length} ${
+					txnsToSend.length > 1 ? 'transactions' : 'transaction'
+				}...`,
+				300
+			);
 			//For large clusters of txn sizes refresh the blockhash
 			for (var txn of txnsToSend) {
 				txn.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
@@ -285,7 +290,8 @@
 				const res = await connection
 					.sendRawTransaction(txn.serialize(), {
 						skipPreflight: true
-					}).catch((err) => {
+					})
+					.catch((err) => {
 						console.error(err);
 						setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
 						return '';
@@ -295,14 +301,19 @@
 					sig: res
 				};
 			});
-			
-			await setMessageSlow(`Waiting for ${sendPromises.length} ${sendPromises.length > 1 ? 'transactions' : 'transaction'} to be confirmed...`, 300);
-			const txnsSentSignatures = await Promise.all(sendPromises).catch(err => {
+
+			await setMessageSlow(
+				`Waiting for ${sendPromises.length} ${
+					sendPromises.length > 1 ? 'transactions' : 'transaction'
+				} to be confirmed...`,
+				300
+			);
+			const txnsSentSignatures = await Promise.all(sendPromises).catch((err) => {
 				console.error(err);
 				setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
-				return [{ error: true, sig: ''}];
-			})
-			console.log('sigs',txnsSentSignatures)
+				return [{ error: true, sig: '' }];
+			});
+			console.log('sigs', txnsSentSignatures);
 			signatures = txnsSentSignatures.filter((x) => !x.error).map((x) => x.sig);
 		}
 		return signatures;
@@ -311,9 +322,8 @@
 	async function finalizeAndSendTransactions(txns: Transaction[]) {
 		let signatures: string[] = [];
 		if ($walletStore.signAllTransactions) {
-			signatures = await  signAllTxns(txns);
-		}
-		else {
+			signatures = await signAllTxns(txns);
+		} else {
 			signatures = await sendEachTxn(txns);
 		}
 		const latestBlockhash = await connection.getLatestBlockhash();

@@ -19,8 +19,7 @@ import {
 	isVoteRestrictionRuleNull,
 	isVoteRestrictionRuleTokenOrNftAnyOwnership,
 	isVoteRestrictionRuleTokenOwnership,
-	type SettingsData,
-	type VoteRestrictionRule
+	type SettingsData
 } from '$lib/anchor/types';
 import { errorFromCode } from '$lib/anchor/errors';
 import { PUBLIC_SOLANA_NETWORK, PUBLIC_RPC_URL } from '$env/static/public';
