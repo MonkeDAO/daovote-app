@@ -57,3 +57,35 @@ export function getRemainingTime(targetDate: Date) {
 		};
 	}
 }
+
+export interface ConvertDateResult {
+	utcDate: Date;
+	unixTimestamp: number;
+  }
+  
+  
+export function convertToUTCDate(input: Date | number): ConvertDateResult {
+	let date: Date;
+  
+	if (typeof input === 'number') {
+	  date = new Date(input * 1000); // Convert Unix timestamp to milliseconds
+	} else if (input instanceof Date) {
+	  date = new Date(input);
+	} else {
+	  throw new Error('Invalid input type. Expected Date object or number (Unix timestamp).');
+	}
+  
+	const utcDate = new Date(date.getTime());
+	let unixTimestamp = Math.floor(utcDate.getTime() / 1000); // Convert back to Unix timestamp (seconds)
+  
+	if (!utcDate.toString().includes('GMT')) {
+	  // Adjust to UTC only if the date is not already in UTC
+	  utcDate.setUTCMinutes(utcDate.getUTCMinutes() + utcDate.getTimezoneOffset());
+	  unixTimestamp = Math.floor(utcDate.getTime() / 1000); // Update the Unix timestamp after adjustment
+	}
+  
+	return {
+	  utcDate,
+	  unixTimestamp
+	};
+  }
