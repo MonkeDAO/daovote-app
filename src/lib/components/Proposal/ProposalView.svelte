@@ -80,8 +80,11 @@
 	let isOwner: boolean;
 	let isNftRestricted: boolean;
 	let isFiltering: boolean;
-
+	let sortedTitles: string[] | undefined;
+	let sortedVotes: number[] | undefined;
+	let sortedPercentages: string[] | undefined;
 	let wallet: Adapter;
+	let totalVotes: number;
 
 	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
 		wallet = $walletStore.wallet;
@@ -105,14 +108,23 @@
 	}
 	$: {
 		if (proposal) {
+			sortedTitles = proposal.options
+				.sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0))
+				.map((option) => option.title);
+			sortedVotes = proposal.options
+				.sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0))
+				.map((option) => (option.voteCount ? option.voteCount : 0));
+			totalVotes = sortedVotes.reduce(
+				(accumulator, currentValue) => accumulator + currentValue,
+				0
+			);
+			sortedPercentages = sortedVotes.map((voteCount) => ((voteCount / totalVotes) * 100).toFixed(2));
 			data = {
-				labels: proposal.options.sort((a, b) => b.id - a.id).map((option) => option.title),
+				labels: sortedTitles,
 				datasets: [
 					{
 						label: '# of Votes',
-						data: proposal.options
-							.sort((a, b) => b.id - a.id)
-							.map((option) => (option.voteCount ? option.voteCount : 0)),
+						data: sortedVotes,
 						backgroundColor: [
 							'rgba(255, 134,159,0.4)',
 							'rgba(98,  182, 239,0.4)',
@@ -472,14 +484,18 @@
 
 				<div class="ml-3 flex flex-col-reverse sm:ml-6">
 					<dt class="text-sm font-medium text-slate-600 dark:text-white">{proposal.voterCount}</dt>
-					<dd class="text-xs text-slate-500 dark:text-white">Number of Votes</dd>
+					<dd class="text-xs text-slate-500 dark:text-white">Number of Voters</dd>
 				</div>
 				<div class="ml-3 flex flex-col-reverse sm:ml-6">
+					<dt class="text-sm font-medium text-slate-600 dark:text-white">{totalVotes}</dt>
+					<dd class="text-xs text-slate-500 dark:text-white">Votes Cast</dd>
+				</div>
+				<!-- <div class="ml-3 flex flex-col-reverse sm:ml-6">
 					<dt class="text-sm font-medium text-slate-600 dark:text-white">
 						{findWinningVoteOptions(proposal?.options)}
 					</dt>
 					<dd class="text-xs text-slate-500 dark:text-white">Winning Option(s)</dd>
-				</div>
+				</div> -->
 			</dl>
 		</div>
 		{#if !isMobile}
@@ -487,6 +503,28 @@
 				class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
 			>
 				<Bar {data} options={{ responsive: true }} />
+			</div>
+		{/if}
+		{#if sortedTitles && sortedVotes && sortedPercentages}
+			<div class="overflow-x-auto">
+				<table class="table-xs">
+					<!-- head -->
+					<thead>
+						<tr>
+							<th>Option</th>
+							<th>Votes</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each sortedTitles as title, index (title)}
+							<!-- row -->
+							<tr>
+								<td>{title}</td>
+								<td>{sortedVotes[index]}&nbsp;({sortedPercentages[index]}%)</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
 			</div>
 		{/if}
 		{#if isOwner && proposal.voteOpen}
