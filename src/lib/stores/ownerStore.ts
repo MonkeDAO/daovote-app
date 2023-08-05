@@ -3,7 +3,7 @@ import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Votebank } from '$lib/anchor/accounts';
 import { isSettingsDataOwnerInfo } from '$lib/anchor/types';
-import { PUBLIC_VOTEBANK, PUBLIC_MAINNET_RPC_URL } from '$env/static/public';
+import { PUBLIC_VOTEBANK, PUBLIC_MAINNET_RPC_URL, PUBLIC_RPC_URL } from '$env/static/public';
 
 interface OwnerCheckStore {
 	isOwner: boolean;
@@ -15,7 +15,7 @@ const createOwnerCheckStore = () => {
 	const checkIsOwner = async (publicKey: PublicKey) => {
 		console.log('checking', publicKey.toBase58());
 		//Loaded client side need public var
-		const connection = new Connection(PUBLIC_MAINNET_RPC_URL, 'confirmed');
+		const connection = new Connection(PUBLIC_RPC_URL, 'confirmed');
 		const voteBankAccountRaw = await Votebank.fromAccountAddress(
 			connection,
 			new PublicKey(PUBLIC_VOTEBANK)
