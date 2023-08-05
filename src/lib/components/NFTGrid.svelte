@@ -39,11 +39,13 @@
 	<!--TODO: Add grouping / sorting by collection based on the proposal/votebank restriction-->
 {:else if !loading && nfts}
 	<h3 id="latest" class="text-2xl font-bold tracking-tight text-black dark:text-white md:text-2xl">
-		Votes
+		Select NFTs for Voting (
+		<div class="badge-outline badge badge-xs bg-gray-200" />
+		<span class="text-sm">Not Voted&nbsp;</span>
+		<div class="badge-success badge badge-xs" />
+		<span class="text-sm">&nbsp;Voted</span>
+		)
 	</h3>
-	<div
-		class="mb-6 h-1 w-[100vw] bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 sm:mx-0 sm:w-full"
-	/>
 	<div class="mb-4 grid grid-cols-4 gap-4">
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
@@ -52,7 +54,7 @@
 					<div class="avatar {nft.eligible ? 'offline cursor-pointer' : 'online'}">
 						<div
 							class="rounded-full {$selectedNfts.includes(nft)
-								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100'
+								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100 dark:ring-offset-4'
 								: ''}"
 							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligible'))}
 						>

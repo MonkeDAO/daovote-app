@@ -45,7 +45,7 @@
 <section class="mb-16 w-full" id="newsletter">
 	{#if isDark}
 		<iframe
-			width="540"
+			width="440"
 			height="400"
 			src="https://591a293c.sibforms.com/serve/MUIEAEJ46IWXL1_Wt-qAeV8rlsBdpanz6eGFISm02syfsM1OcFUoh94AtUz5wfHyBdrqCrVaoeFY250X5eqe-zao1wQhgJnA_cuIFCfYr2eH5QqcVrLAMZrvH46-J7zhG5O30aVhOeH2SOsYa23tFKOO11i6U4JXnfh8YjNnRRSe0NCy_0p8oKhwBS7lgLwXAF_mVlD-zmjvYklz"
 			frameborder="0"
@@ -55,7 +55,7 @@
 		/>
 	{:else}
 		<iframe
-			width="540"
+			width="440"
 			height="400"
 			src="https://591a293c.sibforms.com/serve/MUIEACnWpFzmRrkTMW3zO_cQeTvhmNHSYoDktQZhU29Gi86PV_TMDjItCdNmz2AkWL-phxPezfj57hZJ3Ojpffpa10tDeWqhIaUi1xqt77Z9Z0HqvfqjZAv-Aeixfo_WEUfxviOyGfCQYjTe0ioGDtC8pdPN1bDyDN5HNPXrgQijUFVJAf2Fwgbl43qdFPSoVE3IRgupq4M1dgQy"
 			frameborder="0"

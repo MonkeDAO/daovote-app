@@ -19,11 +19,11 @@ import {
 	isVoteRestrictionRuleNull,
 	isVoteRestrictionRuleTokenOrNftAnyOwnership,
 	isVoteRestrictionRuleTokenOwnership,
-	type SettingsData,
-	type VoteRestrictionRule
+	type SettingsData
 } from '$lib/anchor/types';
 import { errorFromCode } from '$lib/anchor/errors';
 import { PUBLIC_SOLANA_NETWORK, PUBLIC_RPC_URL } from '$env/static/public';
+import { convertToUTCDate } from './date';
 
 export const CREATOR_SEED: string = 'monkedevs';
 export const VOTEBANK_SEED: string = 'votebank';
@@ -179,7 +179,7 @@ export function postDataToBuffer(proposalData: any): Buffer {
 		title: proposalData.title,
 		summary: proposalData.summary,
 		url: proposalData.url,
-		time: Math.floor(new Date().getTime() / 1000)
+		time: convertToUTCDate(new Date().getTime()).unixTimestamp
 	};
 	const dataString = JSON.stringify(proposal);
 	return Buffer.from(dataString);

@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import type { NftMetadata, ProposalItem } from '$lib/types';
 import type { Connection } from '@solana/web3.js';
 import type { SettingsData } from '$lib/anchor/types';
-import { chunkArray, extractRestrictionData, sleep, voteAccountPdaExists } from '$lib/utils/solana';
+import { extractRestrictionData } from '$lib/utils/solana';
 
 interface FilteredNftStore {
 	eligible: NftMetadata[] | undefined;

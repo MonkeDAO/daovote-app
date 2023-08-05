@@ -35,6 +35,7 @@
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { reset, setMessageSlow } from '$lib/utils/common';
+	import { convertToUTCDate } from '$lib/utils/date';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -202,7 +203,7 @@
 					summary: proposal.description,
 					url: shadowDriveUrl
 				};
-				const endDateTimeStamp = Date.parse(proposal.endDate) / 1000;
+				const endDateTimeStamp = convertToUTCDate(Date.parse(proposal.endDate)).unixTimestamp;
 				console.log(
 					'Post data',
 					postData,
