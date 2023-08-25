@@ -46,6 +46,8 @@ export const SITE_DESCRIPTION = 'On Chain Voting for DAOs';
 export const MY_TWITTER_HANDLE = 'MonkeDAO';
 ```
 
+Use `.env.example` to populate env variables. Helius is recommended for fetching NFTs. The mainnet url is needed for interracting with ShadowDrive as it only works on mainnet.
+
 ## Todos
 
 - Add back in Newsletter
