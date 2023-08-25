@@ -82,7 +82,7 @@ export const voteInstructionDiscriminator = [
 export function createVoteInstruction(
   accounts: VoteInstructionAccounts,
   args: VoteInstructionArgs,
-  programId = new web3.PublicKey('mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu')
+  programId = new web3.PublicKey('mdVo394XANGMrVXZCVAaX3AMHYvtTxXwg1sQmDSY1W1')
 ) {
   const [data] = voteStruct.serialize({
     instructionDiscriminator: voteInstructionDiscriminator,

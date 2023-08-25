@@ -106,7 +106,7 @@ export class Proposal implements ProposalArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'mvotp22LaMG3XrZgSHPSNH7gBCiorrLWfYKKKvTacvu'
+      'mdVo394XANGMrVXZCVAaX3AMHYvtTxXwg1sQmDSY1W1'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, proposalBeet)

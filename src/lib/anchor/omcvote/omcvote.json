@@ -88,6 +88,48 @@
       ]
     },
     {
+      "name": "addOwner",
+      "accounts": [
+        {
+          "name": "votebank",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "owner",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "removeOwner",
+      "accounts": [
+        {
+          "name": "votebank",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "owner",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
       "name": "createProposal",
       "accounts": [
         {
@@ -755,6 +797,26 @@
       "code": 6217,
       "name": "ProposalCannotBeClosed",
       "msg": "Cannot close proposal for voting"
+    },
+    {
+      "code": 6218,
+      "name": "NotVotebankOwner",
+      "msg": "Not a votebank owner"
+    },
+    {
+      "code": 6219,
+      "name": "OwnerAlreadyExists",
+      "msg": "Already owner of the votebank"
+    },
+    {
+      "code": 6220,
+      "name": "OwnerNotFound",
+      "msg": "Owner on votebank does not exist"
+    },
+    {
+      "code": 6221,
+      "name": "LastOwnerCannotBeRemoved",
+      "msg": "There needs to be at least one owner"
     }
   ],
   "metadata": {

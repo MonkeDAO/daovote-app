@@ -1,4 +1,6 @@
+export * from './addOwner'
 export * from './closeProposal'
 export * from './createProposal'
 export * from './initialize'
+export * from './removeOwner'
 export * from './vote'

@@ -495,6 +495,95 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * NotVotebankOwner: 'Not a votebank owner'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class NotVotebankOwnerError extends Error {
+  readonly code: number = 0x184a
+  readonly name: string = 'NotVotebankOwner'
+  constructor() {
+    super('Not a votebank owner')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, NotVotebankOwnerError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x184a, () => new NotVotebankOwnerError())
+createErrorFromNameLookup.set(
+  'NotVotebankOwner',
+  () => new NotVotebankOwnerError()
+)
+
+/**
+ * OwnerAlreadyExists: 'Already owner of the votebank'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class OwnerAlreadyExistsError extends Error {
+  readonly code: number = 0x184b
+  readonly name: string = 'OwnerAlreadyExists'
+  constructor() {
+    super('Already owner of the votebank')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, OwnerAlreadyExistsError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x184b, () => new OwnerAlreadyExistsError())
+createErrorFromNameLookup.set(
+  'OwnerAlreadyExists',
+  () => new OwnerAlreadyExistsError()
+)
+
+/**
+ * OwnerNotFound: 'Owner on votebank does not exist'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class OwnerNotFoundError extends Error {
+  readonly code: number = 0x184c
+  readonly name: string = 'OwnerNotFound'
+  constructor() {
+    super('Owner on votebank does not exist')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, OwnerNotFoundError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x184c, () => new OwnerNotFoundError())
+createErrorFromNameLookup.set('OwnerNotFound', () => new OwnerNotFoundError())
+
+/**
+ * LastOwnerCannotBeRemoved: 'There needs to be at least one owner'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class LastOwnerCannotBeRemovedError extends Error {
+  readonly code: number = 0x184d
+  readonly name: string = 'LastOwnerCannotBeRemoved'
+  constructor() {
+    super('There needs to be at least one owner')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, LastOwnerCannotBeRemovedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x184d, () => new LastOwnerCannotBeRemovedError())
+createErrorFromNameLookup.set(
+  'LastOwnerCannotBeRemoved',
+  () => new LastOwnerCannotBeRemovedError()
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated
