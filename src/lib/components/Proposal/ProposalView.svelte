@@ -175,27 +175,6 @@
 	onDestroy(() => {
 		filteredNftStore.clear();
 	});
-	// async function checkVoteAccount(nft: NftMetadata) {
-	// 	const accountExists = await voteAccountPdaExists(
-	// 		connection,
-	// 		new PublicKey(proposal.votebank),
-	// 		new PublicKey(nft.address),
-	// 		proposal.proposalId
-	// 	);
-	// 	return { nft, accountExists };
-	// }
-	// async function fetchAccountIfExists(filteredNfts: NftMetadata[]) {
-	// 	if (connection && proposal) {
-	// 		const nftsVoteAccounts = await Promise.all(filteredNfts.map(checkVoteAccount));
-	// 		nftsFiltered = nftsVoteAccounts
-	// 			.filter(({ accountExists }) => !accountExists)
-	// 			.map(({ nft }) => nft);
-	// 		ineligibleNfts = nftsVoteAccounts
-	// 			.filter(({ accountExists }) => accountExists)
-	// 			.map(({ nft }) => nft);
-	// 		console.log('nftsFiltered', nftsFiltered, ineligibleNfts);
-	// 	}
-	// }
 
 	if (proposalData.proposal?.data?.url?.endsWith('.pdf')) {
 		showPdf = true;
@@ -215,7 +194,7 @@
 				title: option.title,
 				checked: false
 			};
-		});
+		}).sort((a: any, b: any) => a.id - b.id);
 		if (
 			proposalData.proposal?.endTime &&
 			!isDefaultDate(bnToDate(proposalData.proposal.endTime)) &&
@@ -232,11 +211,24 @@
 		ended = true;
 	}
 
+	function handleRadioChange(e: any, optionId: any) {
+  		options.forEach(op => {
+        	if (op.id === optionId) {
+            	op.checked = true;
+        	}
+			else {
+            	op.checked = false;
+        	}
+    	});
+		options = options;
+	}
+
 	function getDate(timestamp: number) {
 		return new Date(timestamp * 1000).toLocaleString();
 	}
 
 	function handleVote() {
+		console.log('handleVote', options);
 		const checkedOptions = options.filter((option) => option.checked);
 		if (checkedOptions.length >= 1 && checkedOptions.length <= proposal.maxOptionsSelectable) {
 			//check nfts before opening the modal
@@ -356,10 +348,13 @@
 </article>
 <div class="">
 	{#if showPdf}
-		<div class="mt-4">
+		<div class="mt-4 flex flex-col items-center">
 			<CollapsablePanelButton title="View PDF">
 				<PdfViewer pdfUrl={proposal.data.url} />
 			</CollapsablePanelButton>
+			<a href={proposal.data.url} target="_blank" rel="noopener noreferrer" class="mt-2">
+				Open in new tab
+			</a>
 		</div>
 	{:else if showImg}
 		<div class="mt-4">
@@ -403,20 +398,26 @@
 			</p>
 			<div class="list">
 				{#each options as option (option)}
-					<!-- <div class="mx-8 list-item text-gray-900 dark:text-gray-100">
-					<div>
-						<span class="list-item-title">{option.title}</span>
-					</div>
-				</div> -->
 					<div class="form-control">
 						<label class="label" class:cursor-pointer={wallet} class:cursor-not-allowed={!wallet}>
 							<span class="label-text text-black dark:text-gray-200">{option.title}</span>
-							<input
-								type="checkbox"
-								disabled={!wallet}
-								bind:checked={option.checked}
-								class="checkbox-primary checkbox"
-							/>
+							{#if proposalData.proposal?.maxOptionsSelectable === 1}
+								<input
+									type="radio"
+									name="optionGroup"
+									disabled={!wallet}
+									value={option.id}
+									on:change={(e) => handleRadioChange(e, option.id)}
+									class="radio radio-primary"
+								/>
+							{:else}
+								<input
+									type="checkbox"
+									disabled={!wallet}
+									bind:checked={option.checked}
+									class="checkbox checkbox-primary"
+								/>
+							{/if}
 						</label>
 					</div>
 				{/each}
