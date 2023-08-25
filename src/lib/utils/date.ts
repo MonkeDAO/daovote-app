@@ -59,33 +59,25 @@ export function getRemainingTime(targetDate: Date) {
 }
 
 export interface ConvertDateResult {
-	utcDate: Date;
+	utcDateStr: string;
 	unixTimestamp: number;
-  }
-  
+}
   
 export function convertToUTCDate(input: Date | number): ConvertDateResult {
 	let date: Date;
   
 	if (typeof input === 'number') {
-	  date = new Date(input * 1000); // Convert Unix timestamp to milliseconds
+	  date = new Date(input); // Removed *1000 since your input is already in milliseconds
 	} else if (input instanceof Date) {
-	  date = new Date(input);
+	  date = input;
 	} else {
-	  throw new Error('Invalid input type. Expected Date object or number (Unix timestamp).');
+	  throw new Error('Invalid input type. Expected Date object or number (timestamp in milliseconds).');
 	}
   
-	const utcDate = new Date(date.getTime());
-	let unixTimestamp = Math.floor(utcDate.getTime() / 1000); // Convert back to Unix timestamp (seconds)
-  
-	if (!utcDate.toString().includes('GMT')) {
-	  // Adjust to UTC only if the date is not already in UTC
-	  utcDate.setUTCMinutes(utcDate.getUTCMinutes() + utcDate.getTimezoneOffset());
-	  unixTimestamp = Math.floor(utcDate.getTime() / 1000); // Update the Unix timestamp after adjustment
-	}
-  
+	const unixTimestamp = Math.floor(date.getTime() / 1000); // Convert to Unix timestamp (seconds)
+	
 	return {
-	  utcDate,
+	  utcDateStr: date.toISOString(), // Directly return the ISO string representation
 	  unixTimestamp
 	};
-  }
+}

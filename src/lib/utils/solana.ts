@@ -76,10 +76,14 @@ export function toAccountMetadata(key: PublicKey): AccountMeta {
 }
 
 export function bnToDate(bnTimestamp: anchor.BN): Date {
-	const timestampSeconds = bnTimestamp.toNumber();
-	const timestampMilliseconds = timestampSeconds * 1000;
-	const date = new Date(timestampMilliseconds);
-	return date;
+    const timestamp = bnTimestamp.toNumber();
+    
+    // Assume that if the timestamp has more than 10 digits, it's in milliseconds
+	// Hack accidentally saving ms instead of seconds
+    const isMilliseconds = timestamp > 9999999999;
+    
+    const date = new Date(isMilliseconds ? timestamp : timestamp * 1000);
+    return date;
 }
 
 export function dateToBn(dateOrString: Date | string): anchor.BN {
