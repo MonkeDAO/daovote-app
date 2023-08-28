@@ -104,7 +104,6 @@ export async function fetchProposalById(
 	try {
 		const [proposalAddress] = proposalAccountPda(votebank, proposalId);
 		const proposalAccount = await Proposal.fromAccountAddress(connection, proposalAddress);
-		console.log('test', proposalAccount);
 		//const proposalData = bufferToPostData(proposalAccount.data);
 		// eslint-disable-next-line no-unused-vars
 		const { data, poster, ...rest } = proposalAccount;
