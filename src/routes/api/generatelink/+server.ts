@@ -19,7 +19,6 @@ export const POST: RequestHandler = async (req) => {
         .digest('hex');
 
     const link = `${PUBLIC_SOLANA_NETWORK === "devnet" ? origin : 'https://vote.monkedao.io'}/delegate/sign/${delegateAccountAddress}?signature=${signature}`;
-    
     return new Response(JSON.stringify({ link }), {
 		status: 200,
 		headers: {
