@@ -3,36 +3,34 @@
     import { createSignDelegateAddressInstruction } from '$lib/anchor/instructions/signDelegateAddress';
     import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
     import { walletProgramConnection } from '$lib/wallet';
-    import { Program, web3 } from '@project-serum/anchor';
+    import { web3 } from '@project-serum/anchor';
     import { toast } from '@zerodevx/svelte-toast';
     import { loading as loadingStore } from '$lib/stores/loadingStore';
     import { message } from '$lib/stores/messageStore';
-    import { extractCustomCodes, isValidSolAddress, sleep } from '$lib/utils/solana';
+    import { extractCustomCodes, sleep } from '$lib/utils/solana';
 	import { workSpace } from "@svelte-on-solana/wallet-adapter-anchor";
 	import type { Adapter } from "@solana/wallet-adapter-base";
 	import type { Connection, PublicKey } from "@solana/web3.js";
 	import { createRevokeDelegateAddressInstruction } from "$lib/anchor/instructions/revokeDelegateAddress";
-    import { faCancel, faAdd, faSign, faPen, faPenFancy, faCheck, faSignOut } from '@fortawesome/free-solid-svg-icons';
+    import { faPenFancy, faSignOut, faCopy } from '@fortawesome/free-solid-svg-icons';
 	import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
 	import { goto } from "$app/navigation";
 	import Fa from "svelte-fa";
+    import { page } from '$app/stores';
    
     export let data: {
         delegateAccount: DelegateAccount | null,
         delegateAccountAddress: string | null,
     };
-    console.log('data', data);
-    let wallet: Adapter;
+    console.log('page', $page, $page.data.error);
     let connection: Connection;
     let currentUser: PublicKey;
-    let program: Program;
     let isOwner: boolean;
     let isOwnerSigned: boolean;
     let owner: string;
     let loading = true;
-    let text = 'Loading...';
-    let error = false;
     let ready: boolean;
+    let tooltipMessage = "Copy";
     const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
 
     $: {
@@ -41,10 +39,8 @@
             connection = $walletConnectionFactory.connection;
         }
         if (ready && $walletConnectionFactory.wallet) {
-            wallet = $walletConnectionFactory.wallet;
         }
         if (ready && $walletConnectionFactory.program) {
-            program = $walletConnectionFactory.program;
         }
         if (ready && $walletConnectionFactory.publicKey) {
             currentUser = $walletConnectionFactory.publicKey;
@@ -121,6 +117,19 @@
         await processTransaction(createRevokeDelegateAddressInstruction);
     };
 
+    function copyToClipboard(text: string) {
+        const el = document.createElement('textarea');  
+        el.value = text;                               
+        document.body.appendChild(el);                
+        el.select();                                   
+        document.execCommand('copy');                 
+        document.body.removeChild(el);                
+            tooltipMessage = "Copied!";
+        setTimeout(() => {
+            tooltipMessage = "Copy to clipboard"; // Reset the message after a delay
+        }, 1500);
+    };
+
     function reset() {
         loadingStore.set(false);
         message.set('');
@@ -133,13 +142,21 @@
         {#if !data || !data.delegateAccount}
             <div class="mb-5">
                 <h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
-                <p class="text-sm text-gray-600">No delegate account found.</p>
+                <p class="text-sm text-gray-600">{$page.data?.error || 'No delegate account found.'}</p>
             </div>
         {/if}
         {#if data && data.delegateAccount}
             <div class="mb-5">
-                <h2 class="text-2xl font-semibold text-gray-900">Owner: {owner}</h2>
-                <p class="text-sm text-gray-600">The owner address will be allowed to vote with any of the addresses below that approved delegation.</p>
+                <h2 class="text-2xl font-semibold text-gray-900">Delegate</h2>
+                <div class="flex items-center mt-2">
+                    <h3 class="text-xl text-gray-800">{owner}</h3>
+                    <div class="tooltip ml-2" data-tip={tooltipMessage}>
+                        <button class="btn-ghost btn btn-sm text-gray-900 focus:outline-none" on:click={() => copyToClipboard(owner)}>
+                            <Fa icon={faCopy} class="text-gray-600 hover:text-gray-800" />
+                        </button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mt-2">The owner address will be allowed to vote with any of the addresses below that approved delegation.</p>
             </div>
             <div class="overflow-x-auto mx-auto">
                 {#if data.delegateAccount.accounts.length > 0}
@@ -173,12 +190,12 @@
             </div>
             {#if isOwner}
             <div class="flex items-end justify-end mt-5 space-x-4">
-                <button class="btn-primary btn btn-md text-gray-900 flex items-center" on:click={signDelegateAccount} disabled={!isOwner || loading || isOwnerSigned}>
+                <button class="btn-primary btn btn-md text-gray-100 flex items-center" on:click={signDelegateAccount} disabled={!isOwner || loading || isOwnerSigned}>
                     <Fa icon={faPenFancy} class="mr-2 ml-1" />
                     {isOwnerSigned ? 'Signed' : 'Sign to approve'}
                 </button>
             
-                <button class="btn-primary btn btn-md text-gray-900 flex items-center" on:click={revokeDelegateAddress} disabled={!isOwner || loading || !isOwnerSigned}>
+                <button class="btn-error btn btn-md text-gray-100 flex items-center" on:click={revokeDelegateAddress} disabled={!isOwner || loading || !isOwnerSigned}>
                     <Fa icon={faSignOut} class="mr-2 ml-1" />
                     {isOwnerSigned ? 'Revoke' : 'Revoked'}
                 </button>
@@ -193,17 +210,5 @@
         {/if}
     </div>
 </section>
-
-<style lang="postcss">
-    button {
-		border: none;
-		padding: 8px;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		color: white;
-		background-color: #4e44ce;
-	}
-</style>
 
 

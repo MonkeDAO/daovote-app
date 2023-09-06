@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { DelegateAccount } from '$lib/anchor/accounts';
-	import { createSignDelegateAddressInstruction } from '$lib/anchor/instructions/signDelegateAddress';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { walletProgramConnection } from '$lib/wallet';
 	import { web3 } from '@project-serum/anchor';
@@ -17,10 +16,9 @@
 	} from '$lib/utils/solana';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import { PublicKey, type Connection, type TransactionInstruction } from '@solana/web3.js';
-	import { createRevokeDelegateAddressInstruction } from '$lib/anchor/instructions/revokeDelegateAddress';
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
 	import Fa from 'svelte-fa';
-	import { faCancel, faAdd } from '@fortawesome/free-solid-svg-icons';
+	import { faCancel, faAdd, faShare } from '@fortawesome/free-solid-svg-icons';
 	import { createAddDelegateAddressInstruction } from '$lib/anchor/instructions/addDelegateAddress';
 	import { createRemoveDelegateAddressInstruction } from '$lib/anchor/instructions';
 
@@ -37,6 +35,29 @@
 	let ready: boolean;
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
 	let delegateAddresses = [{ id: 0, address: '' }];
+    let generatedLink = '';
+
+    async function generateLink(address: string) {
+    try {
+        const response = await fetch('/api/generatelink', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ delegateAccountAddress: address }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to generate the link.');
+        }
+
+        const { link } = await response.json();
+        generatedLink = link;
+
+    } catch (error) {
+        console.error('Error generating link:', error);
+    }
+}
 	$: {
 		ready = $walletConnectionFactory.ready;
 		if (ready && $walletConnectionFactory.connection) {
@@ -73,6 +94,9 @@
 			loading = false; // End loading state
 		}
 	}
+    $: if (data && data.delegateAccountAddress) {
+        generateLink(data.delegateAccountAddress);
+    }
 	$: if (data && data.delegateAccount && data.delegateAccount.accounts && currentUser) {
 		isOwner = data.delegateAccount.delegateOwner.toBase58() === currentUser.toBase58();
 		loading = false;
@@ -139,6 +163,29 @@
 		await sleep(2000);
 		reset();
 	};
+
+    let tooltipMessage = "Copy link to clipboard";
+
+    function copyToClipboard() {
+        if (!data || !data.delegateAccount) {
+            return;
+        }
+        // Construct the full URL
+        const rootUrl = window.location.origin; // This gives you the root URL like "https://example.com"
+        const link = `${rootUrl}/delegate/sign/${data.delegateAccountAddress}`;
+
+        const el = document.createElement('textarea');
+        el.value = generatedLink;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        tooltipMessage = "Copied!";
+        setTimeout(() => {
+            tooltipMessage = "Copy link to clipboard"; // Reset the message after a delay
+        }, 1500);
+    }
 
 	const addDelegateAccounts = async () => {
 		if (!data?.delegateAccountAddress) {
@@ -240,7 +287,7 @@
 		{#if !data || !data.delegateAccount}
 			<div class="mb-5">
 				<h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
-				<p class="text-sm text-gray-600">No delegate account found.</p>
+                <p class="text-gray-900">No delegation account created for the connected wallet. <a href="/delegate/create">Create one!</a></p>
 			</div>
 			{#if loading}
 				<div class="fixed inset-0 flex items-center justify-center">
@@ -280,7 +327,7 @@
 										{/if}
 										<button
 											type="button"
-											class="btn-square btn-sm btn"
+											class="btn-primary btn-square btn-sm btn"
 											on:click={() => removeAccountAddress(account.address)}
 										>
 											<Fa icon={faCancel} />
@@ -313,7 +360,7 @@
 								/>
 								<button
 									type="button"
-									class="btn-square btn-sm btn"
+									class="btn-primary btn-square btn-sm btn"
 									on:click={() => removeDelegateAddress(delegateAddress.id)}
 									style="padding: 4px;"
 								>
@@ -323,21 +370,36 @@
 						{/each}
 						<button
 							type="button"
-							class="btn-square btn-sm btn mt-2"
+							class="btn-primary btn-square btn-sm btn mt-2"
 							on:click={addDelegateAddress}
 							style="padding: 4px;"
 						>
 							<Fa icon={faAdd} />
 						</button>
 					</div>
-					<button
-						type="button"
-						class="btn-primary btn-md btn mt-2 self-end py-2 text-gray-900"
-						disabled={delegateAddresses.length === 0 ||
-							delegateAddresses.length > 5 ||
-							delegateAddresses.some((address) => !isValidSolAddress(address.address))}
-						on:click={() => addDelegateAccounts()}>{delegateAddresses.length > 1 && delegateAddresses.every(x => x.address) ? `Add ${delegateAddresses.length} Accounts` : 'Add Account'}</button
-					>
+					<div class="flex justify-end space-x-2 mt-5">
+                        <button
+                            type="button"
+                            class="btn-primary btn-md btn py-2 text-gray-100 self-end"
+                            disabled={delegateAddresses.length === 0 ||
+                                delegateAddresses.length > 5 ||
+                                delegateAddresses.some((address) => !isValidSolAddress(address.address))}
+                            on:click={() => addDelegateAccounts()}
+                        >
+                            {delegateAddresses.length > 1 && delegateAddresses.every(x => x.address) ? `Add ${delegateAddresses.length} Accounts` : 'Add Account'}
+                        </button>
+    
+                        <!-- Share button to copy link to clipboard -->
+                        <div class="tooltip" data-tip={tooltipMessage}>
+                            <button
+                                class="btn-primary btn-md btn self-end"
+                                on:click={() => copyToClipboard()}
+                            >
+                                <Fa class="mr-2" icon={faShare} />
+                                Generate Sign Link
+                            </button>
+                        </div>
+                    </div>
 				</div>
 			{/if}
 		{/if}
@@ -345,15 +407,6 @@
 </section>
 
 <style lang="postcss">
-	button {
-		border: none;
-		padding: 8px;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		color: white;
-		background-color: #4e44ce;
-	}
 	.custom-input {
 		@apply bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500;
 	}

@@ -55,6 +55,11 @@
 				<NavLink href="/votebank/{PUBLIC_VOTEBANK}/create">Create Proposal</NavLink>
 			</li>
 		{/if}
+		{#if $walletStore?.connected}
+			<li>
+				<NavLink href="/delegate/manage">Delegate</NavLink>
+			</li>
+		{/if}
 		{#if $walletStore?.connected && isOwner}
 			<li>
 				<NavLink href="/votebank/{PUBLIC_VOTEBANK}">Info</NavLink>
