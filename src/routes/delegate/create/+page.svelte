@@ -32,7 +32,7 @@
 	let delegateAccountAddress: PublicKey;
 	let connection: Connection;
 	let wallet: Adapter;
-	let loading = true;
+	let loading = false;
 	let text = 'Loading...';
 	let error = false;
 	let ready: boolean;
@@ -88,6 +88,7 @@
 			return;
 		}
 		loadingStore.set(true);
+        loading = true;
 		const [delegateAccountAddress, _] = delegateAccountPda(currentUser);
 		const ix = createCreateDelegateInstruction(
 			{
@@ -100,6 +101,9 @@
 				delegateAddresses: mappedAddresses
 			}
 		);
+        try {
+
+        
 		const tx = new Transaction().add(ix);
 		tx.feePayer = currentUser;
 		tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
@@ -130,6 +134,14 @@
 		);
 		reset();
         goto('/delegate/manage', { replaceState: true, invalidateAll: true });
+        }
+        catch (e) {
+            console.log(e);
+            reset();
+        }
+        finally {
+            loading = false;
+        }
 	};
 
 	function addOption() {
@@ -190,7 +202,7 @@
 				</button>
 			</div>
 				<button class="btn-primary btn text-gray-900 self-end" on:click={createDelegate}
-					>Create Delegate</button
+                >{#if loading}<span class="loading loading-spinner"></span>{/if}Create Delegate</button
 				>
         </div>
 		</div>
