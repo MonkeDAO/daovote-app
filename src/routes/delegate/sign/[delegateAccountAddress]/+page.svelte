@@ -1,0 +1,166 @@
+<script lang="ts">
+	import type { DelegateAccount } from "$lib/anchor/accounts";
+    import { createSignDelegateAddressInstruction } from '$lib/anchor/instructions/signDelegateAddress';
+    import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+    import { walletProgramConnection } from '$lib/wallet';
+    import { Program, web3 } from '@project-serum/anchor';
+    import { toast } from '@zerodevx/svelte-toast';
+    import { loading as loadingStore } from '$lib/stores/loadingStore';
+    import { message } from '$lib/stores/messageStore';
+    import { extractCustomCodes, isValidSolAddress, sleep } from '$lib/utils/solana';
+	import { workSpace } from "@svelte-on-solana/wallet-adapter-anchor";
+	import type { Adapter } from "@solana/wallet-adapter-base";
+	import type { Connection, PublicKey } from "@solana/web3.js";
+   
+    export let data: {
+        delegateAccount: DelegateAccount | null,
+        delegateAccountAddress: string | null,
+    };
+    console.log('data', data);
+    let wallet: Adapter;
+    let connection: Connection;
+    let currentUser: PublicKey;
+    let program: Program;
+    let isOwner: boolean;
+    let owner: string;
+    let loading = true;
+    let text = 'Loading...';
+    let error = false;
+    let ready: boolean;
+    const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
+
+    $: {
+        ready = $walletConnectionFactory.ready;
+        if (ready && $walletConnectionFactory.connection) {
+            connection = $walletConnectionFactory.connection;
+        }
+        if (ready && $walletConnectionFactory.wallet) {
+            wallet = $walletConnectionFactory.wallet;
+        }
+        if (ready && $walletConnectionFactory.program) {
+            program = $walletConnectionFactory.program;
+        }
+        if (ready && $walletConnectionFactory.publicKey) {
+            currentUser = $walletConnectionFactory.publicKey;
+        }
+    }
+
+    $: if (data && data.delegateAccount && data.delegateAccount.accounts && currentUser) {
+        isOwner = data.delegateAccount.accounts.some(account => account.address.toBase58() === currentUser.toBase58());
+        loading = false;
+    }
+    $: if (data && data.delegateAccount && data.delegateAccount.delegateOwner) {
+        owner = data.delegateAccount.delegateOwner.toString();
+    }
+
+    const signDelegateAccount = async () => {
+        if (!data.delegateAccountAddress) {
+            return;
+        }
+        if (!isOwner) {
+            toast.push("You are not the owner of this delegate account");
+            return;
+        }
+        loadingStore.set(true);
+        const ix = createSignDelegateAddressInstruction(
+            {
+                delegateAccount: new web3.PublicKey(data.delegateAccountAddress),
+                signer: currentUser,
+                systemProgram: web3.SystemProgram.programId
+            }
+        );
+        const tx = new web3.Transaction().add(ix);
+        tx.feePayer = currentUser;
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        message.set('Simulating transaction...');
+        const t = await connection.simulateTransaction(tx);
+        if (t.value.err) {
+            const messages = extractCustomCodes(t.value.err);
+            if (messages.length > 0) {
+                const msgString = messages.join(', ');
+                message.set(`Error: ${msgString}`);
+                setTimeout(() => {
+                    reset();
+                }, 2000);
+                return;
+            }
+        }
+        message.set('Waiting for signature...');
+        const signature = await $walletStore.sendTransaction(tx, connection);
+        const latestBlockhash = await connection.getLatestBlockhash();
+
+        await connection.confirmTransaction(
+            {
+                signature: signature,
+                lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+                blockhash: latestBlockhash.blockhash
+            },
+            'confirmed'
+        );
+        message.set('Success!');
+        await sleep(2000);
+        reset();
+    };
+
+    function reset() {
+        loadingStore.set(false);
+        message.set('');
+    }
+    
+</script>
+
+<section class="container mx-auto px-6 sm:px-8 lg:px-10 py-7">
+    <div class="bg-white shadow sm:rounded-lg max-w-3xl mx-auto p-8">
+        {#if !data || !data.delegateAccount}
+            <div class="mb-5">
+                <h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
+                <p class="text-sm text-gray-600">No delegate account found.</p>
+            </div>
+        {/if}
+        {#if data && data.delegateAccount}
+            <div class="mb-5">
+                <h2 class="text-2xl font-semibold text-gray-900">Owner: {owner}</h2>
+                <p class="text-sm text-gray-600">The owner address will be allowed to vote with any of the addresses below that approved delegation.</p>
+            </div>
+            <div class="overflow-x-auto mx-auto">
+                <table class="table table-md text-gray-600 mx-auto max-w-xl">
+                    <thead>
+                        <tr>
+                            <th class="bg-gray-200">Address</th>
+                            <th class="bg-gray-200">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each data.delegateAccount.accounts as account (account.address)}
+                            <tr class="">
+                                <td class="bg-gray-300">{account.address}</td>
+                                <td class="bg-gray-300">
+                                    <div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
+                                        {#if account.signed}
+                                            <div class="badge-success badge">Signed</div>
+                                        {:else}
+                                            <div class="badge-error badge">Missing Signer</div>
+                                        {/if}
+                                    </div>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
+            {#if isOwner}
+                <button class="btn-primary btn mt-5 text-gray-900" on:click={signDelegateAccount} disabled={!isOwner || loading}>Sign</button>
+            {/if}
+            {#if !isOwner}
+				<p class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700 mt-4">
+					The wallet connected cannot sign for any of these addresses. Please connect the wallet that owns one of these addresses to approve delegation
+				</p>
+			{/if}
+
+        {/if}
+    </div>
+</section>
+
+
+
+

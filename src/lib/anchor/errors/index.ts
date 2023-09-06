@@ -584,6 +584,104 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * TooManyDelegateAddresses: 'You can only delegate 5 addresses'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class TooManyDelegateAddressesError extends Error {
+  readonly code: number = 0x184e
+  readonly name: string = 'TooManyDelegateAddresses'
+  constructor() {
+    super('You can only delegate 5 addresses')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, TooManyDelegateAddressesError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x184e, () => new TooManyDelegateAddressesError())
+createErrorFromNameLookup.set(
+  'TooManyDelegateAddresses',
+  () => new TooManyDelegateAddressesError()
+)
+
+/**
+ * DelegateAddressNotFound: 'Signer not found in delegate addresses'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class DelegateAddressNotFoundError extends Error {
+  readonly code: number = 0x184f
+  readonly name: string = 'DelegateAddressNotFound'
+  constructor() {
+    super('Signer not found in delegate addresses')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, DelegateAddressNotFoundError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x184f, () => new DelegateAddressNotFoundError())
+createErrorFromNameLookup.set(
+  'DelegateAddressNotFound',
+  () => new DelegateAddressNotFoundError()
+)
+
+/**
+ * DuplicateDelegateAddresses: 'Duplicate delegate addresses found'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class DuplicateDelegateAddressesError extends Error {
+  readonly code: number = 0x1850
+  readonly name: string = 'DuplicateDelegateAddresses'
+  constructor() {
+    super('Duplicate delegate addresses found')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, DuplicateDelegateAddressesError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(
+  0x1850,
+  () => new DuplicateDelegateAddressesError()
+)
+createErrorFromNameLookup.set(
+  'DuplicateDelegateAddresses',
+  () => new DuplicateDelegateAddressesError()
+)
+
+/**
+ * DelegateAddressAlreadySigned: 'Delegate address cannot be signed on creation'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class DelegateAddressAlreadySignedError extends Error {
+  readonly code: number = 0x1851
+  readonly name: string = 'DelegateAddressAlreadySigned'
+  constructor() {
+    super('Delegate address cannot be signed on creation')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, DelegateAddressAlreadySignedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(
+  0x1851,
+  () => new DelegateAddressAlreadySignedError()
+)
+createErrorFromNameLookup.set(
+  'DelegateAddressAlreadySigned',
+  () => new DelegateAddressAlreadySignedError()
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

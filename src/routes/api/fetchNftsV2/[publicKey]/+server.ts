@@ -4,7 +4,7 @@ import { web3 } from '@project-serum/anchor';
 import type { HeliusDigitalAssetsResult, NftMetadata, HeliusDigitalAsset } from '$lib/types';
 import { PRIVATE_HELIUS_URL } from '$env/static/private';
 import { PUBLIC_COLLECTION_ADDRESSES } from '$env/static/public';
-import { findProgramAddress } from '$lib/utils/solana';
+import { findProgramAddress, getDelegateAccountType, getEnvNetwork } from '$lib/utils/solana';
 
 const METADATA_PROGRAM_ID = new web3.PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
 
@@ -18,7 +18,6 @@ export const GET: RequestHandler = async (request) => {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
-
 	const ownerPk = new web3.PublicKey(publicKey);
 	async function getAssetsByOwner(owner: string, url: string) {
 		const response = await fetch(url, {
@@ -63,19 +62,36 @@ export const GET: RequestHandler = async (request) => {
 		const { result } = (await response.json()) as HeliusDigitalAssetsResult;
 		return result.items;
 	};
+	const conn = getEnvNetwork();
+    const delegateAccount = await getDelegateAccountType(ownerPk, conn);
+	const addresses: string[] = [publicKey];
+	if (delegateAccount && delegateAccount?.addresses?.some(x => x.signed)) {
+		//push all signed addresses to address array
+		addresses.push(...delegateAccount.addresses.filter(x => x.signed).map(x => x.address));
+	}
+	console.log('addresses', addresses);
 	const collectionAddresses = PUBLIC_COLLECTION_ADDRESSES?.split(',').map((x: any) => (x as string)?.trim());
 	let nftsRaw: HeliusDigitalAsset[] = [];
 	if (collectionAddresses && collectionAddresses.length > 0) {
 		for (var collectionAddress of collectionAddresses) {
-			const assets = await searchAssets(publicKey, url, collectionAddress);
-			nftsRaw = nftsRaw.concat(assets);
+			//search assets for all addresses in address array
+			//use promise.all to get all the nfts for each address
+			const promises = addresses.map(address => searchAssets(address, url, collectionAddress));
+			const assetsArray = await Promise.all(promises);
+			nftsRaw = nftsRaw.concat(...assetsArray);
 		}
 		if (nftsRaw.length === 0) {
-			nftsRaw = await getAssetsByOwner(publicKey, url);
+			//if no assets found, get all assets for all addresses in address array
+			const promises = addresses.map(address => getAssetsByOwner(address, url));
+			const assetsArray = await Promise.all(promises);
+			nftsRaw = nftsRaw.concat(...assetsArray);
 		}
 	}
 	else {
-		nftsRaw = await getAssetsByOwner(publicKey, url);
+		//if no collection addresses, get all assets for all addresses in address array
+		const promises = addresses.map(address => getAssetsByOwner(address, url));
+		const assetsArray = await Promise.all(promises);
+		nftsRaw = nftsRaw.concat(...assetsArray);
 	}
 
 	let nfts: NftMetadata[] = [];
@@ -100,7 +116,7 @@ export const GET: RequestHandler = async (request) => {
 				nfts.push({
 					metadataAddress: metadataAddress.toBase58(),
 					address: nftRaw.id,
-					owner: ownerPk.toBase58(),
+					owner: nftRaw.ownership.owner,
 					json: {
 						name: nftRaw.content.metadata.name,
 						image: nftRaw.content.files.find((x) => x?.mime?.includes('image/'))?.uri
@@ -135,7 +151,8 @@ export const GET: RequestHandler = async (request) => {
 			return 0;
 		}
 	});
-	return new Response(JSON.stringify({ nfts }), {
+	
+	return new Response(JSON.stringify({ nfts, delegateAccount }), {
 		status: 200,
 		headers: {
 			'Content-Type': 'application/json',
