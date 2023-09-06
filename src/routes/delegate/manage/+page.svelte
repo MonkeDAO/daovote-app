@@ -285,10 +285,17 @@
 <section class="container mx-auto px-6 py-7 sm:px-8 lg:px-10">
 	<div class="mx-auto max-w-3xl bg-white p-8 shadow sm:rounded-lg">
 		{#if !data || !data.delegateAccount}
-			<div class="mb-5">
-				<h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
-                <p class="text-gray-900">No delegation account created for the connected wallet. <a href="/delegate/create">Create one!</a></p>
-			</div>
+        <div class="mb-5">
+            <h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
+            <p class="text-gray-900">
+                No delegation account created for the connected wallet. 
+                <button 
+                    class="inline-flex items-center btn btn-outline btn-sm btn-info text-white px-2 py-1"
+                    on:click={() => location.href='/delegate/create'}>
+                    Create one!
+                </button>
+            </p>
+        </div>
 			{#if loading}
 				<div class="fixed inset-0 flex items-center justify-center">
 					<div

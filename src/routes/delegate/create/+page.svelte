@@ -155,7 +155,7 @@
 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 	<div class="py-5">
 		<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
-			<h1 class="text-2xl font-semibold text-gray-900">Create Delegate Account</h1>
+			<h1 class="text-2xl font-semibold text-gray-900">Create Delegatooor</h1>
             <div class="flex h-full flex-col justify-between">
 			<div class="mt-5">
 				<label for="delegateAddresses" class="leading-loose text-gray-900">Delegate Addresses</label
