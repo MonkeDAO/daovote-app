@@ -21,6 +21,11 @@
       "name": "FEE_VOTE",
       "type": "u64",
       "value": "1_000"
+    },
+    {
+      "name": "DELEGATE_FEE",
+      "type": "u64",
+      "value": "1_000"
     }
   ],
   "instructions": [
@@ -293,9 +298,230 @@
           }
         }
       ]
+    },
+    {
+      "name": "voteDelegation",
+      "accounts": [
+        {
+          "name": "voter",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "votebank",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "votes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftVoteMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "delegateAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "proposalId",
+          "type": "u32"
+        },
+        {
+          "name": "voteEntries",
+          "type": {
+            "vec": {
+              "defined": "VoteEntry"
+            }
+          }
+        },
+        {
+          "name": "additionalAccountOffsets",
+          "type": {
+            "vec": {
+              "defined": "AdditionalAccountIndices"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "createDelegate",
+      "accounts": [
+        {
+          "name": "delegate",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "delegator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "delegateAddresses",
+          "type": {
+            "vec": {
+              "defined": "DelegateAddress"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "signDelegateAddress",
+      "accounts": [
+        {
+          "name": "delegateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "removeDelegateAddress",
+      "accounts": [
+        {
+          "name": "delegateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "address",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "addDelegateAddress",
+      "accounts": [
+        {
+          "name": "delegateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "address",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "revokeDelegateAddress",
+      "accounts": [
+        {
+          "name": "delegateAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
+    {
+      "name": "DelegateAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "delegateOwner",
+            "type": "publicKey"
+          },
+          {
+            "name": "accounts",
+            "type": {
+              "vec": {
+                "defined": "DelegateAddress"
+              }
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "Proposal",
       "type": {
@@ -402,6 +628,22 @@
     }
   ],
   "types": [
+    {
+      "name": "DelegateAddress",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "signed",
+            "type": "bool"
+          }
+        ]
+      }
+    },
     {
       "name": "VoteOption",
       "type": {
@@ -817,6 +1059,26 @@
       "code": 6221,
       "name": "LastOwnerCannotBeRemoved",
       "msg": "There needs to be at least one owner"
+    },
+    {
+      "code": 6222,
+      "name": "TooManyDelegateAddresses",
+      "msg": "You can only delegate 5 addresses"
+    },
+    {
+      "code": 6223,
+      "name": "DelegateAddressNotFound",
+      "msg": "Signer not found in delegate addresses"
+    },
+    {
+      "code": 6224,
+      "name": "DuplicateDelegateAddresses",
+      "msg": "Duplicate delegate addresses found"
+    },
+    {
+      "code": 6225,
+      "name": "DelegateAddressAlreadySigned",
+      "msg": "Delegate address cannot be signed on creation"
     }
   ],
   "metadata": {
