@@ -292,7 +292,7 @@
 					</tbody>
 				</table>
                 {:else}
-                    <p>Delegation is enabled but no addresses added yet.</p>
+                    <p class="text-gray-900">Delegation is enabled but no addresses added yet.</p>
                 {/if}
 			</div>
 			{#if data && data.delegateAccount.accounts.length < 5}

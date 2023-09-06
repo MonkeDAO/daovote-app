@@ -12,8 +12,10 @@
 	import type { Adapter } from "@solana/wallet-adapter-base";
 	import type { Connection, PublicKey } from "@solana/web3.js";
 	import { createRevokeDelegateAddressInstruction } from "$lib/anchor/instructions/revokeDelegateAddress";
+    import { faCancel, faAdd, faSign, faPen, faPenFancy, faCheck, faSignOut } from '@fortawesome/free-solid-svg-icons';
 	import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
 	import { goto } from "$app/navigation";
+	import Fa from "svelte-fa";
    
     export let data: {
         delegateAccount: DelegateAccount | null,
@@ -127,7 +129,7 @@
 </script>
 <LoadingOverlay />
 <section class="container mx-auto px-6 sm:px-8 lg:px-10 py-7">
-    <div class="bg-white shadow sm:rounded-lg max-w-3xl mx-auto p-8 flex flex-col">
+    <div class="bg-white shadow sm:rounded-lg max-w-3xl mx-auto p-8">
         {#if !data || !data.delegateAccount}
             <div class="mb-5">
                 <h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
@@ -166,15 +168,22 @@
                     </tbody>
                 </table>
                 {:else}
-                    <p>Delegation is enabled but no addresses added yet.</p>
+                    <p class="text-gray-900">Delegation is enabled but no addresses added yet.</p>
                 {/if}
             </div>
+            {#if isOwner}
             <div class="flex items-end justify-end mt-5 space-x-4">
-                {#if isOwner}
-                    <button class="btn-primary btn btn-md text-gray-900" on:click={signDelegateAccount} disabled={!isOwner || loading || isOwnerSigned}>{isOwnerSigned ? 'Signed': 'Sign'}</button>
-                    <button class="btn-primary btn btn-md text-gray-900" on:click={revokeDelegateAddress} disabled={!isOwner || loading || !isOwnerSigned}>{isOwnerSigned ? 'Revoke': 'Revoked'}</button>
-                {/if}
+                <button class="btn-primary btn btn-md text-gray-900 flex items-center" on:click={signDelegateAccount} disabled={!isOwner || loading || isOwnerSigned}>
+                    <Fa icon={faPenFancy} class="mr-2 ml-1" />
+                    {isOwnerSigned ? 'Signed' : 'Sign to approve'}
+                </button>
+            
+                <button class="btn-primary btn btn-md text-gray-900 flex items-center" on:click={revokeDelegateAddress} disabled={!isOwner || loading || !isOwnerSigned}>
+                    <Fa icon={faSignOut} class="mr-2 ml-1" />
+                    {isOwnerSigned ? 'Revoke' : 'Revoked'}
+                </button>
             </div>
+            {/if}
             {#if !isOwner}
 				<p class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700 mt-4">
 					The wallet connected cannot sign for any of these addresses. Please connect the wallet that owns one of these addresses to approve delegation
