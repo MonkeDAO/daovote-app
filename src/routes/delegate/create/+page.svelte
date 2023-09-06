@@ -118,8 +118,6 @@
 		}
 		message.set('Waiting for signature...');
 		const signature = await $walletStore.sendTransaction(tx, connection);
-
-		console.log('Signature', signature);
 		const latestBlockhash = await connection.getLatestBlockhash();
 
 		await connection.confirmTransaction(
