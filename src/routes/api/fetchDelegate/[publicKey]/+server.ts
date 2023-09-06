@@ -17,7 +17,7 @@ export const GET: RequestHandler = async (request) => {
     const publicKey = new web3.PublicKey(publicKeyStr);
     const delegateAccount = await getDelegateAccount(publicKey, conn);
 	
-	return new Response(JSON.stringify({ delegateAccount }), {
+	return new Response(JSON.stringify({ ...delegateAccount }), {
 		status: 200,
 		headers: {
 			'Content-Type': 'application/json',

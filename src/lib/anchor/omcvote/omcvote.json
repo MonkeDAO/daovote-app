@@ -1079,6 +1079,11 @@
       "code": 6225,
       "name": "DelegateAddressAlreadySigned",
       "msg": "Delegate address cannot be signed on creation"
+    },
+    {
+      "code": 6226,
+      "name": "CannotAddSelfAsDelegate",
+      "msg": "Cannot add self as delegate"
     }
   ],
   "metadata": {

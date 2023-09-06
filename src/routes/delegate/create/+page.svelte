@@ -7,25 +7,24 @@
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import type { DelegateAccount } from '$lib/anchor/accounts';
-    import { message } from '$lib/stores/messageStore';
-    import { loading as loadingStore } from '$lib/stores/loadingStore';
+	import { message } from '$lib/stores/messageStore';
+	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import type { Program } from '@project-serum/anchor';
 	import type { Adapter } from '@solana/wallet-adapter-base';
-    import { toast } from '@zerodevx/svelte-toast';
+	import { toast } from '@zerodevx/svelte-toast';
 	import {
 		SYSTEM_PROGRAM_ID,
 		TREASURY_ADDRESS,
 		delegateAccountPda,
 		extractCustomCodes,
 		getDelegateAccountType,
-
 		isValidSolAddress
-
 	} from '$lib/utils/solana';
 	import type { DelegateAccountType } from '$lib/types';
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
-	import { faCancel } from '@fortawesome/free-solid-svg-icons';
+	import { faAdd, faCancel } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
+	import { goto } from '$app/navigation';
 
 	let delegateAddresses = [{ id: 0, address: '' }];
 
@@ -59,11 +58,11 @@
 
 	const addDelegateAddress = () => {
 		if (delegateAddresses.length < 5) {
-        const newAddressID = delegateAddresses.length;
-        delegateAddresses = [...delegateAddresses, { id: newAddressID, address: '' }];
-        } else {
-            toast.push("Maximum of 5 addresses reached");
-        }
+			const newAddressID = delegateAddresses.length;
+			delegateAddresses = [...delegateAddresses, { id: newAddressID, address: '' }];
+		} else {
+			toast.push('Maximum of 5 addresses reached');
+		}
 	};
 
 	const removeDelegateAddress = (addressID: number) => {
@@ -74,19 +73,21 @@
 	};
 
 	const createDelegate = async () => {
-        const validAddresses = delegateAddresses.filter((address) => isValidSolAddress(address.address));
+		const validAddresses = delegateAddresses.filter((address) =>
+			isValidSolAddress(address.address)
+		);
 		const mappedAddresses = validAddresses.map((address) => {
 			return {
 				address: new PublicKey(address.address),
 				signed: false
 			};
 		});
-        //if mappedaddresses is empty, return
-        if (mappedAddresses.length === 0) {
-            toast.push("No valid addresses");
-            return;
-        }
-        loadingStore.set(true);
+		//if mappedaddresses is empty, return
+		if (mappedAddresses.length === 0) {
+			toast.push('No valid addresses');
+			return;
+		}
+		loadingStore.set(true);
 		const [delegateAccountAddress, _] = delegateAccountPda(currentUser);
 		const ix = createCreateDelegateInstruction(
 			{
@@ -100,37 +101,52 @@
 			}
 		);
 		const tx = new Transaction().add(ix);
-			tx.feePayer = currentUser;
-			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-			message.set('Simulating transaction...');
-			const t = await connection.simulateTransaction(tx);
-			if (t.value.err) {
-				const messages = extractCustomCodes(t.value.err);
-				if (messages.length > 0) {
-					const msgString = messages.join(', ');
-					message.set(`Error: ${msgString}`);
-					setTimeout(() => {
-						reset();
-					}, 2000);
-					return;
-				}
+		tx.feePayer = currentUser;
+		tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+		message.set('Simulating transaction...');
+		const t = await connection.simulateTransaction(tx);
+		if (t.value.err) {
+			const messages = extractCustomCodes(t.value.err);
+			if (messages.length > 0) {
+				const msgString = messages.join(', ');
+				message.set(`Error: ${msgString}`);
+				setTimeout(() => {
+					reset();
+				}, 2000);
+				return;
 			}
-			message.set('Waiting for signature...');
-			const signature = await $walletStore.sendTransaction(tx, connection);
+		}
+		message.set('Waiting for signature...');
+		const signature = await $walletStore.sendTransaction(tx, connection);
 
-			console.log('Signature', signature);
-			const latestBlockhash = await connection.getLatestBlockhash();
+		console.log('Signature', signature);
+		const latestBlockhash = await connection.getLatestBlockhash();
 
-			await connection.confirmTransaction(
-				{
-					signature: signature,
-					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-					blockhash: latestBlockhash.blockhash
-				},
-				'confirmed'
-			);
-            reset();
+		await connection.confirmTransaction(
+			{
+				signature: signature,
+				lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+				blockhash: latestBlockhash.blockhash
+			},
+			'confirmed'
+		);
+		reset();
+        goto('/delegate/manage', { replaceState: true, invalidateAll: true });
 	};
+
+	function addOption() {
+		const newOptionID = delegateAddresses.length;
+		delegateAddresses = [...delegateAddresses, { id: newOptionID, address: '' }];
+	}
+
+	function handleKeyPress(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			// If you want to add the new option when Enter key is pressed
+			addOption();
+		}
+	}
+
 	function reset() {
 		loadingStore.set(false);
 		message.set('');
@@ -140,33 +156,45 @@
 <LoadingOverlay />
 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 	<div class="py-5">
-		<div class="bg-white shadow overflow-hidden sm:rounded-lg max-w-3xl mx-auto p-6">
+		<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 			<h1 class="text-2xl font-semibold text-gray-900">Create Delegate Account</h1>
+            <div class="flex h-full flex-col justify-between">
 			<div class="mt-5">
-				<label for="delegateAddresses" class="leading-loose text-gray-900">Delegate Addresses</label>
+				<label for="delegateAddresses" class="leading-loose text-gray-900">Delegate Addresses</label
+				>
 				{#each delegateAddresses as delegateAddress (delegateAddress.id)}
 					<div class="flex items-center space-x-2">
 						<input
 							type="text"
 							bind:value={delegateAddress.address}
-							class="form-input mt-1 block w-full rounded-md text-gray-900"
-							placeholder="Enter Delegate Address"
+							class="custom-input max-ws-xs input-primary input mt-1 block w-full rounded"
+							placeholder=" Address"
 							required
+							on:keypress={(event) => handleKeyPress(event)}
 						/>
-                        <button
-								type="button"
-								class="btn-square btn-sm btn"
-								on:click={() => removeDelegateAddress(delegateAddress.id)}
-							>
-								<Fa icon={faCancel} />
-							</button>
+						<button
+							type="button"
+							class="btn-square btn-sm btn"
+							on:click={() => removeDelegateAddress(delegateAddress.id)}
+							style="padding: 4px;"
+						>
+							<Fa icon={faCancel} />
+						</button>
 					</div>
 				{/each}
-				<button type="button" class="btn-primary btn-sm btn mt-2 text-gray-900" on:click={addDelegateAddress}>Add Address</button>
+				<button
+					type="button"
+					class="btn-square btn-sm btn mt-2"
+					on:click={addDelegateAddress}
+					style="padding: 4px;"
+				>
+					<Fa icon={faAdd} />
+				</button>
 			</div>
-			<div class="mt-5">
-				<button class="btn-primary btn text-gray-900" on:click={createDelegate}>Create Delegate</button>
-			</div>
+				<button class="btn-primary btn text-gray-900 self-end" on:click={createDelegate}
+					>Create Delegate</button
+				>
+        </div>
 		</div>
 	</div>
 </div>
@@ -197,7 +225,7 @@
 			max-width: 1280px;
 		}
 	}
-    button {
+	button {
 		border: none;
 		padding: 8px;
 		border-radius: 5px;
@@ -219,16 +247,7 @@
 		padding: 4px 8px;
 		font-size: 14px;
 	}
-	.form-input {
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		padding: 0.5rem 0.75rem;
-		font-size: 1rem;
-		line-height: 1.5;
-	}
-	.form-input:focus {
-		border-color: #4e44ce;
-		outline: none;
-		box-shadow: 0 0 3px rgba(78, 68, 206, 0.5);
+	.custom-input {
+		@apply bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500;
 	}
 </style>

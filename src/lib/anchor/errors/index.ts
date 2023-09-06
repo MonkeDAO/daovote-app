@@ -682,6 +682,29 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * CannotAddSelfAsDelegate: 'Cannot add self as delegate'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class CannotAddSelfAsDelegateError extends Error {
+  readonly code: number = 0x1852
+  readonly name: string = 'CannotAddSelfAsDelegate'
+  constructor() {
+    super('Cannot add self as delegate')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, CannotAddSelfAsDelegateError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1852, () => new CannotAddSelfAsDelegateError())
+createErrorFromNameLookup.set(
+  'CannotAddSelfAsDelegate',
+  () => new CannotAddSelfAsDelegateError()
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

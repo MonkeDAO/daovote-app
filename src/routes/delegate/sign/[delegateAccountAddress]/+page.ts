@@ -16,16 +16,19 @@ export async function load({ params }: any) {
     }
     const publicKeyFromParam = new PublicKey(delegateAccountAddress);
     let delegateAccount = null;
+    let delegateAccountPda = null;
     if (!PublicKey.isOnCurve(publicKeyFromParam)) {
        const delegateAccountRaw = await DelegateAccount.fromAccountAddress(connection, publicKeyFromParam).catch(() => { return null; });
        delegateAccount = delegateAccountRaw?.pretty() || null;
+       delegateAccountPda = publicKeyFromParam.toBase58();
     }
     else {
         const delegateAccountRaw = await getDelegateAccount(publicKeyFromParam, connection);
         delegateAccount = delegateAccountRaw?.delegateAccount?.pretty() || null;
+        delegateAccountPda = delegateAccountRaw?.address.toBase58();
     }
 	return {
 		delegateAccount,
-        delegateAccountAddress
+        delegateAccountAddress: delegateAccountPda
 	};
 }

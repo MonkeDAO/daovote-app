@@ -11,6 +11,9 @@
 	import { workSpace } from "@svelte-on-solana/wallet-adapter-anchor";
 	import type { Adapter } from "@solana/wallet-adapter-base";
 	import type { Connection, PublicKey } from "@solana/web3.js";
+	import { createRevokeDelegateAddressInstruction } from "$lib/anchor/instructions/revokeDelegateAddress";
+	import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
+	import { goto } from "$app/navigation";
    
     export let data: {
         delegateAccount: DelegateAccount | null,
@@ -22,6 +25,7 @@
     let currentUser: PublicKey;
     let program: Program;
     let isOwner: boolean;
+    let isOwnerSigned: boolean;
     let owner: string;
     let loading = true;
     let text = 'Loading...';
@@ -53,7 +57,11 @@
         owner = data.delegateAccount.delegateOwner.toString();
     }
 
-    const signDelegateAccount = async () => {
+    $: if (data && data.delegateAccount && data.delegateAccount.accounts && currentUser) {
+        isOwnerSigned = data.delegateAccount.accounts.some(account => account.address.toBase58() === currentUser.toBase58() && account.signed);
+    }
+
+    const processTransaction = async (instructionCreator: (args: { delegateAccount: web3.PublicKey, signer: PublicKey, systemProgram: PublicKey }) => web3.TransactionInstruction) => {
         if (!data.delegateAccountAddress) {
             return;
         }
@@ -62,7 +70,7 @@
             return;
         }
         loadingStore.set(true);
-        const ix = createSignDelegateAddressInstruction(
+        const ix = instructionCreator(
             {
                 delegateAccount: new web3.PublicKey(data.delegateAccountAddress),
                 signer: currentUser,
@@ -99,7 +107,16 @@
         );
         message.set('Success!');
         await sleep(2000);
+        goto(`/delegate/sign/${data.delegateAccountAddress}`, { replaceState: true, invalidateAll: true });
         reset();
+    };
+
+    const signDelegateAccount = async () => {
+        await processTransaction(createSignDelegateAddressInstruction);
+    };
+
+    const revokeDelegateAddress = async () => {
+        await processTransaction(createRevokeDelegateAddressInstruction);
     };
 
     function reset() {
@@ -108,9 +125,9 @@
     }
     
 </script>
-
+<LoadingOverlay />
 <section class="container mx-auto px-6 sm:px-8 lg:px-10 py-7">
-    <div class="bg-white shadow sm:rounded-lg max-w-3xl mx-auto p-8">
+    <div class="bg-white shadow sm:rounded-lg max-w-3xl mx-auto p-8 flex flex-col">
         {#if !data || !data.delegateAccount}
             <div class="mb-5">
                 <h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
@@ -123,6 +140,7 @@
                 <p class="text-sm text-gray-600">The owner address will be allowed to vote with any of the addresses below that approved delegation.</p>
             </div>
             <div class="overflow-x-auto mx-auto">
+                {#if data.delegateAccount.accounts.length > 0}
                 <table class="table table-md text-gray-600 mx-auto max-w-xl">
                     <thead>
                         <tr>
@@ -147,10 +165,16 @@
                         {/each}
                     </tbody>
                 </table>
+                {:else}
+                    <p>Delegation is enabled but no addresses added yet.</p>
+                {/if}
             </div>
-            {#if isOwner}
-                <button class="btn-primary btn mt-5 text-gray-900" on:click={signDelegateAccount} disabled={!isOwner || loading}>Sign</button>
-            {/if}
+            <div class="flex items-end justify-end mt-5 space-x-4">
+                {#if isOwner}
+                    <button class="btn-primary btn btn-md text-gray-900" on:click={signDelegateAccount} disabled={!isOwner || loading || isOwnerSigned}>{isOwnerSigned ? 'Signed': 'Sign'}</button>
+                    <button class="btn-primary btn btn-md text-gray-900" on:click={revokeDelegateAddress} disabled={!isOwner || loading || !isOwnerSigned}>{isOwnerSigned ? 'Revoke': 'Revoked'}</button>
+                {/if}
+            </div>
             {#if !isOwner}
 				<p class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700 mt-4">
 					The wallet connected cannot sign for any of these addresses. Please connect the wallet that owns one of these addresses to approve delegation
@@ -161,6 +185,16 @@
     </div>
 </section>
 
-
+<style lang="postcss">
+    button {
+		border: none;
+		padding: 8px;
+		border-radius: 5px;
+		font-size: 16px;
+		cursor: pointer;
+		color: white;
+		background-color: #4e44ce;
+	}
+</style>
 
 
