@@ -22,7 +22,6 @@
         delegateAccount: DelegateAccount | null,
         delegateAccountAddress: string | null,
     };
-    console.log('page', $page, $page.data.error);
     let connection: Connection;
     let currentUser: PublicKey;
     let isOwner: boolean;

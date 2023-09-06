@@ -24,7 +24,6 @@ export async function load({ params, url, fetch }: any) {
         })
     });
     const { error, valid } = await resp.json();
-    console.log('error from resp', error, valid);
     if (!valid) {
         return {
             status: 400,
