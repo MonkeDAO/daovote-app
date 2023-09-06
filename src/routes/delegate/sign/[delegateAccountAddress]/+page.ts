@@ -52,6 +52,7 @@ export async function load({ params, url, fetch }: any) {
     }
 	return {
 		delegateAccount,
-        delegateAccountAddress: delegateAccountPda
+        delegateAccountAddress: delegateAccountPda,
+        signature: signature
 	};
 }

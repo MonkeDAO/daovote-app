@@ -21,6 +21,7 @@
     export let data: {
         delegateAccount: DelegateAccount | null,
         delegateAccountAddress: string | null,
+        signature: string | null,
     };
     let connection: Connection;
     let currentUser: PublicKey;
@@ -104,7 +105,7 @@
         );
         message.set('Success!');
         await sleep(2000);
-        goto(`/delegate/sign/${data.delegateAccountAddress}`, { replaceState: true, invalidateAll: true });
+        goto(`/delegate/sign/${data.delegateAccountAddress}?signature=${signature}`, { replaceState: true, invalidateAll: true });
         reset();
     };
 
