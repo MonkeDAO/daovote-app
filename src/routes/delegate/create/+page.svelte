@@ -166,6 +166,32 @@
 <LoadingOverlay />
 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 	<div class="py-5">
+		<div class="mx-auto max-w-md text-gray-900 dark:text-gray-100">
+			<h3 class="text-2xl font-bold leading-relaxed">What is delegation?</h3>
+			<p>
+				Delegation is a process by which you can give the voting power of your ledger or wallet with
+				SMB Gen2 in it to a different wallet.
+			</p>
+			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
+				<img src="/delegate.png" alt="delegation" class="bg-transparent" />
+			</div>
+			<h3 class="mt-5 text-2xl font-bold leading-relaxed">Why delegate?</h3>
+			<p>
+				If you don't want to connect the wallet with your monke in it regularly to vote or don't
+				want to break out your ledger, delegation is the way to go.
+			</p>
+			<h3 class="mt-8 text-2xl font-bold leading-relaxed">How delegate?</h3>
+			<p>
+				Delegation is a process by which you can give the voting power of your ledger or wallet with
+				SMB Gen2 in it to a different wallet.
+			</p>
+			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
+				<img src="/del.png" alt="delegation" class="bg-transparent" />
+			</div>
+		</div>
+		<!-- <div class="mb-5 flex items-center justify-center mt-8">
+			<img src="/delegate.png" alt="delegation" class="h-2/5 w-2/5 bg-transparent hidden md:block" />
+		</div> -->
 		<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 			<h1 class="text-2xl font-semibold text-gray-900">Create Delegatooor</h1>
             <div class="flex h-full flex-col justify-between">
@@ -204,7 +230,7 @@
 				<button class="btn-primary btn text-gray-900 self-end" on:click={createDelegate}
                 >{#if loading}<span class="loading loading-spinner"></span>{/if}Create Delegate</button
 				>
-        </div>
+			</div>
 		</div>
 	</div>
 </div>
