@@ -37,19 +37,7 @@
 	import { goto } from '$app/navigation';
 	import Fa from 'svelte-fa';
 	import { faCopy } from '@fortawesome/free-solid-svg-icons';
-
-	let isDark = false;
-	$: {
-		if (typeof localStorage !== 'undefined') {
-			console.log('localStorage.theme:', localStorage.theme);
-			if (
-				localStorage.theme === 'dark' ||
-				(!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-			) {
-				isDark = true;
-			}
-		}
-	}
+	import { isDark } from '$lib/stores/darkModeStore';
 
 	let delegateAddress = '';
 	let delegateAddressPublickey: PublicKey;
@@ -350,7 +338,7 @@
 				SMB Gen2 in it to a different wallet.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
-				{#if isDark}
+				{#if $isDark}
 					<img src="/dark-delegate.png" alt="delegation" class="bg-transparent" />
 				{:else}
 					<img src="/delegate.png" alt="delegation" class="bg-transparent" />

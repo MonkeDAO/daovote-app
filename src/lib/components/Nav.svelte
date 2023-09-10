@@ -5,30 +5,22 @@
 	import NavLink from './NavLink.svelte';
 	import { WalletMultiButton } from '@svelte-on-solana/wallet-adapter-ui';
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
+	import { isDark } from '$lib/stores/darkModeStore';
 
-	let isDark = false;
 	let isOwner: boolean;
 	$: {
 		isOwner = $ownerCheckStore.isOwner;
 		$ownerCheckSyncStore;
 	}
-	if (typeof localStorage !== 'undefined') {
-		if (
-			localStorage.theme === 'dark' ||
-			(!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-		) {
-			isDark = true;
-		}
-	}
 	function toggleDarkMode() {
-		if (isDark) {
+		if ($isDark) {
 			document.documentElement.classList.remove('dark');
 			localStorage.theme = 'light';
-			isDark = false;
+			isDark.set(false);
 		} else {
 			document.documentElement.classList.add('dark');
 			localStorage.theme = 'dark';
-			isDark = true;
+			isDark.set(true);
 		}
 	}
 </script>
@@ -74,7 +66,7 @@
 			transition-all hover:ring-2 dark:bg-yellow-800"
 			on:click={toggleDarkMode}
 		>
-			{#if isDark}
+			{#if $isDark}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
