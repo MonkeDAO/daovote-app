@@ -100,6 +100,7 @@
 	let tooltipMessage = 'Copy link to clipboard';
 
 	function copyToClipboard() {
+		console.log("copyToClipboard", data);
 		if (!data || !data.delegateAccount) {
 			return;
 		}
@@ -155,7 +156,13 @@
 		owner = data.delegateAccount.delegateOwner.toString();
 	}
 
-	$: if (data && data.delegateAccount && data.delegateAccount.accounts && data.delegateAccount.accounts[0] && currentUser) {
+	$: if (
+		data &&
+		data.delegateAccount &&
+		data.delegateAccount.accounts &&
+		data.delegateAccount.accounts[0] &&
+		currentUser
+	) {
 		isOwnerSigned = data.delegateAccount.accounts[0].signed;
 		delegateAddressPublickey = data.delegateAccount.accounts[0].address;
 	}
@@ -283,7 +290,7 @@
 				'confirmed'
 			);
 			reset();
-			goto('/delegate/manage', { replaceState: true, invalidateAll: true });
+			// goto('/delegate/create', { replaceState: true, invalidateAll: true });
 		} catch (e) {
 			console.log(e);
 			reset();
@@ -383,7 +390,7 @@
 								><span class="font-normal">{data.delegateAccount.accounts[0].address}</span></em
 							>
 						</p>
-						<p class="text-sm text-gray-600">
+						<p class="mb-8 text-sm text-gray-600">
 							This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
 						</p>
 						{#if isOwnerSigned}
@@ -393,12 +400,10 @@
 								>{#if loading}<span class="loading loading-spinner" />{/if}Revoke Delegation</button
 							>
 						{:else}
-							<div class="tooltip" data-tip={tooltipMessage}>
-								<button class="btn-primary btn-md btn self-end" on:click={() => copyToClipboard()}>
-									<Fa class="mr-2" icon={faCopy} />
-									Generate Sign Link
-								</button>
-							</div>
+							<button class="btn-primary btn-md btn self-end" on:click={() => copyToClipboard()}>
+								<Fa class="mr-1" icon={faCopy} />
+								Generate Sign Link
+							</button>
 						{/if}
 					</div>
 				{:else}
