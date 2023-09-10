@@ -12,7 +12,7 @@
 	import type { Adapter } from "@solana/wallet-adapter-base";
 	import type { Connection, PublicKey } from "@solana/web3.js";
 	import { createRevokeDelegateAddressInstruction } from "$lib/anchor/instructions/revokeDelegateAddress";
-    import { faPenFancy, faSignOut, faCopy } from '@fortawesome/free-solid-svg-icons';
+    import { faPenFancy, faSignOut, faCopy, faBookmark } from '@fortawesome/free-solid-svg-icons';
 	import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
 	import { goto } from "$app/navigation";
 	import Fa from "svelte-fa";
@@ -148,10 +148,11 @@
         {#if data && data.delegateAccount}
             <div class="mb-5">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-3">Delegation</h2>
-                <div class="alert alert-error mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1s" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div class="alert alert-warning mb-3">
+                    <!-- <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1s" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> -->
+                    <Fa icon={faBookmark} class="ml-1" />
                     <span>Bookmark this link to revoke access incase your hot wallet is compromised.</span>
-                  </div>
+                </div>
                 <div class="flex items-center mt-2">
                     <h3 class="text-xl text-gray-800">{owner}</h3>
                     <div class="tooltip ml-2" data-tip={tooltipMessage}>
@@ -167,8 +168,8 @@
                 <table class="table table-md text-gray-600 mx-auto max-w-xl">
                     <thead>
                         <tr>
-                            <th class="bg-gray-200">Address</th>
-                            <th class="bg-gray-200">Status</th>
+                            <th class="bg-gray-200 text-gray-500">Address</th>
+                            <th class="bg-gray-200 text-gray-500">Status</th>
                         </tr>
                     </thead>
                     <tbody>

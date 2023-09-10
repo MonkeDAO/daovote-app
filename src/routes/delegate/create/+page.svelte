@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
-	import { onMount } from 'svelte';
 	import {
 		type Connection,
 		PublicKey,
@@ -36,11 +34,11 @@
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
 	import { goto } from '$app/navigation';
 	import Fa from 'svelte-fa';
-	import { faCopy } from '@fortawesome/free-solid-svg-icons';
+	import { faCopy, faWarning } from '@fortawesome/free-solid-svg-icons';
 	import { isDark } from '$lib/stores/darkModeStore';
 
 	let delegateAddress = '';
-	let delegateAddressPublickey: PublicKey;
+	let delegateAddressPublickey: PublicKey | null;
 	let data: {
 		delegateAccount: DelegateAccount | null;
 		delegateAccountAddress: string | null;
@@ -105,10 +103,6 @@
 		if (!data || !data.delegateAccount) {
 			return;
 		}
-		// Construct the full URL
-		const rootUrl = window.location.origin; // This gives you the root URL like "https://example.com"
-		const link = `${rootUrl}/delegate/sign/${data.delegateAccountAddress}`;
-
 		const el = document.createElement('textarea');
 		el.value = generatedLink;
 		document.body.appendChild(el);
@@ -169,7 +163,7 @@
 	}
 
 	const removeAccountAddress = async () => {
-		if (!data?.delegateAccountAddress) {
+		if (!data?.delegateAccountAddress || !delegateAddressPublickey) {
 			return;
 		}
 		const ix = createRemoveDelegateAddressInstruction(
@@ -184,6 +178,8 @@
 		);
 		await processTransaction(ix);
 		await fetchData(currentUser);
+		delegateAddressPublickey = null;
+		delegateAddress = '';
 	};
 
 	const processTransaction = async (
@@ -375,6 +371,12 @@
 				<p class="italic text-gray-600">
 					Make sure you're connected with the wallet you want to vote with.
 				</p>
+				{#if data?.delegateAccountAddress}
+					<div class="alert alert-warning mt-4">
+						<Fa icon={faWarning} class="ml-1" />
+						<span>Delegation is enabled but no addresses added yet. Enable one below.</span>
+					</div>
+				{/if}
 				<div class="flex h-full flex-col justify-between">
 					<div class="mt-5">
 						<label for="delegateAddresses" class="leading-loose text-gray-900"
@@ -400,9 +402,6 @@
 			<!-- Render the "Manage Delegate Account" view -->
 			<div class="mx-auto mb-5 max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 				<h1 class="text-2xl font-semibold text-gray-900">Delegation Details</h1>
-				<!-- <p class="italic text-gray-600">
-					You have transfer
-				</p> -->
 				{#if data.delegateAccount.accounts.length > 0}
 					<div class="flex h-full flex-col justify-between">
 						<p class="text-md font-semibold” mt-5 text-gray-900">
@@ -419,18 +418,20 @@
 						<p class="mb-8 text-sm text-gray-600">
 							This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
 						</p>
-						{#if isOwnerSigned}
+						<div class="flex items-end justify-end mt-5 space-x-4">
+							{#if delegateAddressPublickey}
 							<button
 								class="btn-primary btn mt-5 self-end text-gray-900"
 								on:click={removeAccountAddress}
-								>{#if loading}<span class="loading loading-spinner" />{/if}Revoke Delegation</button
+								>{#if loading}<span class="loading loading-spinner" />{/if}Remove Delegation</button
 							>
-						{:else}
+							{/if}
 							<button class="btn-primary btn-md btn self-end" on:click={() => copyToClipboard()}>
-								<Fa class="mr-1" icon={faCopy} />
+								<Fa class="mr-1 ml-2" icon={faCopy} />
 								Generate Sign Link
 							</button>
-						{/if}
+						</div>
+				
 					</div>
 				{:else}
 					<p class="text-gray-900">Delegation is enabled but no addresses added yet.</p>
