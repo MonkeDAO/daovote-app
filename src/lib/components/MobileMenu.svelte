@@ -8,7 +8,7 @@
 		$ownerCheckSyncStore;
 	}
 	let isOpen = false;
-	let isMenuRendered;
+	let isMenuRendered: boolean;
 	$: {
 		if (isOpen) {
 			setTimeout(() => {
