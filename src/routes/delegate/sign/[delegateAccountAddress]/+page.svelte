@@ -160,7 +160,7 @@
                         </button>
                     </div>
                 </div>
-                <p class="text-sm text-gray-600 mt-2">This address now has voting power from all SMB Gen2 NFTs present in the below address.</p>
+                <p class="text-sm text-gray-600 mt-2">This address will have voting power from all SMB Gen2 NFTs present in the below address once signed.</p>
             </div>
             <div class="overflow-x-auto mx-auto">
                 {#if data.delegateAccount.accounts.length > 0}

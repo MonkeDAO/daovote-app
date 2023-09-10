@@ -38,6 +38,19 @@
 	import Fa from 'svelte-fa';
 	import { faCopy } from '@fortawesome/free-solid-svg-icons';
 
+	let isDark = false;
+	$: {
+		if (typeof localStorage !== 'undefined') {
+			console.log('localStorage.theme:', localStorage.theme);
+			if (
+				localStorage.theme === 'dark' ||
+				(!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+			) {
+				isDark = true;
+			}
+		}
+	}
+
 	let delegateAddress = '';
 	let delegateAddressPublickey: PublicKey;
 	let data: {
@@ -337,7 +350,11 @@
 				SMB Gen2 in it to a different wallet.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
-				<img src="/delegate.png" alt="delegation" class="bg-transparent" />
+				{#if isDark}
+					<img src="/dark-delegate.png" alt="delegation" class="bg-transparent" />
+				{:else}
+					<img src="/delegate.png" alt="delegation" class="bg-transparent" />
+				{/if}
 			</div>
 			<h3 class="mt-5 text-2xl font-bold leading-relaxed">Why delegate?</h3>
 			<p>
@@ -350,7 +367,11 @@
 				SMB Gen2 in it to a different wallet.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
-				<img src="/steps.png" alt="delegation" class="bg-transparent" />
+				{#if isDark}
+					<img src="/dark-steps.png" alt="delegation" class="bg-transparent" />
+				{:else}
+					<img src="/steps.png" alt="delegation" class="bg-transparent" />
+				{/if}
 			</div>
 		</div>
 		{#if isFetching}
@@ -396,7 +417,7 @@
 				</p> -->
 				{#if data.delegateAccount.accounts.length > 0}
 					<div class="flex h-full flex-col justify-between">
-						<p class="text-md mt-5 font-semibold text-gray-900">
+						<p class="text-md font-semibold” mt-5 text-gray-900">
 							Wallet with Voting Power: <em class="italic"
 								><span class="font-normal">{owner}</span></em
 							>

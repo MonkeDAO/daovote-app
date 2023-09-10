@@ -50,9 +50,6 @@
 		<li>
 			<NavLink href="/about">About</NavLink>
 		</li>
-		<li>
-			<NavLink href="/delegate/create">Delegate</NavLink>
-		</li>
 		{#if $walletStore?.connected && isOwner}
 			<li>
 				<NavLink href="/votebank/{PUBLIC_VOTEBANK}/create">Create Proposal</NavLink>
@@ -60,7 +57,7 @@
 		{/if}
 		{#if $walletStore?.connected}
 			<li>
-				<NavLink href="/delegate/manage">Delegate</NavLink>
+				<NavLink href="/delegate/create">Delegate</NavLink>
 			</li>
 		{/if}
 		{#if $walletStore?.connected && isOwner}

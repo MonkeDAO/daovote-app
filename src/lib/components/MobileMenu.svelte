@@ -94,19 +94,6 @@
 					>
 				</li>
 			{/if}
-			{#if $walletStore?.connected}
-				<li />
-				<li
-					class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
-					style="transition-delay: 350ms;"
-				>
-					<a
-						class="flex w-auto pb-4"
-						on:click={() => setTimeout(() => (isOpen = false), 300)}
-						href="/delegate/manage">Delegate</a
-					>
-				</li>
-			{/if}
 			<li
 				class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
 				style="transition-delay: 350ms;"
