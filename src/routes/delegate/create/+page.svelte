@@ -9,7 +9,8 @@
 	} from '@solana/web3.js';
 	import {
 		createCreateDelegateInstruction,
-		createRemoveDelegateAddressInstruction
+		createRemoveDelegateAddressInstruction,
+		createAddDelegateAddressInstruction
 	} from '$lib/anchor/instructions';
 	import { walletProgramConnection } from '$lib/wallet';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
@@ -100,7 +101,6 @@
 	let tooltipMessage = 'Copy link to clipboard';
 
 	function copyToClipboard() {
-		console.log("copyToClipboard", data);
 		if (!data || !data.delegateAccount) {
 			return;
 		}
@@ -248,18 +248,34 @@
 		];
 		loadingStore.set(true);
 		loading = true;
+		let ix;
 		const [delegateAccountAddress, _] = delegateAccountPda(currentUser);
-		const ix = createCreateDelegateInstruction(
-			{
-				delegate: delegateAccountAddress,
-				delegator: currentUser,
-				treasury: TREASURY_ADDRESS,
-				systemProgram: SYSTEM_PROGRAM_ID
-			},
-			{
-				delegateAddresses: mappedAddress
-			}
-		);
+		if (data?.delegateAccount) {
+			ix = createAddDelegateAddressInstruction(
+				{
+					delegateAccount: new web3.PublicKey(delegateAccountAddress),
+					signer: currentUser,
+					systemProgram: web3.SystemProgram.programId,
+					treasury: TREASURY_ADDRESS
+				},
+				{
+					address: new PublicKey(delegateAddress)
+				}
+			);
+		} else {
+			ix = createCreateDelegateInstruction(
+				{
+					delegate: delegateAccountAddress,
+					delegator: currentUser,
+					treasury: TREASURY_ADDRESS,
+					systemProgram: SYSTEM_PROGRAM_ID
+				},
+				{
+					delegateAddresses: mappedAddress
+				}
+			);
+		}
+
 		try {
 			const tx = new Transaction().add(ix);
 			tx.feePayer = currentUser;
@@ -290,6 +306,7 @@
 				'confirmed'
 			);
 			reset();
+			currentUser = currentUser;
 			// goto('/delegate/create', { replaceState: true, invalidateAll: true });
 		} catch (e) {
 			console.log(e);

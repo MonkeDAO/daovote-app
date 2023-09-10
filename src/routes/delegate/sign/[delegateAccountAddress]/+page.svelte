@@ -147,7 +147,11 @@
         {/if}
         {#if data && data.delegateAccount}
             <div class="mb-5">
-                <h2 class="text-2xl font-semibold text-gray-900">Delegate</h2>
+                <h2 class="text-2xl font-semibold text-gray-900 mb-3">Delegation</h2>
+                <div class="alert alert-error mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1s" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Bookmark this link to revoke access incase your hot wallet is compromised.</span>
+                  </div>
                 <div class="flex items-center mt-2">
                     <h3 class="text-xl text-gray-800">{owner}</h3>
                     <div class="tooltip ml-2" data-tip={tooltipMessage}>
@@ -156,7 +160,7 @@
                         </button>
                     </div>
                 </div>
-                <p class="text-sm text-gray-600 mt-2">The owner address will be allowed to vote with any of the addresses below that approved delegation.</p>
+                <p class="text-sm text-gray-600 mt-2">This address now has voting power from all SMB Gen2 NFTs present in the below address.</p>
             </div>
             <div class="overflow-x-auto mx-auto">
                 {#if data.delegateAccount.accounts.length > 0}
