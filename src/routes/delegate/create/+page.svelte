@@ -97,7 +97,7 @@
 			console.error('Error generating link:', error);
 		}
 	}
-	let tooltipMessage = 'Copy link to clipboard';
+	let tooltipMessage: string | null = null;
 
 	function copyToClipboard() {
 		if (!data || !data.delegateAccount) {
@@ -112,7 +112,7 @@
 
 		tooltipMessage = 'Copied!';
 		setTimeout(() => {
-			tooltipMessage = 'Copy link to clipboard'; // Reset the message after a delay
+			tooltipMessage = null; // Reset the message after a delay
 		}, 1500);
 	}
 
@@ -347,8 +347,7 @@
 			</p>
 			<h3 class="mt-8 text-2xl font-bold leading-relaxed">How delegate?</h3>
 			<p>
-				Delegation is a process by which you can give the voting power of your ledger or wallet with
-				SMB Gen2 in it to a different wallet.
+				Add an address to your delegate account and sign it with the wallet that has your monke in it. You can then vote with the wallet that has the voting power from your monke. You can remove and replace the address at any time.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
 				{#if isDark}
@@ -369,12 +368,12 @@
 			<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 				<h1 class="text-2xl font-semibold text-gray-900">Delegate Vote</h1>
 				<p class="italic text-gray-600">
-					Make sure you're connected with the wallet you want to vote with.
+					Make sure you're connected with the wallet you want to vote on proposals with.
 				</p>
 				{#if data?.delegateAccountAddress}
 					<div class="alert alert-warning mt-4">
 						<Fa icon={faWarning} class="ml-1" />
-						<span>Delegation is enabled but no addresses added yet. Enable one below.</span>
+						<span>Delegation is enabled but no addresses added yet. Add an address below.</span>
 					</div>
 				{/if}
 				<div class="flex h-full flex-col justify-between">
@@ -412,26 +411,44 @@
 						<p class="text-sm text-gray-600">This is the address you can cast votes from.</p>
 						<p class="text-md mt-5 font-semibold text-gray-900">
 							Wallet with SMB Gen2 NFTs: <em class="italic"
-								><span class="font-normal">{data.delegateAccount.accounts[0].address}</span></em
+								><span
+									class="font-normal {data.delegateAccount.accounts[0].signed
+										? 'text-green-500'
+										: 'text-red-500'}">{data.delegateAccount.accounts[0].address}</span
+								></em
 							>
 						</p>
-						<p class="mb-8 text-sm text-gray-600">
-							This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
+						<p class="mb-4 text-sm text-gray-600">
+							 This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
 						</p>
-						<div class="flex items-end justify-end mt-5 space-x-4">
-							{#if delegateAddressPublickey}
-							<button
-								class="btn-primary btn mt-5 self-end text-gray-900"
-								on:click={removeAccountAddress}
-								>{#if loading}<span class="loading loading-spinner" />{/if}Remove Delegation</button
-							>
+						<div class="mb-2 flex">
+							{#if !data.delegateAccount.accounts[0].signed}
+							<div class="mr-6 flex items-center text-sm text-gray-600">
+								<span class="mr-1 inline-block h-4 w-4 rounded-full bg-red-500" />
+								<em class="italic">Not Active</em>
+							</div>
+							{:else}
+							<div class="flex items-center text-sm text-gray-600">
+								<span class="mr-1 inline-block h-4 w-4 rounded-full bg-green-500" />
+								<em class="italic">Active</em>
+							</div>
 							{/if}
-							<button class="btn-primary btn-md btn self-end" on:click={() => copyToClipboard()}>
-								<Fa class="mr-1 ml-2" icon={faCopy} />
-								Generate Sign Link
-							</button>
 						</div>
-				
+						<div class="mt-5 flex items-end justify-end space-x-4">
+							{#if delegateAddressPublickey}
+								<button
+									class="btn-primary btn mt-5 self-end text-gray-900"
+									on:click={removeAccountAddress}
+									>{#if loading}<span class="loading loading-spinner" />{/if}Remove Delegation</button
+								>
+							{/if}
+							<div class="tooltip ml-2" data-tip={tooltipMessage}>
+								<button class="btn-primary btn-md btn self-end" on:click={() => copyToClipboard()}>
+									<Fa class="ml-2" icon={faCopy} />
+									Generate Sign Link
+								</button>
+							</div>
+						</div>
 					</div>
 				{:else}
 					<p class="text-gray-900">Delegation is enabled but no addresses added yet.</p>
