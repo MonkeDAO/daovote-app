@@ -347,6 +347,7 @@ export function getExplorerUrl(
 	}
 }
 export function trimAddress(str: string): string {
+	if (!str) return str;
 	const maxLength = 10; //needs to be atleast 10 characters
 
 	if (str.length <= maxLength) {

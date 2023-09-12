@@ -28,7 +28,8 @@
 		getEnvNetwork,
 		isValidSolAddress,
 		getDelegateAccount,
-		sleep
+		sleep,
+		trimAddress
 	} from '$lib/utils/solana';
 	import type { DelegateAccountType } from '$lib/types';
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
@@ -36,6 +37,7 @@
 	import Fa from 'svelte-fa';
 	import { faCopy, faWarning } from '@fortawesome/free-solid-svg-icons';
 	import { isDark } from '$lib/stores/darkModeStore';
+	import ConfirmationModal from '$lib/components/ConfirmationModal.svelte';
 
 	let delegateAddress = '';
 	let delegateAddressPublickey: PublicKey | null;
@@ -47,6 +49,7 @@
 	let wallet: Adapter;
 	let loading = false;
 	let text = 'Loading...';
+	let confirmationModal: any;
 	let error = false;
 	let owner: string;
 	let ready: boolean;
@@ -236,7 +239,7 @@
 	};
 
 	const createDelegate = async () => {
-		isValidSolAddress(delegateAddress);
+		if (!isValidSolAddress(delegateAddress)) return;
 		const mappedAddress = [
 			{
 				address: new PublicKey(delegateAddress),
@@ -317,7 +320,17 @@
 			event.preventDefault();
 		}
 	}
-
+	function confirmAddress() {
+		if (!isValidSolAddress(delegateAddress)) {
+			toast.push('Please enter a valid address');
+			return;
+		}
+		confirmationModal.openModal();
+	}
+	async function handleConfirm(event: CustomEvent<any>) {
+		confirmationModal.closeModal();
+		await createDelegate();
+	}
 	function reset() {
 		loadingStore.set(false);
 		message.set('');
@@ -325,6 +338,16 @@
 </script>
 
 <LoadingOverlay />
+<ConfirmationModal
+	data={delegateAddress}
+	bind:this={confirmationModal}
+	message="This will allow {trimAddress(
+		currentUser?.toBase58()
+	)} to vote on proposals with the voting power of {delegateAddress}. Are you sure you want to continue?"
+	eventOnConfirm="confirm"
+	on:confirm={handleConfirm}
+/>
+
 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 	<div class="py-5">
 		<div class="mx-auto max-w-md text-gray-900 dark:text-gray-100">
@@ -347,7 +370,16 @@
 			</p>
 			<h3 class="mt-8 text-2xl font-bold leading-relaxed">How delegate?</h3>
 			<p>
-				Add an address to your delegate account and sign it with the wallet that has your monke in it. You can then vote with the wallet that has the voting power from your monke. You can remove and replace the address at any time.
+				Add an address to your delegate account and sign it with the wallet that has your monke in
+				it. You can then vote with the wallet that has the voting power from your monke. You can
+				remove and replace the address at any time.
+			</p>
+			<h3 class="mt-8 text-2xl font-bold leading-relaxed">Which wallet do I use?</h3>
+			<p>
+				The wallet that should be utilizing this page is the one that you will be voting with
+				(burner or hot wallet). In order to reduce the amount of times the wallet with the NFTs is
+				connected to this site, use the input box to input your address that holds the NFTs. The
+				address should be the one that holds the NFTs, not the one that you will be voting with.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
 				{#if isDark}
@@ -392,7 +424,7 @@
 							/>
 						</div>
 					</div>
-					<button class="btn-primary btn self-end text-gray-900" on:click={createDelegate}
+					<button class="btn-primary btn self-end text-gray-900" on:click={confirmAddress}
 						>{#if loading}<span class="loading loading-spinner" />{/if}Transfer Vote Power</button
 					>
 				</div>
@@ -419,21 +451,37 @@
 							>
 						</p>
 						<p class="mb-4 text-sm text-gray-600">
-							 This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
+							This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
 						</p>
 						<div class="mb-2 flex">
 							{#if !data.delegateAccount.accounts[0].signed}
-							<div class="mr-6 flex items-center text-sm text-gray-600">
-								<span class="mr-1 inline-block h-4 w-4 rounded-full bg-red-500" />
-								<em class="italic">Not Active</em>
-							</div>
+								<div class="mr-6 flex items-center text-sm text-gray-600">
+									<span class="mr-1 inline-block h-4 w-4 rounded-full bg-red-500" />
+									<em class="italic">Not Active</em>
+								</div>
 							{:else}
-							<div class="flex items-center text-sm text-gray-600">
-								<span class="mr-1 inline-block h-4 w-4 rounded-full bg-green-500" />
-								<em class="italic">Active</em>
-							</div>
+								<div class="flex items-center text-sm text-gray-600">
+									<span class="mr-1 inline-block h-4 w-4 rounded-full bg-green-500" />
+									<em class="italic">Active</em>
+								</div>
 							{/if}
 						</div>
+						{#if !data.delegateAccount.accounts[0].signed}
+							<div class="mb-2">
+								<div class="alert alert-warning mb-4">
+									<Fa icon={faWarning} class="ml-1" />
+									<span>Delegation is still not complete Complete the remaining steps below.</span>
+								</div>
+								<ul class="steps">
+									<li data-content="✓" class="step-primary step">Address Added</li>
+									<li data-content="1" class="step">Go to copied sign link</li>
+									<li data-content="2" class="step">
+										Connect with {trimAddress(data.delegateAccount.accounts[0].address.toBase58())}
+									</li>
+									<li data-content="3" class="step">Sign to enable vote power</li>
+								</ul>
+							</div>
+						{/if}
 						<div class="mt-5 flex items-end justify-end space-x-4">
 							{#if delegateAddressPublickey}
 								<button
