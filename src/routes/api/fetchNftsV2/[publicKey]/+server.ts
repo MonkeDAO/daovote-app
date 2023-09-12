@@ -20,57 +20,72 @@ export const GET: RequestHandler = async (request) => {
 	}
 	const ownerPk = new web3.PublicKey(publicKey);
 	async function getAssetsByOwner(owner: string, url: string) {
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				jsonrpc: '2.0',
-				id: `daovote_${owner}`,
-				method: 'getAssetsByOwner',
-				params: {
-					ownerAddress: owner,
-					page: 1,
-					limit: 1000
-				}
-			})
-		});
-		const { result } = (await response.json()) as HeliusDigitalAssetsResult;
-		//TODO: Paginate maybe later?
-		return result.items;
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					jsonrpc: '2.0',
+					id: `daovote_${owner}`,
+					method: 'getAssetsByOwner',
+					params: {
+						ownerAddress: owner,
+						page: 1,
+						limit: 1000
+					}
+				})
+			});
+			const { result } = (await response.json()) as HeliusDigitalAssetsResult;
+			//TODO: Paginate maybe later?
+			return result.items;
+		}
+		catch (e) {
+			console.log('Error: getAssetsByOwner', e);
+			return [];
+		}
 	}
 
 	async function searchAssets(owner: string, url: string, collection: string) {
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				jsonrpc: '2.0',
-				id: 'my-id',
-				method: 'searchAssets',
-				params: {
-					ownerAddress: owner,
-					grouping: ["collection", collection],
-					page: 1,
-					limit: 1000
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
 				},
-			}),
-		});
-		const { result } = (await response.json()) as HeliusDigitalAssetsResult;
-		return result.items;
+				body: JSON.stringify({
+					jsonrpc: '2.0',
+					id: 'my-id',
+					method: 'searchAssets',
+					params: {
+						ownerAddress: owner,
+						grouping: ["collection", collection],
+						page: 1,
+						limit: 1000
+					},
+				}),
+			});
+			console.log('searchAssets', response.status, response.statusText, response.headers);
+			console.log('searchAssetsJSON', collection);
+			const responseJson = await response.json();
+			const { result } = responseJson as HeliusDigitalAssetsResult;
+			return result.items;
+		}
+		catch (e) {
+			console.log('Error: searchAssets', e);
+			return [];
+		}
 	};
 	const conn = getEnvNetwork();
-    const delegateAccount = await getDelegateAccountType(ownerPk, conn);
+	const delegateAccount = await getDelegateAccountType(ownerPk, conn);
 	const addresses: string[] = [publicKey];
 	if (delegateAccount && delegateAccount?.addresses?.some(x => x.signed)) {
 		//push all signed addresses to address array
 		addresses.push(...delegateAccount.addresses.filter(x => x.signed).map(x => x.address));
 	}
-	console.log('addresses', addresses);
-	const collectionAddresses = PUBLIC_COLLECTION_ADDRESSES?.split(',').map((x: any) => (x as string)?.trim());
+	console.log('addresses', PUBLIC_COLLECTION_ADDRESSES);
+	const collectionAddresses = PUBLIC_COLLECTION_ADDRESSES?.split(',').map((x: any) => (x as string)?.trim().replace(/["']/g, ""));
 	let nftsRaw: HeliusDigitalAsset[] = [];
 	if (collectionAddresses && collectionAddresses.length > 0) {
 		for (var collectionAddress of collectionAddresses) {
@@ -151,7 +166,7 @@ export const GET: RequestHandler = async (request) => {
 			return 0;
 		}
 	});
-	
+
 	return new Response(JSON.stringify({ nfts, delegateAccount }), {
 		status: 200,
 		headers: {
