@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { PUBLIC_VOTE_PROGRAM } from '$env/static/public';
 import { VoteAccount, Votebank } from '$lib/anchor/accounts';
 import {
@@ -49,7 +50,6 @@ export async function buildNftVoteIx(
 	if (!proposal) {
 		return null;
 	}
-
 	const {
 		restrictionMint: proposalRestrictionMint,
 		isNftRestricted: proposalIsNftRestricted,

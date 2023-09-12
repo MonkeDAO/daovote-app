@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
 	PublicKey,
 	Connection,
@@ -105,9 +106,6 @@ export async function fetchProposalById(
 	try {
 		const [proposalAddress] = proposalAccountPda(votebank, proposalId);
 		const proposalAccount = await Proposal.fromAccountAddress(connection, proposalAddress);
-		console.log('test', proposalAccount);
-		//const proposalData = bufferToPostData(proposalAccount.data);
-		// eslint-disable-next-line no-unused-vars
 		const { data, poster, ...rest } = proposalAccount;
 		const decode = new TextDecoder();
 		const dataDecoded = decode.decode(data);
@@ -271,7 +269,6 @@ export async function getDelegateAccountType(
 	const delegateAccount = await DelegateAccount.fromAccountAddress(connection, delegateAddress).catch(
 		(e) => console.log('delegateAccount doesnt exist', e?.message)
 	);
-	console.log('delegateAccount', delegateAccount);
 	if (delegateAccount) {
 		return {
 			address: delegateAddress.toBase58(),
