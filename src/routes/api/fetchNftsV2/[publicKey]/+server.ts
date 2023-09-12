@@ -42,7 +42,7 @@ export const GET: RequestHandler = async (request) => {
 			return result.items;
 		}
 		catch (e) {
-			console.log('Error: getAssetsByOwner', e);
+			console.error('Error: getAssetsByOwner', e);
 			return [];
 		}
 	}
@@ -66,14 +66,12 @@ export const GET: RequestHandler = async (request) => {
 					},
 				}),
 			});
-			console.log('searchAssets', response.status, response.statusText, response.headers);
-			console.log('searchAssetsJSON', collection);
 			const responseJson = await response.json();
 			const { result } = responseJson as HeliusDigitalAssetsResult;
 			return result.items;
 		}
 		catch (e) {
-			console.log('Error: searchAssets', e);
+			console.error('Error: searchAssets', e);
 			return [];
 		}
 	};
