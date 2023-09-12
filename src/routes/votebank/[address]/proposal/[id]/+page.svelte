@@ -35,7 +35,6 @@
 	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
 
 	export let data: any;
-	console.log('proposal page', data);
 	let nfts: NftMetadata[];
 	let connection: Connection;
 	let proposalItem: ProposalItem;

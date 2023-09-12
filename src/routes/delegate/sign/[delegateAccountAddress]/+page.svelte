@@ -114,7 +114,6 @@
 			);
 			message.set('Success!');
 		} catch (e) {
-			console.log(e);
 			message.set(`${(e as any)?.message ?? 'Error! Please try again'}`);
 		} finally {
 			await sleep(2000);

@@ -267,7 +267,6 @@ export async function getDelegateAccountType(
 	connection: anchor.web3.Connection,
 	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID
 ): Promise<DelegateAccountType | undefined> {
-	console.log('publickey', publicKey.toBase58());
 	const [delegateAddress] = delegateAccountPda(publicKey, programId);
 	const delegateAccount = await DelegateAccount.fromAccountAddress(connection, delegateAddress).catch(
 		(e) => console.log('delegateAccount doesnt exist', e?.message)

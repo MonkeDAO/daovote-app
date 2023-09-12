@@ -14,13 +14,10 @@
 
 	function updateRemainingTime() {
 		const remainingTime = getRemainingTime(targetDate);
-		console.log(remainingTime, 'remainingTime', targetDate, 'targetDate');
-
 		if (remainingTime.ended) {
 			ended = true;
 			clearInterval(intervalId);
 		} else {
-			console.log('updating', remainingTime, remainingTime.days, remainingTime.hours, remainingTime.minutes, remainingTime.seconds);
 			days = remainingTime.days;
 			hours = remainingTime.hours;
 			minutes = remainingTime.minutes;
