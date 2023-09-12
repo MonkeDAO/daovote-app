@@ -82,7 +82,6 @@ export const GET: RequestHandler = async (request) => {
 		//push all signed addresses to address array
 		addresses.push(...delegateAccount.addresses.filter(x => x.signed).map(x => x.address));
 	}
-	console.log('addresses', PUBLIC_COLLECTION_ADDRESSES);
 	const collectionAddresses = PUBLIC_COLLECTION_ADDRESSES?.split(',').map((x: any) => (x as string)?.trim().replace(/["']/g, ""));
 	let nftsRaw: HeliusDigitalAsset[] = [];
 	if (collectionAddresses && collectionAddresses.length > 0) {
