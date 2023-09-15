@@ -470,7 +470,7 @@
 							<div class="mb-2">
 								<div class="alert alert-warning mb-4">
 									<Fa icon={faWarning} class="ml-1" />
-									<span>Delegation is still not complete Complete the remaining steps below.</span>
+									<span>Delegation is still not complete. Please complete the remaining steps below.</span>
 								</div>
 								<ul class="steps">
 									<li data-content="✓" class="step-primary step">Address Added</li>
