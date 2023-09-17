@@ -34,7 +34,7 @@
 		<div class="text-2xl font-bold leading-relaxed text-gray-900 dark:text-gray-100">
 			Loading NFTs...
 		</div>
-		<progress class="w-70 progress dark:progress-primary" />
+		<span class="loading loading-infinity loading-lg text-info"></span>
 	</div>
 	<!--TODO: Add grouping / sorting by collection based on the proposal/votebank restriction-->
 {:else if !loading && nfts}

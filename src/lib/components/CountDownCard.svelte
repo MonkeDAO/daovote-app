@@ -14,7 +14,6 @@
 
 	function updateRemainingTime() {
 		const remainingTime = getRemainingTime(targetDate);
-
 		if (remainingTime.ended) {
 			ended = true;
 			clearInterval(intervalId);
@@ -41,7 +40,7 @@
 		{#if !ended}
 			<span class="text-m countdown font-mono">
 				{#if displayLabel} Ending in &nbsp;{/if}
-				<span style="--value:{days};" />:
+				<span style="--value:{days > 99 ? 99 : days};" />:
 				<span style="--value:{hours};" />:
 				<span style="--value:{minutes};" />:
 				<span style="--value:{seconds};" />

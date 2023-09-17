@@ -1,4 +1,5 @@
 export * from './AdditionalAccountIndices'
+export * from './DelegateAddress'
 export * from './QuantifiedMint'
 export * from './SettingsData'
 export * from './SettingsType'

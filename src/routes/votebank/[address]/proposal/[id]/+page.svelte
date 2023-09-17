@@ -35,7 +35,6 @@
 	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
 
 	export let data: any;
-	console.log('proposal page', data);
 	let nfts: NftMetadata[];
 	let connection: Connection;
 	let proposalItem: ProposalItem;
@@ -275,6 +274,10 @@
 				if (!simulated) continue;
 				txnsToSend.push(txn);
 			}
+			if (txnsToSend.length === 0) {
+				await sleep(1500);
+				return signatures;
+			}
 			await setMessageSlow(
 				`Waiting for signature for ${txnsToSend.length} ${
 					txnsToSend.length > 1 ? 'transactions' : 'transaction'
@@ -344,8 +347,12 @@
 			)}</a> <br/>`;
 			voteUrls.push(voteTxUrl);
 		}
-		toast.push(`Voted! ${voteUrls.join(' ')}`, {
+		signatures.length > 0 ? toast.push(`Voted! ${voteUrls.join(' ')}`, {
 			duration: 3000,
+			pausable: true,
+			target: 'new'
+		}) : toast.push(`Something went wrong please make sure you are voting with the correct nft or token`, {
+			duration: 5000,
 			pausable: true,
 			target: 'new'
 		});

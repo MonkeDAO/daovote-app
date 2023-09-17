@@ -83,7 +83,7 @@
 	let sortedTitles: string[] | undefined;
 	let sortedVotes: number[] | undefined;
 	let sortedPercentages: string[] | undefined;
-	let wallet: Adapter;
+	let wallet: Adapter | null;
 	let totalVotes: number;
 
 	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
