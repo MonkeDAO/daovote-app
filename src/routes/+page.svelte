@@ -71,7 +71,7 @@
 		<div class="flex flex-col gap-6 md:flex-row">
 			{#if loading}
 				<div class="flex items-center justify-center">
-					<progress class="progress w-56" />
+					<span class="loading loading-bars loading-lg text-info"></span>
 				</div>
 			{:else if open_proposals.length > 0}
 				<div class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-1 xl:grid-cols-2">

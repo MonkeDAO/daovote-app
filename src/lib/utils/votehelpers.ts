@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { PUBLIC_VOTE_PROGRAM } from '$env/static/public';
-import { Proposal, VoteAccount, Votebank } from '$lib/anchor/accounts';
+import { VoteAccount, Votebank } from '$lib/anchor/accounts';
 import {
+	createVoteDelegationInstruction,
 	createVoteInstruction,
 	type VoteInstructionAccounts,
 	type VoteInstructionArgs
@@ -11,9 +13,11 @@ import { web3 } from '@project-serum/anchor';
 import type { Connection, TransactionInstruction } from '@solana/web3.js';
 import {
 	TREASURY_ADDRESS,
+	delegateAccountPda,
 	extractRestrictionData,
 	fetchProposalById,
 	getDefaultPublicKey,
+	getDelegateAccountType,
 	proposalAccountPda,
 	toAccountMetadata,
 	voteAccountPda
@@ -21,6 +25,7 @@ import {
 import type { SettingsData, VoteEntry } from '$lib/anchor/types';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import type { AdditionalAccountIndices } from '../anchor/types/AdditionalAccountIndices';
+import type { VoteDelegationInstructionAccounts, VoteDelegationInstructionArgs } from '../anchor/instructions/voteDelegation';
 
 export async function buildNftVoteIx(
 	connection: Connection,
@@ -33,6 +38,9 @@ export async function buildNftVoteIx(
 	programId: PublicKey = new PublicKey(PUBLIC_VOTE_PROGRAM)
 ): Promise<TransactionInstruction | null> {
 	const votebankAccount = await Votebank.fromAccountAddress(connection, votebank);
+	const [delegateAccountAddress] = delegateAccountPda(voter, programId);
+	const delegateAccount = await getDelegateAccountType(voter, connection);
+
 	let proposal: ProposalItem | null;
 	if (!proposalItem) {
 		proposal = await fetchProposalById(connection, votebank, proposalId);
@@ -42,7 +50,6 @@ export async function buildNftVoteIx(
 	if (!proposal) {
 		return null;
 	}
-
 	const {
 		restrictionMint: proposalRestrictionMint,
 		isNftRestricted: proposalIsNftRestricted,
@@ -67,7 +74,7 @@ export async function buildNftVoteIx(
 			mint = new PublicKey(nft.address);
 			nftMintMetadata = new PublicKey(nft.metadataAddress);
 		}
-		tokenAccount = await getAssociatedTokenAddress(mint, voter);
+		tokenAccount = await getAssociatedTokenAddress(mint, new PublicKey(nft.owner));
 	}
 	const [proposalPda] = proposalAccountPda(votebank, proposalId);
 
@@ -97,6 +104,16 @@ export async function buildNftVoteIx(
 		treasury: TREASURY_ADDRESS,
 		systemProgram: web3.SystemProgram.programId
 	};
+	let voteDelegateInstructionAccounts: VoteDelegationInstructionAccounts = {
+		voter: voter,
+		votebank: votebank,
+		proposal: proposalPda,
+		votes: votepda,
+		nftVoteMint: mint,
+		delegateAccount: delegateAccountAddress,
+		treasury: TREASURY_ADDRESS,
+		systemProgram: web3.SystemProgram.programId
+	}
 	if (isNftRestricted) {
 		const accountIndices: AdditionalAccountIndices = {
 			__kind: 'NftOwnership',
@@ -107,12 +124,18 @@ export async function buildNftVoteIx(
 		additionalAccountOffsets = [accountIndices];
 	}
 	voteInstructionAccounts.anchorRemainingAccounts = [...tokenToAccountMetaFormat];
+	voteDelegateInstructionAccounts.anchorRemainingAccounts = [...tokenToAccountMetaFormat];
 	const voteInstructionArgs: VoteInstructionArgs = {
 		proposalId: proposalId,
 		voteEntries,
 		additionalAccountOffsets
 	};
-	return createVoteInstruction(voteInstructionAccounts, voteInstructionArgs, programId);
+	const voteDelegateInstructionArgs: VoteDelegationInstructionArgs= {
+		proposalId: proposalId,
+		voteEntries,
+		additionalAccountOffsets
+	};
+	return delegateAccount ? createVoteDelegationInstruction(voteDelegateInstructionAccounts,voteDelegateInstructionArgs, programId) : createVoteInstruction(voteInstructionAccounts, voteInstructionArgs, programId);
 }
 
 export async function buildTokenVoteIx(

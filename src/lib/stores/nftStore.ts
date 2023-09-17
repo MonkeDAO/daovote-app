@@ -1,10 +1,11 @@
 // nftStore.ts
 import { derived, writable, get } from 'svelte/store';
-import type { NftMetadata } from '$lib/types';
+import type { DelegateAccountType, NftMetadata } from '$lib/types';
 import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 
 interface NftStore {
 	data: NftMetadata[] | undefined;
+	delegateAccount: DelegateAccountType | null;
 	owner: string | undefined;
 	isFetching: boolean;
 }
@@ -13,7 +14,8 @@ const createNftStore = () => {
 	const { subscribe, set, update } = writable<NftStore>({
 		data: undefined,
 		owner: undefined,
-		isFetching: false
+		isFetching: false,
+		delegateAccount: null
 	});
 
 	const fetchNftsFromServer = async (publicKey: string) => {
@@ -25,7 +27,7 @@ const createNftStore = () => {
 				throw new Error(data.error);
 			}
 
-			set({ data: data.nfts, owner: publicKey, isFetching: false });
+			set({ data: data.nfts, owner: publicKey, isFetching: false, delegateAccount: data.delegateAccount });
 		} catch (err) {
 			console.error(err);
 		}
@@ -34,7 +36,7 @@ const createNftStore = () => {
 	return {
 		subscribe,
 		fetchNftsFromServer,
-		clear: () => set({ data: undefined, owner: undefined, isFetching: false })
+		clear: () => set({ data: undefined, owner: undefined, isFetching: false, delegateAccount: null })
 	};
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
 	PublicKey,
 	Connection,
@@ -8,8 +9,8 @@ import {
 	Transaction
 } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
-import { Proposal, VoteAccount } from '$lib/anchor/accounts';
-import type { ProposalItem } from '$lib/types';
+import { DelegateAccount, Proposal, VoteAccount } from '$lib/anchor/accounts';
+import type { DelegateAccountType, ProposalItem } from '$lib/types';
 import {
 	isSettingsDataDescription,
 	isSettingsDataOwnerInfo,
@@ -29,6 +30,7 @@ export const CREATOR_SEED: string = 'monkedevs';
 export const VOTEBANK_SEED: string = 'votebank';
 export const PROPOSAL_SEED: string = 'proposal';
 export const VOTE_SEED: string = 'votes';
+export const DELEGATE_SEED: string = 'delegate';
 export const VOTE_PROGRAM_ID: anchor.web3.PublicKey = new anchor.web3.PublicKey(
 	'mdVo394XANGMrVXZCVAaX3AMHYvtTxXwg1sQmDSY1W1'
 );
@@ -67,10 +69,10 @@ export function isDefaultPublicKey(key: PublicKey): boolean {
 	return key.equals(getDefaultPublicKey());
 }
 
-export function toAccountMetadata(key: PublicKey): AccountMeta {
+export function toAccountMetadata(key: PublicKey, writeable = false): AccountMeta {
 	return {
 		pubkey: key,
-		isWritable: true,
+		isWritable: writeable,
 		isSigner: false
 	};
 }
@@ -104,9 +106,6 @@ export async function fetchProposalById(
 	try {
 		const [proposalAddress] = proposalAccountPda(votebank, proposalId);
 		const proposalAccount = await Proposal.fromAccountAddress(connection, proposalAddress);
-		console.log('test', proposalAccount);
-		//const proposalData = bufferToPostData(proposalAccount.data);
-		// eslint-disable-next-line no-unused-vars
 		const { data, poster, ...rest } = proposalAccount;
 		const decode = new TextDecoder();
 		const dataDecoded = decode.decode(data);
@@ -251,6 +250,58 @@ export function voteAccountPda(
 	);
 }
 
+export function delegateAccountPda(
+	publicKey: anchor.web3.PublicKey,
+	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID
+) {
+	return findProgramAddress(
+		[Buffer.from(DELEGATE_SEED), publicKey.toBuffer()],
+		programId
+	);
+}
+
+export async function getDelegateAccountType(
+	publicKey: PublicKey,
+	connection: anchor.web3.Connection,
+	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID
+): Promise<DelegateAccountType | undefined> {
+	const [delegateAddress] = delegateAccountPda(publicKey, programId);
+	const delegateAccount = await DelegateAccount.fromAccountAddress(connection, delegateAddress).catch(
+		(e) => console.log('delegateAccount doesnt exist', e?.message)
+	);
+	if (delegateAccount) {
+		return {
+			address: delegateAddress.toBase58(),
+			owner: delegateAccount.delegateOwner.toBase58(),
+			addresses: delegateAccount.accounts.map((x) => {
+				return {
+					address: x.address.toBase58(),
+					signed: x.signed
+				}
+			})
+		}
+	}
+	return undefined;
+}
+
+export async function getDelegateAccount(
+	publicKey: PublicKey,
+	connection: anchor.web3.Connection,
+	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID
+): Promise<{delegateAccount: DelegateAccount, address: PublicKey} | undefined> {
+	const [delegateAddress] = delegateAccountPda(publicKey, programId);
+	const delegateAccount = await DelegateAccount.fromAccountAddress(connection, delegateAddress).catch(
+		(e) => console.log('delegateAccount doesnt exist', e?.message)
+	);
+	if (delegateAccount) {
+		return {
+			address: delegateAddress,
+			delegateAccount
+		};
+	}
+	return undefined;
+}
+
 export async function voteAccountPdaExists(
 	connection: anchor.web3.Connection,
 	votebank: anchor.web3.PublicKey,
@@ -296,6 +347,7 @@ export function getExplorerUrl(
 	}
 }
 export function trimAddress(str: string): string {
+	if (!str) return str;
 	const maxLength = 10; //needs to be atleast 10 characters
 
 	if (str.length <= maxLength) {

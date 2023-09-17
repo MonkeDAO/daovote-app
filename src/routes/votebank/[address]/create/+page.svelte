@@ -69,7 +69,6 @@
 		if (ready && $walletConnectionFactory.publicKey) {
 			currentUser = $walletConnectionFactory.publicKey;
 		}
-		console.log('Derived store updated:', $walletConnectionFactory, $nftWallet);
 	}
 	$: if (data.address) {
 		votebankAddress = new PublicKey(data.address);

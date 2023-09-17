@@ -226,3 +226,14 @@ export type Royalty = {
 	primary_sale_happened: boolean;
 	locked: boolean;
 };
+
+export type DelegateAccountType = {
+	address: string;
+	owner: string;
+	addresses: DelegateAddressType[]
+}
+
+export type DelegateAddressType = {
+	address: string;
+	signed: boolean;
+}

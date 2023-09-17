@@ -1,6 +1,14 @@
-<script>
+<script lang="ts">
+	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
+	import { PUBLIC_VOTEBANK } from '$env/static/public';
+	let isOwner: boolean;
+	$: {
+		isOwner = $ownerCheckStore.isOwner;
+		$ownerCheckSyncStore;
+	}
 	let isOpen = false;
-	let isMenuRendered;
+	let isMenuRendered: boolean;
 	$: {
 		if (isOpen) {
 			setTimeout(() => {
@@ -73,16 +81,19 @@
 					href="/">Home</a
 				>
 			</li>
-			<li
-				class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
-				style="transition-delay: 250ms;"
-			>
-				<a
-					class="flex w-auto pb-4"
-					on:click={() => setTimeout(() => (isOpen = false), 300)}
-					href="/blog">Blog</a
+			{#if $walletStore?.connected && isOwner}
+				<li />
+				<li
+					class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
+					style="transition-delay: 350ms;"
 				>
-			</li>
+					<a
+						class="flex w-auto pb-4"
+						on:click={() => setTimeout(() => (isOpen = false), 300)}
+						href={`/votebank/${PUBLIC_VOTEBANK}/create`}>Create Proposal</a
+					>
+				</li>
+			{/if}
 			<li
 				class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
 				style="transition-delay: 350ms;"

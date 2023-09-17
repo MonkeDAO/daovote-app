@@ -1,7 +1,6 @@
 <script>
 	import { loading } from '$lib/stores/loadingStore'; // import your stores
 	import { message } from '$lib/stores/messageStore'; // import your stores
-	console.log('loading', $loading, $message);
 
 	// create a function that sets loading to false
 	function closeLoadingScreen() {
