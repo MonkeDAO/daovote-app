@@ -149,11 +149,11 @@
 	}
 
 	filteredNftStore.subscribe(($filteredNftStore) => {
-		eligibleNfts = $filteredNftStore.eligible;
-		ineligibleNfts = $filteredNftStore.ineligible;
-		allNfts = eligibleNfts?.concat(ineligibleNfts!).map((nft) => {
+		eligibleNfts = $filteredNftStore.eligible ?? [];
+		ineligibleNfts = $filteredNftStore.ineligible ?? [];
+		allNfts = eligibleNfts.concat(ineligibleNfts).map((nft) => {
 			let eligible = false;
-			if (eligibleNfts?.includes(nft)) {
+			if (eligibleNfts?.some((eligibleNft) => eligibleNft.address === nft.address)) {
 				eligible = true;
 			}
 			return { ...nft, eligible };
