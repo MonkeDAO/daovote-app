@@ -54,7 +54,7 @@
 				<div class="p-2">
 					<div class="avatar {nft.eligible ? 'offline cursor-pointer' : 'online cursor-not-allowed'}">
 						<div
-							class="rounded-full {$selectedNfts.includes(nft)
+							class="rounded-full {$selectedNfts.some(selected => selected.address === nft.address)
 								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100 dark:ring-offset-4'
 								: ''}"
 							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligible'))}

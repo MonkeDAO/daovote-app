@@ -1,7 +1,8 @@
 import { writable } from 'svelte/store';
+import type { NftMetadata } from './types';
 
 const createSelectedNfts = () => {
-	const { subscribe, set, update } = writable<any[]>([]);
+	const { subscribe, set, update } = writable<NftMetadata[]>([]);
 
 	return {
 		subscribe,
