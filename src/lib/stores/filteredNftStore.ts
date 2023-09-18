@@ -3,6 +3,7 @@ import type { NftMetadata, ProposalItem } from '$lib/types';
 import type { Connection } from '@solana/web3.js';
 import type { SettingsData } from '$lib/anchor/types';
 import { extractRestrictionData } from '$lib/utils/solana';
+import type { VoteAccount } from '$lib/anchor/accounts';
 
 interface FilteredNftStore {
 	eligible: NftMetadata[] | undefined;
@@ -53,14 +54,14 @@ const createFilteredNftStore = () => {
 					return store;
 				});
 			}
-			const nftsVoteAccounts: { nft: NftMetadata; accountExists: boolean }[] = data;
+			const nftsVoteAccounts: { nft: NftMetadata; accountExists: boolean, voteAccount: VoteAccount | undefined }[] = data;
 			const nftsFiltered = nftsVoteAccounts
 				.filter(({ accountExists }) => !accountExists)
-				.map(({ nft }) => nft);
+				.map(({ nft, voteAccount }) =>  { return {...nft, voteAccount}});
 
 			const ineligibleNfts = nftsVoteAccounts
 				.filter(({ accountExists }) => accountExists)
-				.map(({ nft }) => nft);
+				.map(({ nft, voteAccount }) =>  { return {...nft, voteAccount}});
 
 			update((store) => {
 				store.eligible = nftsFiltered;

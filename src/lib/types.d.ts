@@ -1,3 +1,5 @@
+import type { VoteAccount } from './anchor/accounts';
+
 export type ContentItem = {
 	title: string;
 	description: string;
@@ -119,6 +121,7 @@ export type NftMetadata = {
 	owner: string;
 	address: string;
 	eligible?: boolean;
+	voteAccount?: VoteAccount;
 };
 
 export type HeliusDigitalAssetResult = {

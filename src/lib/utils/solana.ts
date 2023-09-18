@@ -308,13 +308,13 @@ export async function voteAccountPdaExists(
 	nft: anchor.web3.PublicKey,
 	proposalId: number,
 	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID
-): Promise<boolean> {
+): Promise<{accountExists: boolean, voteAccount: VoteAccount | undefined}> {
 	const [voteAccount] = voteAccountPda(votebank, nft, proposalId, programId);
 	const voteAccountStruct = await VoteAccount.fromAccountAddress(connection, voteAccount).catch(
 		(e) => console.log('voteAccount doesnt exist', e?.message)
 	);
 	console.log('voteAccountStruct', voteAccountStruct, nft.toBase58());
-	return voteAccountStruct !== undefined;
+	return { accountExists: voteAccountStruct !== undefined, voteAccount: voteAccountStruct ?? undefined };
 }
 
 export function getEnvNetwork(

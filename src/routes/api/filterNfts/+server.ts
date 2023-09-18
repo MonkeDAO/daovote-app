@@ -4,15 +4,16 @@ import type { RequestHandler } from '@sveltejs/kit';
 import type { NftMetadata, ProposalItem } from '$lib/types';
 import { chunkArray, getEnvNetwork, sleep, voteAccountPdaExists } from '$lib/utils/solana';
 import type { Connection } from '@solana/web3.js';
+import type { VoteAccount } from '$lib/anchor/accounts';
 
 async function checkVoteAccount(connection: Connection, proposal: ProposalItem, nft: NftMetadata) {
-	const accountExists = await voteAccountPdaExists(
+	const result = await voteAccountPdaExists(
 		connection,
 		new PublicKey(proposal.votebank),
 		new PublicKey(nft.address),
 		proposal.proposalId
 	);
-	return { nft, accountExists };
+	return { nft, accountExists: result.accountExists, voteAccount: result.voteAccount  };
 }
 
 export const POST: RequestHandler = async (req) => {
@@ -29,7 +30,7 @@ export const POST: RequestHandler = async (req) => {
 
 	const chunks = await chunkArray<NftMetadata>(nfts, chunkSize);
 
-	let nftsVoteAccounts: { nft: NftMetadata; accountExists: boolean }[] = [];
+	let nftsVoteAccounts: { nft: NftMetadata; accountExists: boolean, voteAccount: VoteAccount | undefined }[] = [];
 	for (const chunk of chunks) {
 		const chunkResult = await Promise.all(
 			chunk.map((nft) => checkVoteAccount(connection, proposal, nft))
