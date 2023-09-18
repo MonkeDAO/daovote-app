@@ -10,6 +10,7 @@
 	let loading = true;
 	nftStore.subscribe((store) => {
 		loading = store.isFetching;
+		nfts = store.data;
 	});
 	filteredNftStore.subscribe((store) => {
 		isFiltering = store.isFetching;
@@ -51,7 +52,7 @@
 			{#if nft.json}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div class="p-2">
-					<div class="avatar {nft.eligible ? 'offline cursor-pointer' : 'online'}">
+					<div class="avatar {nft.eligible ? 'offline cursor-pointer' : 'online cursor-not-allowed'}">
 						<div
 							class="rounded-full {$selectedNfts.includes(nft)
 								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100 dark:ring-offset-4'
@@ -60,7 +61,7 @@
 						>
 							<img
 								class="mt-0 h-full w-full object-fill"
-								src={nft.json.image}
+								src={nft.json.image ?? "https://arweave.net/ncRp795w-ca_Xb5zkUBtBmxSQ_bcYA49E03NtMoHJMg"}
 								alt={nft.json.name}
 							/>
 						</div>
