@@ -382,7 +382,7 @@
 				address should be the one that holds the NFTs, not the one that you will be voting with.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
-				{#if isDark}
+				{#if $isDark}
 					<img src="/dark-steps.png" alt="delegation" class="bg-transparent" />
 				{:else}
 					<img src="/steps.png" alt="delegation" class="bg-transparent" />
@@ -473,12 +473,12 @@
 									<span>Delegation is still not complete. Please complete the remaining steps below.</span>
 								</div>
 								<ul class="steps">
-									<li data-content="✓" class="step-primary step">Address Added</li>
-									<li data-content="1" class="step">Go to copied sign link</li>
-									<li data-content="2" class="step">
+									<li data-content="✓" class="step-primary step text-black">Address Added</li>
+									<li data-content="1" class="step text-black">Go to copied sign link</li>
+									<li data-content="2" class="step text-black">
 										Connect with {trimAddress(data.delegateAccount.accounts[0].address.toBase58())}
 									</li>
-									<li data-content="3" class="step">Sign to enable vote power</li>
+									<li data-content="3" class="step text-black">Sign to enable vote power</li>
 								</ul>
 							</div>
 						{/if}
