@@ -33,6 +33,7 @@
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { buildNftVoteIx, buildTokenVoteIx } from '$lib/utils/votehelpers';
 	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
+	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -452,6 +453,7 @@
 				return;
 			}
 			await finalizeAndSendTransactions(voteTxns);
+			filteredNftStore.pushIneligible(event.detail.selectedNfts);
 			data.proposal.voterCount += event.detail.selectedNfts ? event.detail.selectedNfts.length : 1;
 		}
 	}

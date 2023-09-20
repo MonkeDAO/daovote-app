@@ -4,16 +4,24 @@
 	import type { NftMetadata } from '$lib/types';
 	import { nftStore } from '$lib/stores/nftStore';
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
+	import { onMount } from 'svelte';
 
 	export let nfts: NftMetadata[] | undefined;
 	let isFiltering: boolean;
 	let loading = true;
+	let allSelected = false;
 	nftStore.subscribe((store) => {
 		loading = store.isFetching;
 		nfts = store.data;
 	});
 	filteredNftStore.subscribe((store) => {
 		isFiltering = store.isFetching;
+		if (store.ineligible && store.eligible) {
+			nfts = [...store.eligible, ...store.ineligible];
+		}
+	});
+	onMount(() => {
+		selectedNfts.reset();
 	});
 	function toggleNftSelection(nft: any) {
 		if (isSelected(nft)) {
@@ -24,9 +32,21 @@
 		console.log('selected nfts', $selectedNfts);
 	}
 
+	function selectAll() {
+		if (nfts) {
+			selectedNfts.selectAll(nfts.filter((nft) => nft.eligible));
+			allSelected = true;
+		}
+	}
+
+	function deselectAll() {
+		selectedNfts.reset();
+		allSelected = false;
+	}
+
 	function isSelected(nft: any) {
 		console.log('is selected', nft, $selectedNfts);
-		return $selectedNfts.includes(nft);
+		return $selectedNfts.some((selected) => selected.address === nft?.address);
 	}
 </script>
 
@@ -38,7 +58,7 @@
 		<span class="loading loading-infinity loading-lg text-info"></span>
 	</div>
 	<!--TODO: Add grouping / sorting by collection based on the proposal/votebank restriction-->
-{:else if !loading && nfts}
+{:else if !loading && !isFiltering && nfts}
 	<h3 id="latest" class="text-2xl font-bold tracking-tight text-black dark:text-white md:text-2xl">
 		Select NFTs for Voting (
 		<div class="badge-outline badge badge-xs bg-gray-200" />
@@ -47,6 +67,14 @@
 		<span class="text-sm">&nbsp;Voted</span>
 		)
 	</h3>
+	<div class="mb-4 mt-2">
+		{#if nfts && nfts.some(x => x.eligible)}
+			<button class="btn btn-info btn-sm join-item" on:click={selectAll}>Select All</button>
+		{/if}
+		{#if allSelected || $selectedNfts.length > 0}
+			<button class="btn btn-warning btn-sm join-item" on:click={deselectAll}>Unselect All</button>
+		{/if}
+	</div>
 	<div class="mb-4 grid grid-cols-4 gap-4">
 		{#each nfts as nft (nft.address)}
 			{#if nft.json}
@@ -54,10 +82,10 @@
 				<div class="p-2">
 					<div class="avatar {nft.eligible ? 'offline cursor-pointer' : 'online cursor-not-allowed'}">
 						<div
-							class="rounded-full {$selectedNfts.some(selected => selected.address === nft.address)
+							class="rounded-full {$selectedNfts.some(selected => selected?.address === nft?.address)
 								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100 dark:ring-offset-4'
 								: ''}"
-							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligible'))}
+							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligibsle', nft, $selectedNfts, nft.eligible))}
 						>
 							<img
 								class="mt-0 h-full w-full object-fill"
