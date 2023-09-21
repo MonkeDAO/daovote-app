@@ -4,12 +4,11 @@
 	import type { NftMetadata } from '$lib/types';
 	import { nftStore } from '$lib/stores/nftStore';
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	export let nfts: NftMetadata[] | undefined;
 	let isFiltering: boolean;
 	let loading = true;
-	let allSelected = false;
 	nftStore.subscribe((store) => {
 		loading = store.isFetching;
 		nfts = store.data;
@@ -45,6 +44,9 @@
 	function isSelected(nft: any) {
 		return $selectedNfts.some((selected) => selected.address === nft?.address);
 	}
+	onDestroy(() => {
+		filteredNftStore.clear();
+	});
 </script>
 
 {#if loading || isFiltering}
