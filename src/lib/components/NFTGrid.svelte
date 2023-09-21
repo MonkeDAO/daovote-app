@@ -84,7 +84,7 @@
 							class="rounded-full {$selectedNfts.some(selected => selected?.address === nft?.address)
 								? 'ring ring-primary-focus ring-offset-2 ring-offset-base-100 dark:ring-offset-4'
 								: ''}"
-							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligibsle', nft, $selectedNfts, nft.eligible))}
+							on:click={() => (nft.eligible ? toggleNftSelection(nft) : console.log('ineligibsle', nft))}
 						>
 							<img
 								class="mt-0 h-full w-full object-fill"
