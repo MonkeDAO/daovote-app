@@ -162,7 +162,7 @@
 	});
 
 	$: {
-		if (nfts && votebankSettings && connection && proposal && !skipFilter) {
+		if (nfts && votebankSettings && connection && proposal) {
 			const voteBankSetting = extractRestrictionData(votebankSettings);
 			if (voteBankSetting.isNftRestricted && voteBankSetting.restrictionMint && !skipFilter) {
 				isNftRestricted = true;

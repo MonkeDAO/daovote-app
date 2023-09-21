@@ -73,9 +73,9 @@ const createFilteredNftStore = () => {
 
 	const pushIneligible = (nfts: NftMetadata[]) => {
 		update((store) => {
-			const test = nfts.map((nft) => { return { ...nft, eligible: false } });
-			store.eligible = store?.eligible?.filter((nft) => !test.some(x => x.address === nft.address));
-			store.ineligible = [...store?.ineligible ?? [], ...test];
+			const inelegibleToPush = nfts.map((nft) => { return { ...nft, eligible: false } });
+			store.eligible = store?.eligible?.filter((nft) => !inelegibleToPush.some(x => x.address === nft.address));
+			store.ineligible = [...store?.ineligible ?? [], ...inelegibleToPush];
 			return store;
 		});
 	}
