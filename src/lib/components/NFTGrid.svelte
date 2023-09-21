@@ -35,17 +35,14 @@
 	function selectAll() {
 		if (nfts) {
 			selectedNfts.selectAll(nfts.filter((nft) => nft.eligible));
-			allSelected = true;
 		}
 	}
 
 	function deselectAll() {
 		selectedNfts.reset();
-		allSelected = false;
 	}
 
 	function isSelected(nft: any) {
-		console.log('is selected', nft, $selectedNfts);
 		return $selectedNfts.some((selected) => selected.address === nft?.address);
 	}
 </script>
@@ -71,7 +68,7 @@
 		{#if nfts && nfts.some(x => x.eligible)}
 			<button class="btn btn-info btn-sm join-item" on:click={selectAll}>Select All</button>
 		{/if}
-		{#if allSelected || $selectedNfts.length > 0}
+		{#if $selectedNfts.length > 0}
 			<button class="btn btn-warning btn-sm join-item" on:click={deselectAll}>Unselect All</button>
 		{/if}
 	</div>

@@ -64,6 +64,11 @@
 		}
 		if (ready && $walletConnectionFactory.wallet) {
 			wallet = $walletConnectionFactory.wallet;
+			wallet.on('error', (err) => {
+				setMessageSlow(`Wallet Error: ${(err as any)?.message ?? err}`, 500).then(() => {
+					reset();
+				});
+			});
 		}
 		if (ready && $walletConnectionFactory.metaplex) {
 			metaplex = $walletConnectionFactory.metaplex;
@@ -194,11 +199,14 @@
 			transactions.push(transaction);
 			return transactions;
 		}
+		if (nfts.length > 10) {
+			await setMessageSlow(`Building vote transaction for ${nfts.length} nfts`, 500);
+		}
 		// If the vote is restricted to an nft, we need to build a transaction for each nft
 		for (let nft of nfts) {
-			await setMessageSlow('Building vote transaction for ' + nft.json.name, 300);
+			if (nfts.length <= 10)
+				await setMessageSlow('Building vote transaction for ' + nft.json.name, 300);
 			const instruction = await buildNftVoteTxn(votedFor, votebankAccountAddress, nft);
-			console.log('instruction', instruction);
 			if (!instruction) continue;
 
 			transaction.add(instruction);
@@ -296,7 +304,7 @@
 						skipPreflight: true
 					})
 					.catch((err) => {
-						console.error(err);
+						console.error('txn error', err);
 						setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
 						return '';
 					});
@@ -313,7 +321,7 @@
 				300
 			);
 			const txnsSentSignatures = await Promise.all(sendPromises).catch((err) => {
-				console.error(err);
+				console.error('error sent', err);
 				setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
 				return [{ error: true, sig: '' }];
 			});
@@ -468,7 +476,6 @@
 			currentUser &&
 			$walletStore.signTransaction
 		) {
-			console.log('close proposal', e.detail);
 			const { proposalId, votebank } = e.detail;
 			await closeProposal(proposalId, votebank);
 		} else {
