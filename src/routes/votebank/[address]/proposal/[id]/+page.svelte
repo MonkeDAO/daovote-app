@@ -33,6 +33,7 @@
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { buildNftVoteIx, buildTokenVoteIx } from '$lib/utils/votehelpers';
 	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
+	import { H } from 'highlight.run';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -253,6 +254,12 @@
 
 	async function simulateTxn(connection: Connection, txn: Transaction) {
 		const t = await connection.simulateTransaction(txn);
+		H.track('simulateTxn',{
+			event: 'simulateTxn',
+			category: 'votebank',
+			label: 'simulateTxn',
+			t: JSON.stringify(t)
+		});
 		if (t.value.err) {
 			const messages = extractCustomCodes(t.value.err);
 			if (messages.length > 0) {

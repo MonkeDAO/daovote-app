@@ -85,6 +85,7 @@
 		"chart.js": "^4.3.0",
 		"daisyui": "^3.7.3",
 		"date-fns": "^2.29.3",
+		"highlight.run": "^7.5.3",
 		"mdbsvelte": "^1.0.12",
 		"prism-themes": "^1.9.0",
 		"rollup-plugin-node-polyfills": "^0.2.1",
