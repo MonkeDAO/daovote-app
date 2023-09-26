@@ -11,7 +11,8 @@ const createSelectedNfts = () => {
 			update((currentSelectedNfts) =>
 				currentSelectedNfts.filter((nft: any) => nft.address !== address)
 			),
-		reset: () => set([])
+		reset: () => set([]),
+		selectAll: (nfts: NftMetadata[]) => set(nfts)
 	};
 };
 
