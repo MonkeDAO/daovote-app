@@ -61,7 +61,7 @@ const createFilteredNftStore = () => {
 
 			const ineligibleNfts = nftsVoteAccounts
 				.filter(({ accountExists }) => accountExists)
-				.map(({ nft, voteAccount }) =>  { return {...nft, eligible:false, voteAccount}});
+				.map(({ nft, voteAccount }) =>  { return {...nft, eligible: false, voteAccount}});
 
 			update((store) => {
 				store.eligible = nftsFiltered;
