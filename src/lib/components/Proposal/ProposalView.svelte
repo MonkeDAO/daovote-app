@@ -85,6 +85,7 @@
 	let sortedPercentages: string[] | undefined;
 	let wallet: Adapter | null;
 	let totalVotes: number;
+	let skipFilter = false;
 
 	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
 		wallet = $walletStore.wallet;
@@ -163,7 +164,7 @@
 	$: {
 		if (nfts && votebankSettings && connection && proposal) {
 			const voteBankSetting = extractRestrictionData(votebankSettings);
-			if (voteBankSetting.isNftRestricted && voteBankSetting.restrictionMint) {
+			if (voteBankSetting.isNftRestricted && voteBankSetting.restrictionMint && !skipFilter) {
 				isNftRestricted = true;
 				isFiltering = true;
 				filteredNftStore.filterNfts(connection, proposal, votebankSettings, nfts).then(() => {
@@ -262,6 +263,7 @@
 				checked: false
 			};
 		});
+		skipFilter = true;
 		selectedNfts.reset();
 	}
 
@@ -291,6 +293,7 @@
 	}
 	onDestroy(() => {
 		selectedNfts.reset();
+		skipFilter = false;
 	});
 </script>
 

@@ -33,6 +33,7 @@
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { buildNftVoteIx, buildTokenVoteIx } from '$lib/utils/votehelpers';
 	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
+	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -63,6 +64,11 @@
 		}
 		if (ready && $walletConnectionFactory.wallet) {
 			wallet = $walletConnectionFactory.wallet;
+			wallet.on('error', (err) => {
+				setMessageSlow(`Wallet Error: ${(err as any)?.message ?? err}`, 500).then(() => {
+					reset();
+				});
+			});
 		}
 		if (ready && $walletConnectionFactory.metaplex) {
 			metaplex = $walletConnectionFactory.metaplex;
@@ -195,9 +201,8 @@
 		}
 		// If the vote is restricted to an nft, we need to build a transaction for each nft
 		for (let nft of nfts) {
-			await setMessageSlow('Building vote transaction for ' + nft.json.name, 300);
+			await setMessageSlow('Building vote transaction for ' + nft.json.name, 10);
 			const instruction = await buildNftVoteTxn(votedFor, votebankAccountAddress, nft);
-			console.log('instruction', instruction);
 			if (!instruction) continue;
 
 			transaction.add(instruction);
@@ -228,6 +233,7 @@
 		for (let txn of txns) {
 			try {
 				const simulated = await simulateTxn(connection, txn);
+				await setMessageSlow(`Simulating transaction ${i} of ${txns.length}`, 50);
 				if (!simulated) {
 					i++;
 					continue;
@@ -269,9 +275,15 @@
 		let signatures: string[] = [];
 		if ($walletStore.signAllTransactions) {
 			await setMessageSlow('Simulating transactions...', 300);
+			let i = 1;
 			for (let txn of txns) {
 				const simulated = await simulateTxn(connection, txn);
-				if (!simulated) continue;
+				await setMessageSlow(`Simulating transaction ${i} of ${txns.length}`, 50);
+				if (!simulated){
+					i++; 
+					continue;
+				} 
+				i++;
 				txnsToSend.push(txn);
 			}
 			if (txnsToSend.length === 0) {
@@ -295,7 +307,7 @@
 						skipPreflight: true
 					})
 					.catch((err) => {
-						console.error(err);
+						console.error('txn error', err);
 						setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
 						return '';
 					});
@@ -312,7 +324,7 @@
 				300
 			);
 			const txnsSentSignatures = await Promise.all(sendPromises).catch((err) => {
-				console.error(err);
+				console.error('error sent', err);
 				setMessageSlow(`Transaction Error: ${(err as any)?.message ?? err}`);
 				return [{ error: true, sig: '' }];
 			});
@@ -332,21 +344,24 @@
 		const latestBlockhash = await connection.getLatestBlockhash();
 		const voteUrls: string[] = [];
 		for (let signature of signatures) {
-			await connection.confirmTransaction(
+			var res = await connection.confirmTransaction(
 				{
 					signature: signature,
 					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
 					blockhash: latestBlockhash.blockhash
 				},
 				'confirmed'
-			);
-			await setMessageSlow('Vote success!');
+			).catch(e => {
+				console.error('error confirming', signature, e);
+			});
+			if (!res) continue;
 			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 			const voteTxUrl = `<a href="${explorerUrl}" target="_blank">${trimAddress(
 				signature
 			)}</a> <br/>`;
 			voteUrls.push(voteTxUrl);
 		}
+		await setMessageSlow('Vote success!');
 		signatures.length > 0 ? toast.push(`Voted! ${voteUrls.join(' ')}`, {
 			duration: 3000,
 			pausable: true,
@@ -452,6 +467,7 @@
 				return;
 			}
 			await finalizeAndSendTransactions(voteTxns);
+			filteredNftStore.pushIneligible(event.detail.selectedNfts);
 			data.proposal.voterCount += event.detail.selectedNfts ? event.detail.selectedNfts.length : 1;
 		}
 	}
@@ -466,7 +482,6 @@
 			currentUser &&
 			$walletStore.signTransaction
 		) {
-			console.log('close proposal', e.detail);
 			const { proposalId, votebank } = e.detail;
 			await closeProposal(proposalId, votebank);
 		} else {
