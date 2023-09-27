@@ -199,13 +199,9 @@
 			transactions.push(transaction);
 			return transactions;
 		}
-		if (nfts.length > 10) {
-			await setMessageSlow(`Building vote transaction for ${nfts.length} nfts`, 500);
-		}
 		// If the vote is restricted to an nft, we need to build a transaction for each nft
 		for (let nft of nfts) {
-			if (nfts.length <= 10)
-				await setMessageSlow('Building vote transaction for ' + nft.json.name, 300);
+			await setMessageSlow('Building vote transaction for ' + nft.json.name, 10);
 			const instruction = await buildNftVoteTxn(votedFor, votebankAccountAddress, nft);
 			if (!instruction) continue;
 
@@ -237,6 +233,7 @@
 		for (let txn of txns) {
 			try {
 				const simulated = await simulateTxn(connection, txn);
+				await setMessageSlow(`Simulating transaction ${i} of ${txns.length}`, 50);
 				if (!simulated) {
 					i++;
 					continue;
@@ -278,9 +275,15 @@
 		let signatures: string[] = [];
 		if ($walletStore.signAllTransactions) {
 			await setMessageSlow('Simulating transactions...', 300);
+			let i = 1;
 			for (let txn of txns) {
 				const simulated = await simulateTxn(connection, txn);
-				if (!simulated) continue;
+				await setMessageSlow(`Simulating transaction ${i} of ${txns.length}`, 50);
+				if (!simulated){
+					i++; 
+					continue;
+				} 
+				i++;
 				txnsToSend.push(txn);
 			}
 			if (txnsToSend.length === 0) {
@@ -341,21 +344,24 @@
 		const latestBlockhash = await connection.getLatestBlockhash();
 		const voteUrls: string[] = [];
 		for (let signature of signatures) {
-			await connection.confirmTransaction(
+			var res = await connection.confirmTransaction(
 				{
 					signature: signature,
 					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
 					blockhash: latestBlockhash.blockhash
 				},
 				'confirmed'
-			);
-			await setMessageSlow('Vote success!');
+			).catch(e => {
+				console.error('error confirming', signature, e);
+			});
+			if (!res) continue;
 			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 			const voteTxUrl = `<a href="${explorerUrl}" target="_blank">${trimAddress(
 				signature
 			)}</a> <br/>`;
 			voteUrls.push(voteTxUrl);
 		}
+		await setMessageSlow('Vote success!');
 		signatures.length > 0 ? toast.push(`Voted! ${voteUrls.join(' ')}`, {
 			duration: 3000,
 			pausable: true,

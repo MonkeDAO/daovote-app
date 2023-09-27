@@ -86,15 +86,16 @@ export async function buildNftVoteIx(
 		  ]
 		: [];
 	const [votepda] = voteAccountPda(votebank, mint, proposalId);
-	const voteAccountFetched = await VoteAccount.fromAccountAddress(connection, votepda).catch(
-		(err) => {
-			console.log('vote account not found', err);
-			return null;
-		}
-	);
-	if (voteAccountFetched) {
-		return null;
-	}
+	//Commented out to avoid extra rpc call. Also prevents sneaking in a txn that will forsure fail. If somehow this becomes an issue uncomment.
+	// const voteAccountFetched = await VoteAccount.fromAccountAddress(connection, votepda).catch(
+	// 	(err) => {
+	// 		console.log('vote account not found', err);
+	// 		return null;
+	// 	}
+	// );
+	// if (voteAccountFetched) {
+	// 	return null;
+	// }
 	let voteInstructionAccounts: VoteInstructionAccounts = {
 		voter: voter,
 		votebank: votebank,
