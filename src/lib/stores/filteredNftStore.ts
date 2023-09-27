@@ -57,11 +57,11 @@ const createFilteredNftStore = () => {
 			const nftsVoteAccounts: { nft: NftMetadata; accountExists: boolean, voteAccount: VoteAccount | undefined }[] = data;
 			const nftsFiltered = nftsVoteAccounts
 				.filter(({ accountExists }) => !accountExists)
-				.map(({ nft, voteAccount }) =>  { return {...nft, voteAccount}});
+				.map(({ nft, voteAccount }) =>  { return {...nft, eligible: true, voteAccount}});
 
 			const ineligibleNfts = nftsVoteAccounts
 				.filter(({ accountExists }) => accountExists)
-				.map(({ nft, voteAccount }) =>  { return {...nft, voteAccount}});
+				.map(({ nft, voteAccount }) =>  { return {...nft, eligible:false, voteAccount}});
 
 			update((store) => {
 				store.eligible = nftsFiltered;
@@ -72,9 +72,19 @@ const createFilteredNftStore = () => {
 		}
 	}
 
+	const pushIneligible = (nfts: NftMetadata[]) => {
+		update((store) => {
+			const inelegibleToPush = nfts.map((nft) => { return { ...nft, eligible: false } });
+			store.eligible = store?.eligible?.filter((nft) => !inelegibleToPush.some(x => x.address === nft.address));
+			store.ineligible = [...store?.ineligible ?? [], ...inelegibleToPush];
+			return store;
+		});
+	}
+
 	return {
 		subscribe,
 		filterNfts,
+		pushIneligible,
 		clear: () => set({ eligible: undefined, ineligible: undefined, isFetching: false })
 	};
 };

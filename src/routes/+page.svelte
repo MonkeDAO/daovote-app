@@ -9,6 +9,7 @@
 	let loading = true;
 	$: if (data) {
 		open_proposals = data.json.open_proposals;
+		open_proposals.sort((a, b) => b.proposalId - a.proposalId);
 		closed_proposals = data.json.closed_proposals;
 		loading = false;
 	}
