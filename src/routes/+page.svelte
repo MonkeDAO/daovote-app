@@ -1,14 +1,20 @@
 <script lang="ts">
 	import Newsletter from '$lib/components/Newsletter.svelte';
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
+	import { PUBLIC_IGNORED_PROPOSALS } from '$env/static/public';
 	import type { CardItem, ProposalItem } from '$lib/types';
 	import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, MY_TWITTER_HANDLE } from '$lib/siteConfig';
 	export let data: any;
 	let open_proposals: ProposalItem[] = [];
 	let closed_proposals: ProposalItem[] = [];
 	let loading = true;
+	const ignoredProposalsArray = PUBLIC_IGNORED_PROPOSALS
+		.slice(1, -1) // Remove brackets
+		.split(',')
+		.map(Number); // Convert each element to a number
 	$: if (data) {
 		open_proposals = data.json.open_proposals;
+		open_proposals = open_proposals.filter(proposal => !ignoredProposalsArray.includes(proposal.proposalId));
 		open_proposals.sort((a, b) => b.proposalId - a.proposalId);
 		closed_proposals = data.json.closed_proposals;
 		loading = false;
@@ -72,7 +78,7 @@
 		<div class="flex flex-col gap-6 md:flex-row">
 			{#if loading}
 				<div class="flex items-center justify-center">
-					<span class="loading loading-bars loading-lg text-info"></span>
+					<span class="loading loading-bars loading-lg text-info" />
 				</div>
 			{:else if open_proposals.length > 0}
 				<div class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-1 xl:grid-cols-2">
