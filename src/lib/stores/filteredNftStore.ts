@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 import type { NftMetadata, ProposalItem } from '$lib/types';
 import type { Connection } from '@solana/web3.js';
-import type { SettingsData } from '$lib/anchor/types';
+import type { SettingsData, VoteEntry } from '$lib/anchor/types';
 import { extractRestrictionData } from '$lib/utils/solana';
-import type { VoteAccount } from '$lib/anchor/accounts';
+import { VoteAccount } from '$lib/anchor/accounts';
 
 interface FilteredNftStore {
 	eligible: NftMetadata[] | undefined;
@@ -72,9 +72,9 @@ const createFilteredNftStore = () => {
 		}
 	}
 
-	const pushIneligible = (nfts: NftMetadata[]) => {
+	const pushIneligible = (nfts: NftMetadata[], voteEntries?: VoteEntry[]) => {
 		update((store) => {
-			const inelegibleToPush = nfts.map((nft) => { return { ...nft, eligible: false } });
+			const inelegibleToPush = nfts.map((nft) => { return { ...nft, eligible: false, voteAccount: voteEntries ? VoteAccount.fromArgs({votes: voteEntries}) : undefined } });
 			store.eligible = store?.eligible?.filter((nft) => !inelegibleToPush.some(x => x.address === nft.address));
 			store.ineligible = [...store?.ineligible ?? [], ...inelegibleToPush];
 			return store;

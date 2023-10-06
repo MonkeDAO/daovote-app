@@ -467,7 +467,7 @@
 				return;
 			}
 			await finalizeAndSendTransactions(voteTxns);
-			filteredNftStore.pushIneligible(event.detail.selectedNfts);
+			filteredNftStore.pushIneligible(event.detail.selectedNfts, voteOptions);
 			data.proposal.voterCount += event.detail.selectedNfts ? event.detail.selectedNfts.length : 1;
 		}
 	}
