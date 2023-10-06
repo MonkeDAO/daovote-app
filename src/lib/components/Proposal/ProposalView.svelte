@@ -73,6 +73,7 @@
 	let options: any[];
 	let voteConfirmationModal: any;
 	let confirmationModal: any;
+	let cancelConfirmationModal: any;
 	let eligibleNfts: NftMetadata[] | undefined;
 	let ineligibleNfts: NftMetadata[] | undefined;
 	let allNfts: NftMetadata[] | undefined;
@@ -86,7 +87,7 @@
 	let wallet: Adapter | null;
 	let totalVotes: number;
 	let skipFilter = false;
-
+	let isProposalCreator = false;
 	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
 		wallet = $walletStore.wallet;
 	} else {
@@ -119,6 +120,10 @@
 				(accumulator, currentValue) => accumulator + currentValue,
 				0
 			);
+			if ($walletStore?.wallet?.publicKey) {
+				isProposalCreator =
+					proposal.poster === $walletStore?.wallet?.publicKey?.toBase58();
+			}
 			sortedPercentages = sortedVotes.map((voteCount) => ((voteCount / totalVotes) * 100).toFixed(2));
 			data = {
 				labels: sortedTitles,
@@ -287,9 +292,16 @@
 	function closeProposal() {
 		confirmationModal.openModal();
 	}
+	function cancelProposal() {
+		cancelConfirmationModal.openModal();
+	}
 	function handleCloseProposal(e: CustomEvent<any>): void {
 		confirmationModal.closeModal();
 		dispatch('closeProposal', e.detail);
+	}
+	function handleCancelProposal(e: CustomEvent<any>): void {
+		cancelConfirmationModal.closeModal();
+		dispatch('cancelProposal', e.detail);
 	}
 	onDestroy(() => {
 		selectedNfts.reset();
@@ -308,6 +320,14 @@
 	message="Are you sure you want to close this proposal?"
 	eventOnConfirm="closeProposal"
 	on:closeProposal={handleCloseProposal}
+/>
+<ConfirmationModal
+	id="cancel-proposal-modal"
+	data={proposal}
+	bind:this={cancelConfirmationModal}
+	message="Are you sure you want to cancel this proposal? All data will be lost."
+	eventOnConfirm="cancelProposal"
+	on:cancelProposal={handleCancelProposal}
 />
 <LoadingOverlay />
 <article
@@ -457,6 +477,16 @@
 				</div>
 			</div>
 		{/if}
+		{#if isProposalCreator}
+			<div>
+				<button
+					class="btn-error btn right-1 top-1 mt-5 flex items-center justify-center justify-center rounded px-4 pt-1 font-medium text-gray-900 dark:text-gray-100"
+					on:click={cancelProposal}
+					disabled={!isProposalCreator}
+					>Cancel Proposal
+				</button>
+			</div>
+		{/if}
 	</article>
 {:else}
 	<article
@@ -554,6 +584,16 @@
 						{/if}
 					</p>
 				</div>
+			</div>
+		{/if}
+		{#if isProposalCreator}
+			<div>
+				<button
+					class="btn-error btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded px-4 pt-1 font-medium text-gray-900 dark:text-gray-100"
+					on:click={cancelProposal}
+					disabled={!isProposalCreator}
+					>Cancel Proposal
+				</button>
 			</div>
 		{/if}
 	</article>
