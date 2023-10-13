@@ -370,16 +370,15 @@
 			</p>
 			<h3 class="mt-8 text-2xl font-bold leading-relaxed">How delegate?</h3>
 			<p>
-				Add an address to your delegate account and sign it with the wallet that has your monke in
-				it. You can then vote with the wallet that has the voting power from your monke. You can
-				remove and replace the address at any time.
+				Request delegation permissions using the wallet you intend to vote from by entering 
+				the wallet address with your monke into the form. You then use a special generated link 
+				to approve delegation for the voting wallet wallet using the wallet your monke is in. 
+				You can remove and replace the address at any time.
 			</p>
 			<h3 class="mt-8 text-2xl font-bold leading-relaxed">Which wallet do I use?</h3>
 			<p>
-				The wallet that should be utilizing this page is the one that you will be voting with
-				(burner or hot wallet). In order to reduce the amount of times the wallet with the NFTs is
-				connected to this site, use the input box to input your address that holds the NFTs. The
-				address should be the one that holds the NFTs, not the one that you will be voting with.
+				You should use the wallet you intend to vote from on this site (burner or hot wallet). 
+				Your monke wallet should only be used to approve delegation requests.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
 				{#if $isDark}
