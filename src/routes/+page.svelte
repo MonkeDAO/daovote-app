@@ -4,6 +4,7 @@
 	import { PUBLIC_IGNORED_PROPOSALS } from '$env/static/public';
 	import type { CardItem, ProposalItem } from '$lib/types';
 	import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, MY_TWITTER_HANDLE } from '$lib/siteConfig';
+	import { bnToDate } from '$lib/utils/solana';
 	export let data: any;
 	let open_proposals: ProposalItem[] = [];
 	let closed_proposals: ProposalItem[] = [];
@@ -109,7 +110,7 @@
 						href="/votebank/{item.votebank}/proposal/{item.proposalId}">{item.data.title}</a
 					>
 					<span class="hidden text-xs text-black dark:text-gray-400 sm:inline"
-						>{new Date().toISOString().slice(0, 10)}</span
+						>{item.endTime ? bnToDate(item.endTime)?.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)}</span
 					>
 				</li>
 			{/each}
