@@ -34,6 +34,8 @@
 	import { buildNftVoteIx, buildTokenVoteIx } from '$lib/utils/votehelpers';
 	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
+	import { createCancelProposalInstruction } from '$lib/anchor/instructions';
+	import { goto } from '$app/navigation';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -441,6 +443,72 @@
 		}
 	}
 
+	async function cancelProposal(proposalId: number, votebank: string) {
+		try {
+			loadingStore.set(true);
+			message.set('Cancelling proposal...');
+			const voteBankAddress = new PublicKey(votebank);
+			const [proposalAccount] = proposalAccountPda(new PublicKey(votebank), proposalId);
+			const ix = createCancelProposalInstruction(
+				{
+					proposal: proposalAccount,
+					proposalOwner: currentUser,
+					votebank: voteBankAddress,
+					systemProgram: new PublicKey('11111111111111111111111111111111')
+				},
+				{
+					proposalId: proposalId
+				}
+			);
+			const tx = new Transaction().add(ix);
+			tx.feePayer = currentUser;
+			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			message.set('Simulating transaction...');
+			//const test = VersionedTransaction.deserialize(tx.serialize());
+			const t = await connection.simulateTransaction(tx);
+			if (t.value.err) {
+				const messages = extractCustomCodes(t.value.err);
+				if (messages.length > 0) {
+					const msgString = messages.join(', ');
+					message.set(`Error: ${msgString}`);
+					setTimeout(() => {
+						reset();
+					}, 2000);
+					return;
+				}
+			}
+			message.set('Waiting for signature...');
+			const signature = await $walletStore.sendTransaction(tx, connection);
+
+			console.log('Signature', signature);
+			const latestBlockhash = await connection.getLatestBlockhash();
+
+			await connection.confirmTransaction(
+				{
+					signature: signature,
+					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+					blockhash: latestBlockhash.blockhash
+				},
+				'confirmed'
+			);
+			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
+			reset();
+			toast.push(
+				`Proposal Cancelled! <a href="${explorerUrl}" target="_blank">${voteBankAddress.toBase58()}</a>`,
+				{
+					duration: 3000,
+					pausable: true
+				}
+			);
+			await goto('/');
+		} catch (e: any) {
+			message.set(`Error: ${e?.message ?? e}`); //clear message
+			setTimeout(() => {
+				reset();
+			}, 1200);
+		}
+	}
+
 	async function setMessageSlow(msg: string, delay = 500) {
 		message.set(msg);
 		await sleep(delay);
@@ -488,6 +556,23 @@
 			toast.push(`You are not an authorized owner of this proposal`, { target: 'new' });
 		}
 	}
+
+	async function handleCancelProposal(e: CustomEvent<any>): Promise<void> {
+		if (
+			isOwner &&
+			connection &&
+			wallet &&
+			metaplex &&
+			program &&
+			currentUser &&
+			$walletStore.signTransaction
+		) {
+			const { proposalId, votebank } = e.detail;
+			await cancelProposal(proposalId, votebank);
+		} else {
+			toast.push(`You are not an authorized to cancel proposal`, { target: 'new' });
+		}
+	}
 </script>
 
 <div class="wrap">
@@ -513,6 +598,7 @@
 		}}
 		on:vote={handleVoteSubmit}
 		on:closeProposal={handleCloseProposal}
+		on:cancelProposal={handleCancelProposal}
 	/>
 {/if}
 

@@ -1,5 +1,6 @@
 export * from './addOwner'
 export * from './closeProposal'
+export * from './cancelProposal'
 export * from './createDelegate'
 export * from './createProposal'
 export * from './initialize'

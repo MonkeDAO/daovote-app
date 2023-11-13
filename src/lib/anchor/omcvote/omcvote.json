@@ -238,6 +238,37 @@
       ]
     },
     {
+      "name": "cancelProposal",
+      "accounts": [
+        {
+          "name": "proposal",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "votebank",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "proposalOwner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "proposalId",
+          "type": "u32"
+        }
+      ]
+    },
+    {
       "name": "vote",
       "accounts": [
         {
@@ -928,6 +959,36 @@
         },
         {
           "name": "endTime",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ProposalCancelledEvent",
+      "fields": [
+        {
+          "name": "posterPubkey",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "votebankPubkey",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "proposalPubkey",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "proposalId",
+          "type": "u32",
+          "index": false
+        },
+        {
+          "name": "cancelTime",
           "type": "i64",
           "index": false
         }
