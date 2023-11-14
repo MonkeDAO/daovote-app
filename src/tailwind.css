@@ -10,10 +10,18 @@
 	font-family: var(--font-body);
 }
 
+html {
+	@apply bg-white;
+}
+
+html.dark {
+	@apply bg-gray-900;
+}
+
 body {
 	min-height: 100vh;
 	margin: 0;
-
+	@apply bg-white;
 	/* 
 		CUSTOM SCROLLBARS! 
 		- https://css-tricks.com/strut-your-stuff-with-a-custom-scrollbar/

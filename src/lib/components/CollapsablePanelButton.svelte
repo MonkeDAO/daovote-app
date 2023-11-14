@@ -9,7 +9,7 @@
 		class="btn-primary btn w-1/4 justify-center"
 		on:click={() => (contentVisible = !contentVisible)}
 	>
-		{title}
+		{expanded ? `${title.replace("View", "Hide")}` : title}
 	</button>
 	{#if contentVisible}
 		<div class="p-4">

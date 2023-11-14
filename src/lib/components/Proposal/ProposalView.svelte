@@ -372,7 +372,7 @@
 <div class="">
 	{#if showPdf}
 		<div class="mt-4 flex flex-col items-center">
-			<CollapsablePanelButton title="View PDF">
+			<CollapsablePanelButton expanded={true} title="View Full Proposal">
 				<PdfViewer pdfUrl={proposal.data.url} />
 			</CollapsablePanelButton>
 			<a href={proposal.data.url} target="_blank" rel="noopener noreferrer" class="mt-2">
@@ -381,7 +381,7 @@
 		</div>
 	{:else if showImg}
 		<div class="mt-4">
-			<CollapsablePanelButton title="View Image">
+			<CollapsablePanelButton expanded={true} title="View Image">
 				<!-- svelte-ignore a11y-img-redundant-alt -->
 				<img src={proposal.data.url} alt="Proposal image" />
 			</CollapsablePanelButton>
