@@ -3610,7 +3610,7 @@ caniuse-lite@^1.0.30001449, caniuse-lite@^1.0.30001464:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001481.tgz#f58a717afe92f9e69d0e35ff64df596bfad93912"
   integrity sha512-KCqHwRnaa1InZBtqXzP98LPg0ajCVujMKjqKDhZEthIpAsJl/YEIa3YvXjGXPVqzZVguccuu7ga9KOE1J9rKPQ==
 
-canvas@^2.11.0, "canvas@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz":
+canvas@^2.11.2, "canvas@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz#67f9339bfb8e303792e91df8526cd45375fdb930"
 
@@ -3759,11 +3759,6 @@ color-support@^1.1.2:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/color-support/-/color-support-1.1.3.tgz#93834379a1cc9a0c61f82f52f0d04322251bd5a2"
   integrity sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==
-
-colord@^2.9:
-  version "2.9.3"
-  resolved "https://registry.yarnpkg.com/colord/-/colord-2.9.3.tgz#4f8ce919de456f1d5c1c368c307fe20f3e59fb43"
-  integrity sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw==
 
 combined-stream@^1.0.8:
   version "1.0.8"
@@ -3958,16 +3953,20 @@ csv@^6.0.5:
     csv-stringify "^6.3.2"
     stream-transform "^3.2.4"
 
-daisyui@^3.7.3:
-  version "3.7.3"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-3.7.3.tgz#247cfefa0112c31679af9035eff65e1bd866f062"
-  integrity sha512-gKlz3RwfaukZxf8nQZsDAZ7quUSi7F8HjGGB34tkHruvfQB9cgVDQsmqUqSQtkAJYvzbrg/3dLUa9+5jF4iC1A==
+culori@^3:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/culori/-/culori-3.2.0.tgz#df6561503f0cc20e8e1c029f086466666c0ac62f"
+  integrity sha512-HIEbTSP7vs1mPq/2P9In6QyFE0Tkpevh0k9a+FkjhD+cwsYm9WRSbn4uMdW9O0yXlNYC3ppxL3gWWPOcvEl57w==
+
+daisyui@^4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-4.2.3.tgz#f6934eec7a28fe8c087f7515c9bbcb9a7c76aada"
+  integrity sha512-tu3dDlfz+98kfgcPZPd5vyNVMUS2+lQQkrVINZNnAlIZEn0YDxXSmot30V9hy3g6f+8tdYQtdYYhjXuGzlI8Lg==
   dependencies:
-    colord "^2.9"
     css-selector-tokenizer "^0.8"
-    postcss "^8"
+    culori "^3"
+    picocolors "^1"
     postcss-js "^4"
-    tailwindcss "^3"
 
 dash-get@^1.0.2:
   version "1.0.2"
@@ -6111,17 +6110,15 @@ pbkdf2@^3.0.17, pbkdf2@^3.0.3, pbkdf2@^3.0.9:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-pdfjs-dist@^3.0.279:
-  version "3.5.141"
-  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-3.5.141.tgz#a98c2d4dd3192592ba7055d3e450ed6e97112f41"
-  integrity sha512-lYIvyi5grtYOIatsfCifIKwxHeAJ8eHyP22DTdvY4pm0yWVSFQnMafpgCPSw8gaNRDDdcHnBVOkqMsyK8SRxZg==
-  dependencies:
-    path2d-polyfill "^2.0.1"
-    web-streams-polyfill "^3.2.1"
+pdfjs-dist@^3.8.162:
+  version "3.11.174"
+  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-3.11.174.tgz#5ff47b80f2d58c8dd0d74f615e7c6a7e7e704c4b"
+  integrity sha512-TdTZPf1trZ8/UFu5Cx/GXB7GZM30LT+wWUNfsi6Bq8ePLnb+woNKtDymI2mxZYBpMbonNFqKmiz684DIfnd8dA==
   optionalDependencies:
-    canvas "^2.11.0"
+    canvas "^2.11.2"
+    path2d-polyfill "^2.0.1"
 
-picocolors@^1.0.0:
+picocolors@^1, picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
   integrity sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==
@@ -6232,15 +6229,6 @@ postcss-value-parser@^4.0.0, postcss-value-parser@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
-
-postcss@^8:
-  version "8.4.29"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.29.tgz#33bc121cf3b3688d4ddef50be869b2a54185a1dd"
-  integrity sha512-cbI+jaqIeu/VGqXEarWkRCCffhjgXc0qjBtXpqJhTBohMUjUQnbBr0xqX3vEKudc4iviTewcJo5ajcec5+wdJw==
-  dependencies:
-    nanoid "^3.3.6"
-    picocolors "^1.0.0"
-    source-map-js "^1.0.2"
 
 postcss@^8.4.21, postcss@^8.4.23:
   version "8.4.23"
@@ -7251,12 +7239,12 @@ svelte-hmr@^0.15.1:
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.15.1.tgz#d11d878a0bbb12ec1cba030f580cd2049f4ec86b"
   integrity sha512-BiKB4RZ8YSwRKCNVdNxK/GfY+r4Kjgp9jCLEy0DuqAKfmQtpL38cQK3afdpjw4sqSs4PLi3jIPJIFp259NkZtA==
 
-svelte-pdf@^1.0.18:
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/svelte-pdf/-/svelte-pdf-1.0.18.tgz#898c49fafde6cb8437d887298b21f1bf6b7150cd"
-  integrity sha512-VVakAdCc9EeimhyqUyxkr+buVLtG+zlBIzjO+VFsZkqH3ZA9YGJlO+jL2DyMUdoL09A6YjoY8LMu+a69Y39yAA==
+svelte-pdf@^1.0.20:
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/svelte-pdf/-/svelte-pdf-1.0.20.tgz#ac8314799e4f6b4fe83044ec7e9a744a167131a1"
+  integrity sha512-CALTIVcCbI4sDOBBUhcXWDUmXLV5mvk0esgXSmgAh3JKz4dJaGRDBc5A09i6dxkvY4RzblwnuV8F+3wtRrDrJA==
   dependencies:
-    pdfjs-dist "^3.0.279"
+    pdfjs-dist "^3.8.162"
 
 svelte-preprocess@^5.0.1, svelte-preprocess@^5.0.3:
   version "5.0.3"
@@ -7284,7 +7272,7 @@ sveltekit-search-params@^1.0.10:
   resolved "https://registry.yarnpkg.com/sveltekit-search-params/-/sveltekit-search-params-1.0.12.tgz#b09227bb1c3321f69f579fd88e2057be9a80212e"
   integrity sha512-Ex4uuhX+dnLdyWdssEZeEpYSiJZBLPNiMsbCqGzOFyWXHSd6GICGsUc1TyLxobpe5PAdnRSPGNLjCRYhdZO7Dw==
 
-tailwindcss@^3, tailwindcss@^3.2.7:
+tailwindcss@^3.2.7:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-3.3.2.tgz#2f9e35d715fdf0bbf674d90147a0684d7054a2d3"
   integrity sha512-9jPkMiIBXvPc2KywkraqsUfbfj+dHDb+JPWtSJa9MLFdrPyazI7q6WX2sUrm7R9eVR7qqv3Pas7EvQFzxKnI6w==
@@ -7733,11 +7721,6 @@ wcwidth@^1.0.1:
   integrity sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==
   dependencies:
     defaults "^1.0.3"
-
-web-streams-polyfill@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"
-  integrity sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==
 
 web3-utils@^1.3.4:
   version "1.9.0"
