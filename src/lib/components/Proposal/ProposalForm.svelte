@@ -248,18 +248,18 @@
 					>
 				</div>
 				<div class="flex flex-col">
-					<label class="input-group input-group-vertical text-gray-100">
-						<span class="bg-gray-200 text-black dark:bg-gray-700 dark:text-gray-100"
+					<div class="join join-vertical">
+						<span class="bg-gray-200 text-black dark:bg-gray-700 dark:text-gray-100 join-item pl-2"
 							>Max options voter can pick</span
 						>
 						<input
 							type="number"
 							bind:value={maxOptions}
 							placeholder="1"
-							class="input-bordered input bg-gray-200 text-black placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+							class="input-bordered input join-item bg-gray-200 text-black placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
 							required
 						/>
-					</label>
+				</div>
 				</div>
 				{#if !useEditor}
 					<div class="flex flex-col">
