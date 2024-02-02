@@ -15,7 +15,7 @@
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
-	import { PublicKey, type Connection, Transaction, TransactionInstruction } from '@solana/web3.js';
+	import { PublicKey, type Connection, Transaction, TransactionInstruction, ComputeBudgetProgram } from '@solana/web3.js';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { Metaplex } from '@metaplex-foundation/js';
 	import type { Program } from '@project-serum/anchor';
@@ -190,6 +190,14 @@
 		const { isNftRestricted } = extractRestrictionData(settings);
 		let transaction = new Transaction();
 		transaction.feePayer = currentUser;
+		const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ 
+  			units: 800_000 
+		});
+		const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ 
+  			microLamports: 1 
+		});
+		transaction.add(modifyComputeUnits);
+		transaction.add(addPriorityFee);
 		if (!isNftRestricted) {
 			// Add the vote instruction
 			const instruction = await buildVoteTokenTxn(votedFor, votebankAccountAddress);
@@ -345,6 +353,7 @@
 		}
 		const latestBlockhash = await connection.getLatestBlockhash();
 		const voteUrls: string[] = [];
+		let confirmedCount = 0;
 		for (let signature of signatures) {
 			var res = await connection.confirmTransaction(
 				{
@@ -357,11 +366,16 @@
 				console.error('error confirming', signature, e);
 			});
 			if (!res) continue;
+			confirmedCount++;
 			const explorerUrl = `${getExplorerUrl(PUBLIC_SOLANA_NETWORK, 'transaction', signature)}`;
 			const voteTxUrl = `<a href="${explorerUrl}" target="_blank">${trimAddress(
 				signature
 			)}</a> <br/>`;
 			voteUrls.push(voteTxUrl);
+		}
+		if (confirmedCount !== signatures.length) {
+			await setMessageSlow('Vote failed to confirm');
+			return;
 		}
 		await setMessageSlow('Vote success!');
 		signatures.length > 0 ? toast.push(`Voted! ${voteUrls.join(' ')}`, {
