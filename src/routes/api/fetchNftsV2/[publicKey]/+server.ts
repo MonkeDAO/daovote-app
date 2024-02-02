@@ -67,6 +67,10 @@ export const GET: RequestHandler = async (request) => {
 				}),
 			});
 			const responseJson = await response.json();
+			if (!responseJson.result || !responseJson.result.items) {
+				console.log('Error: searchAssets', responseJson);
+				return [];
+			}
 			const { result } = responseJson as HeliusDigitalAssetsResult;
 			return result.items;
 		}
@@ -83,6 +87,7 @@ export const GET: RequestHandler = async (request) => {
 		addresses.push(...delegateAccount.addresses.filter(x => x.signed).map(x => x.address));
 	}
 	const collectionAddresses = PUBLIC_COLLECTION_ADDRESSES?.split(',').map((x: any) => (x as string)?.trim().replace(/["']/g, ""));
+	console.log('collectionAddresses', collectionAddresses);
 	let nftsRaw: HeliusDigitalAsset[] = [];
 	if (collectionAddresses && collectionAddresses.length > 0) {
 		for (var collectionAddress of collectionAddresses) {

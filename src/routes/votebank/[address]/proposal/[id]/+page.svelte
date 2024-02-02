@@ -218,7 +218,7 @@
 			transaction.add(instruction);
 			const txnSize = getTxSize(transaction, currentUser);
 			console.log('txnSize', txnSize);
-			if (txnSize > 1280) {
+			if (txnSize > 1232) {
 				// Remove the last instruction that caused the size to exceed limit
 				transaction.instructions.pop();
 
@@ -226,6 +226,14 @@
 				transactions.push(transaction);
 				transaction = new Transaction();
 				transaction.feePayer = currentUser;
+				const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ 
+  					units: 800_000 
+				});
+				const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ 
+  					microLamports: 1 
+				});
+				transaction.add(modifyComputeUnits);
+				transaction.add(addPriorityFee);
 				transaction.add(instruction); // Add the instruction to the new transaction
 			}
 		}
