@@ -319,14 +319,13 @@ export async function voteAccountPdaExists(
 
 export function getEnvNetwork(
 	commitment: anchor.web3.Commitment = 'confirmed',
-	rpcUrl?: string
 ): anchor.web3.Connection {
 	const network = PUBLIC_SOLANA_NETWORK as Cluster;
 	const rpcUrlPublic = PUBLIC_RPC_URL;
-	if (!rpcUrl || !rpcUrlPublic) {
+	if (!rpcUrlPublic) {
 		return new anchor.web3.Connection(clusterApiUrl(network), commitment);
 	}
-	return new anchor.web3.Connection(rpcUrl || rpcUrlPublic, commitment);
+	return new anchor.web3.Connection(rpcUrlPublic, commitment);
 }
 
 export function getExplorerUrl(
