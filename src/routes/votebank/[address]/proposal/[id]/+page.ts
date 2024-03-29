@@ -1,6 +1,5 @@
 // src/routes/votebank/[address]/+page.ts
 
-import { PRIVATE_HELIUS_URL } from '$env/static/private';
 import { Votebank } from '$lib/anchor/accounts';
 import { fetchProposalById, getEnvNetwork } from '$lib/utils/solana';
 import { PublicKey } from '@solana/web3.js';
@@ -8,7 +7,7 @@ import { PublicKey } from '@solana/web3.js';
 /** @type {import('./$types').PageLoad} */
 export async function load({ params }: any) {
 	const { id, address } = params;
-	const connection = getEnvNetwork(undefined, PRIVATE_HELIUS_URL);
+	const connection = getEnvNetwork();
 	const voteBankAccountRaw = await Votebank.fromAccountAddress(connection, new PublicKey(address));
 	const votebank = voteBankAccountRaw?.pretty();
 	// const ownerInfo = votebank?.settings.find((x) => isSettingsDataOwnerInfo(x));
