@@ -50,7 +50,7 @@
 		"vite": "^5.0.0"
 	},
 	"engines": {
-		"node": ">=18.x"
+		"node": ">=20.x"
 	},
 	"resolutions": {
 		"canvas": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz"
@@ -94,7 +94,7 @@
 		"svelte-action-balancer": "^1.0.4",
 		"svelte-chartjs": "^3.1.5",
 		"svelte-fa": "^3.0.3",
-		"svelte-pdf": "^1.0.18",
+		"svelte-pdf": "^1.0.20",
 		"svelte-tiptap": "^0.7.0",
 		"sveltekit-search-params": "^2.1.2",
 		"tweetnacl": "^1.0.3",

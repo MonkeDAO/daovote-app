@@ -3870,7 +3870,7 @@ caniuse-lite@^1.0.30001449, caniuse-lite@^1.0.30001464:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001481.tgz#f58a717afe92f9e69d0e35ff64df596bfad93912"
   integrity sha512-KCqHwRnaa1InZBtqXzP98LPg0ajCVujMKjqKDhZEthIpAsJl/YEIa3YvXjGXPVqzZVguccuu7ga9KOE1J9rKPQ==
 
-canvas@^2.11.0, "canvas@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz":
+canvas@^2.11.2, "canvas@https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz#67f9339bfb8e303792e91df8526cd45375fdb930"
 
@@ -6459,15 +6459,13 @@ pbkdf2@^3.0.17, pbkdf2@^3.0.3, pbkdf2@^3.0.9:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-pdfjs-dist@^3.0.279:
-  version "3.5.141"
-  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-3.5.141.tgz#a98c2d4dd3192592ba7055d3e450ed6e97112f41"
-  integrity sha512-lYIvyi5grtYOIatsfCifIKwxHeAJ8eHyP22DTdvY4pm0yWVSFQnMafpgCPSw8gaNRDDdcHnBVOkqMsyK8SRxZg==
-  dependencies:
-    path2d-polyfill "^2.0.1"
-    web-streams-polyfill "^3.2.1"
+pdfjs-dist@^3.8.162:
+  version "3.11.174"
+  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-3.11.174.tgz#5ff47b80f2d58c8dd0d74f615e7c6a7e7e704c4b"
+  integrity sha512-TdTZPf1trZ8/UFu5Cx/GXB7GZM30LT+wWUNfsi6Bq8ePLnb+woNKtDymI2mxZYBpMbonNFqKmiz684DIfnd8dA==
   optionalDependencies:
-    canvas "^2.11.0"
+    canvas "^2.11.2"
+    path2d-polyfill "^2.0.1"
 
 periscopic@^3.1.0:
   version "3.1.0"
@@ -7634,12 +7632,12 @@ svelte-hmr@^0.15.3:
   resolved "https://registry.yarnpkg.com/svelte-hmr/-/svelte-hmr-0.15.3.tgz#df54ccde9be3f091bf5f18fc4ef7b8eb6405fbe6"
   integrity sha512-41snaPswvSf8TJUhlkoJBekRrABDXDMdpNpT2tfHIv4JuhgvHqLMhEPGtaQn0BmbNSTkuz2Ed20DF2eHw0SmBQ==
 
-svelte-pdf@^1.0.18:
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/svelte-pdf/-/svelte-pdf-1.0.18.tgz#898c49fafde6cb8437d887298b21f1bf6b7150cd"
-  integrity sha512-VVakAdCc9EeimhyqUyxkr+buVLtG+zlBIzjO+VFsZkqH3ZA9YGJlO+jL2DyMUdoL09A6YjoY8LMu+a69Y39yAA==
+svelte-pdf@^1.0.20:
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/svelte-pdf/-/svelte-pdf-1.0.20.tgz#ac8314799e4f6b4fe83044ec7e9a744a167131a1"
+  integrity sha512-CALTIVcCbI4sDOBBUhcXWDUmXLV5mvk0esgXSmgAh3JKz4dJaGRDBc5A09i6dxkvY4RzblwnuV8F+3wtRrDrJA==
   dependencies:
-    pdfjs-dist "^3.0.279"
+    pdfjs-dist "^3.8.162"
 
 svelte-preprocess@^5.1.3:
   version "5.1.3"
@@ -8136,11 +8134,6 @@ wcwidth@^1.0.1:
   integrity sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==
   dependencies:
     defaults "^1.0.3"
-
-web-streams-polyfill@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"
-  integrity sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==
 
 web3-utils@^1.3.4:
   version "1.9.0"

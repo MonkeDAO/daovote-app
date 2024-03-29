@@ -23,7 +23,7 @@ const config = {
 	// Docs: https://github.com/sveltejs/kit/blob/master/packages/adapter-netlify/README.md
 	kit: {
 		adapter: adapter({
-			runtime: 'nodejs18.x'
+			runtime: 'nodejs20.x'
 		})
 	}
 };
