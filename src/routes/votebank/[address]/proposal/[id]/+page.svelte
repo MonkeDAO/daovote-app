@@ -174,6 +174,7 @@
 			return transactions;
 		}
 		loadingStore.set(true);
+		message.set('Building vote transactions...');
 
 		const votebankAccountAddress = new PublicKey(data.address);
 		const voteBankAccountRaw = await Votebank.fromAccountAddress(
