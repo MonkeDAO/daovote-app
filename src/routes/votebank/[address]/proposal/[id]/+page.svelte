@@ -194,7 +194,7 @@
   			units: 800_000 
 		});
 		const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ 
-  			microLamports: 1 
+  			microLamports: 10000 
 		});
 		transaction.add(modifyComputeUnits);
 		transaction.add(addPriorityFee);
@@ -230,7 +230,7 @@
   					units: 800_000 
 				});
 				const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ 
-  					microLamports: 1 
+  					microLamports: 10000 
 				});
 				transaction.add(modifyComputeUnits);
 				transaction.add(addPriorityFee);
