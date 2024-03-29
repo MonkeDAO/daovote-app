@@ -49,6 +49,6 @@ export async function load({ setHeaders }: any) {
 			address
 		};
 	} catch (err) {
-		throw error(400, 'Bad Request');
+		error(400, 'Bad Request');
 	}
 }

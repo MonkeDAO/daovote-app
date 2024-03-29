@@ -28,6 +28,6 @@ export async function GET({ params }: any) {
 	} catch (err) {
 		console.log("didn't find ", address);
 		console.error(err);
-		throw error(404, 'votebank not found');
+		error(404, 'votebank not found');
 	}
 }

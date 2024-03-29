@@ -8,7 +8,7 @@ export async function load({ setHeaders, fetch }: any) {
 	// alternate strategy https://www.davidwparker.com/posts/how-to-make-an-rss-feed-in-sveltekit
 	// Object.entries(import.meta.glob('./*.md')).map(async ([path, page]) => {
 	if (res.status > 400) {
-		throw error(res.status, await res.text());
+		error(res.status, await res.text());
 	}
 
 	/** @type {import('$lib/types').ContentItem[]} */
