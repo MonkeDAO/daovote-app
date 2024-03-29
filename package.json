@@ -49,7 +49,7 @@
 		"vite": "^4.3.3"
 	},
 	"engines": {
-		"node": ">=18.x"
+		"node": ">=20.x"
 	},
 	"resolutions": {
 		"canvas": "https://registry.yarnpkg.com/@favware/skip-dependency/-/skip-dependency-1.2.1.tgz"
