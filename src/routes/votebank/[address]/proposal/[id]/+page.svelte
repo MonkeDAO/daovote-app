@@ -191,11 +191,12 @@
 		const { isNftRestricted } = extractRestrictionData(settings);
 		let transaction = new Transaction();
 		transaction.feePayer = currentUser;
+		const computeUnits = nfts.length >= 5 ? 600_000 : Math.max(80_000, nfts.length * 51_215);
 		const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ 
-  			units: 800_000 
+  			units: computeUnits 
 		});
 		const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ 
-  			microLamports: 10000 
+  			microLamports: 100000
 		});
 		transaction.add(modifyComputeUnits);
 		transaction.add(addPriorityFee);
@@ -228,10 +229,10 @@
 				transaction = new Transaction();
 				transaction.feePayer = currentUser;
 				const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({ 
-  					units: 800_000 
+  					units: computeUnits 
 				});
 				const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({ 
-  					microLamports: 10000 
+  					microLamports: 100000 
 				});
 				transaction.add(modifyComputeUnits);
 				transaction.add(addPriorityFee);
