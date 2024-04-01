@@ -15,7 +15,10 @@ const createOwnerCheckStore = () => {
 	const checkIsOwner = async (publicKey: PublicKey) => {
 		console.log('checking', publicKey.toBase58());
 		//Loaded client side need public var
-		const connection = new Connection(PUBLIC_RPC_URL, 'confirmed');
+		const connection = new Connection(PUBLIC_RPC_URL, {
+			commitment: 'confirmed',
+			httpHeaders: { Origin: 'https://vote.monkedao.io' }
+		});
 		const voteBankAccountRaw = await Votebank.fromAccountAddress(
 			connection,
 			new PublicKey(PUBLIC_VOTEBANK)

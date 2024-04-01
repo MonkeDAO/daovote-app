@@ -24,7 +24,8 @@ export const GET: RequestHandler = async (request) => {
 			const response = await fetch(url, {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					'Origin': 'https://vote.monkedao.io'
 				},
 				body: JSON.stringify({
 					jsonrpc: '2.0',
@@ -53,6 +54,7 @@ export const GET: RequestHandler = async (request) => {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					'Origin': 'https://vote.monkedao.io'
 				},
 				body: JSON.stringify({
 					jsonrpc: '2.0',

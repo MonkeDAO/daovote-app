@@ -323,9 +323,15 @@ export function getEnvNetwork(
 	const network = PUBLIC_SOLANA_NETWORK as Cluster;
 	const rpcUrlPublic = PUBLIC_RPC_URL;
 	if (!rpcUrlPublic) {
-		return new anchor.web3.Connection(clusterApiUrl(network), commitment);
+		return new anchor.web3.Connection(clusterApiUrl(network), {
+			httpHeaders: { Origin: 'https://vote.monkedao.io' },
+			commitment
+		});
 	}
-	return new anchor.web3.Connection(rpcUrlPublic, commitment);
+	return new anchor.web3.Connection(rpcUrlPublic, {
+		httpHeaders: { Origin: 'https://vote.monkedao.io' },
+		commitment
+	});
 }
 
 export function getExplorerUrl(
