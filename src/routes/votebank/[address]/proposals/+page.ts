@@ -27,7 +27,7 @@ export async function load({ params, setHeaders }: any) {
 			console.log('openProposalRaw', openProposalRaw);
 			open_proposals = openProposalRaw;
 		}
-		if (data.openProposals && data.openProposals.length > 0) {
+		if (data.closedProposals && data.closedProposals.length > 0) {
 			const closedProposalRaw = await fetchProposals(
 				connection,
 				new PublicKey(address),
