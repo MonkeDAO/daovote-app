@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { web3 } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { Votebank } from '$lib/anchor/accounts';
-import type { VoteBankProposals } from '$lib/types';
+import type { ProposalItem, VoteBankProposals } from '$lib/types';
 import { fetchProposals, getEnvNetwork } from '$lib/utils/solana';
 import { PUBLIC_VOTEBANK } from '$env/static/public';
 // export const prerender = true; // turned off bc it causes errors
@@ -16,8 +16,8 @@ export async function load({ setHeaders }: any) {
 		//TODO: Configurable/env variable
 		const connection = getEnvNetwork();
 		data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(address));
-		let open_proposals: any[] = [];
-		let closed_proposals: any[] = [];
+		let open_proposals: ProposalItem[] = [];
+		let closed_proposals: ProposalItem[] = [];
 		if (data.openProposals && data.openProposals.length > 0) {
 			const openProposalRaw = await fetchProposals(
 				connection,
@@ -39,7 +39,7 @@ export async function load({ setHeaders }: any) {
 		responseData = {
 			votebank: address,
 			open_proposals: open_proposals,
-			closed_proposals: closed_proposals
+			closed_proposals: closed_proposals.sort((a, b) => b.endTime - a.endTime)
 		};
 		setHeaders({
 			'cache-control': 'public, max-age=3600' // 1 hour - increase the max age as you get more confident in your caching
