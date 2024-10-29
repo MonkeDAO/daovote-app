@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { PUBLIC_VOTE_PROGRAM } from '$env/static/public';
+import { PUBLIC_VOTE_PROGRAM, PUBLIC_ENABLE_FEE_PAYER } from '$env/static/public';
 import { VoteAccount, Votebank } from '$lib/anchor/accounts';
 import {
 	createVoteDelegationInstruction,
@@ -15,6 +15,7 @@ import {
 	TREASURY_ADDRESS,
 	delegateAccountPda,
 	extractRestrictionData,
+	feePayerPda,
 	fetchProposalById,
 	getDefaultPublicKey,
 	getDelegateAccountType,
@@ -26,6 +27,7 @@ import type { SettingsData, VoteEntry } from '$lib/anchor/types';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import type { AdditionalAccountIndices } from '../anchor/types/AdditionalAccountIndices';
 import type { VoteDelegationInstructionAccounts, VoteDelegationInstructionArgs } from '../anchor/instructions/voteDelegation';
+
 
 export async function buildNftVoteIx(
 	connection: Connection,
@@ -77,7 +79,8 @@ export async function buildNftVoteIx(
 		tokenAccount = await getAssociatedTokenAddress(mint, new PublicKey(nft.owner));
 	}
 	const [proposalPda] = proposalAccountPda(votebank, proposalId);
-
+	const [feePayerPdaAccount] = feePayerPda(votebank);
+	const feePayerEnabled = Boolean(PUBLIC_ENABLE_FEE_PAYER);
 	const tokenToAccountMetaFormat = isNftRestricted
 		? [
 				toAccountMetadata(tokenAccount),
@@ -98,6 +101,7 @@ export async function buildNftVoteIx(
 	// }
 	let voteInstructionAccounts: VoteInstructionAccounts = {
 		voter: voter,
+		feePayer: feePayerEnabled ? feePayerPdaAccount : undefined,
 		votebank: votebank,
 		proposal: proposalPda,
 		votes: votepda,
@@ -107,6 +111,7 @@ export async function buildNftVoteIx(
 	};
 	let voteDelegateInstructionAccounts: VoteDelegationInstructionAccounts = {
 		voter: voter,
+		feePayer: feePayerEnabled ? feePayerPdaAccount : undefined,
 		votebank: votebank,
 		proposal: proposalPda,
 		votes: votepda,
@@ -201,6 +206,7 @@ export async function buildTokenVoteIx(
 	}
 	let voteInstructionAccounts: VoteInstructionAccounts = {
 		voter: voter,
+		feePayer: voter,
 		votebank: votebank,
 		proposal: proposalPda,
 		votes: votepda,

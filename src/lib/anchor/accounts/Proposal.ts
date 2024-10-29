@@ -26,6 +26,9 @@ export type ProposalArgs = {
   voteOpen: boolean
   proposalId: number
   endTime: beet.bignum
+  collectionSize: number
+  quorumThreshold: number
+  quorumMetTime: beet.bignum
 }
 
 export const proposalDiscriminator = [26, 94, 189, 187, 116, 136, 53, 33]
@@ -46,7 +49,10 @@ export class Proposal implements ProposalArgs {
     readonly voterCount: number,
     readonly voteOpen: boolean,
     readonly proposalId: number,
-    readonly endTime: beet.bignum
+    readonly endTime: beet.bignum,
+    readonly collectionSize: number,
+    readonly quorumThreshold: number,
+    readonly quorumMetTime: beet.bignum
   ) {}
 
   /**
@@ -62,7 +68,10 @@ export class Proposal implements ProposalArgs {
       args.voterCount,
       args.voteOpen,
       args.proposalId,
-      args.endTime
+      args.endTime,
+      args.collectionSize,
+      args.quorumThreshold,
+      args.quorumMetTime
     )
   }
 
@@ -190,6 +199,19 @@ export class Proposal implements ProposalArgs {
         }
         return x
       })(),
+      collectionSize: this.collectionSize,
+      quorumThreshold: this.quorumThreshold,
+      quorumMetTime: (() => {
+        const x = <{ toNumber: () => number }>this.quorumMetTime
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
     }
   }
 }
@@ -215,6 +237,9 @@ export const proposalBeet = new beet.FixableBeetStruct<
     ['voteOpen', beet.bool],
     ['proposalId', beet.u32],
     ['endTime', beet.i64],
+    ['collectionSize', beet.u32],
+    ['quorumThreshold', beet.u32],
+    ['quorumMetTime', beet.i64],
   ],
   Proposal.fromArgs,
   'Proposal'

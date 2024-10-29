@@ -31,6 +31,7 @@ export const VOTEBANK_SEED: string = 'votebank';
 export const PROPOSAL_SEED: string = 'proposal';
 export const VOTE_SEED: string = 'votes';
 export const DELEGATE_SEED: string = 'delegate';
+export const FEE_PAYER_SEED: string = 'fee_payer';
 export const VOTE_PROGRAM_ID: anchor.web3.PublicKey = new anchor.web3.PublicKey(
 	'mdVo394XANGMrVXZCVAaX3AMHYvtTxXwg1sQmDSY1W1'
 );
@@ -256,6 +257,16 @@ export function delegateAccountPda(
 ) {
 	return findProgramAddress(
 		[Buffer.from(DELEGATE_SEED), publicKey.toBuffer()],
+		programId
+	);
+}
+
+export function feePayerPda(
+	votebank: anchor.web3.PublicKey,
+	programId: anchor.web3.PublicKey = VOTE_PROGRAM_ID,
+) {
+	return findProgramAddress(
+		[Buffer.from(FEE_PAYER_SEED), votebank.toBuffer()],
 		programId
 	);
 }

@@ -218,7 +218,8 @@
 						proposalId,
 						[], //TODO: add settings if needed?
 						additionalAccountOffsets,
-						toBigNumber(endDateTimeStamp)
+						toBigNumber(endDateTimeStamp),
+						proposal.quorumRequirement
 					)
 					.accounts({
 						proposal: proposalAccount,

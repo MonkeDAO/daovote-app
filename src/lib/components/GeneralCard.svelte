@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { CardItem } from '$lib/types';
-	import CountDownCard from './CountDownCard.svelte';
-	import { bnToDate } from '$lib/utils/solana';
+	import ProposalProgress from './Proposal/ProposalProgress.svelte';
 	import { onMount } from 'svelte';
 	export let item: CardItem;
 	function truncateDescription(description: string) {
@@ -26,7 +25,15 @@
 		<div class="capsize card-content mb-2 flex items-center text-gray-800 dark:text-gray-200">
 			{truncateDescription(item.description)}
 		</div>
-		<CountDownCard targetDate={bnToDate(item.endtime)} displayLabel={false} />
+		<ProposalProgress 
+			proposal={{
+				endTime: item.endtime,
+				quorumThreshold: item.quorumThreshold ?? 0,
+				quorumMetTime: item.quorumMetTime ?? 0,
+				voterCount: item.voterCount ?? 0
+			}}
+			compact={true}
+		/>
 	</div>
 </a>
 

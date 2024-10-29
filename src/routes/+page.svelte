@@ -25,7 +25,10 @@
 			title: item.data.title,
 			description: item.data.summary,
 			url: `/votebank/${item.votebank}/proposal/${item.proposalId}`,
-			endtime: item.endTime
+			endtime: item.endTime,
+			quorumThreshold: item.quorumThreshold,
+			quorumMetTime: item.quorumMetTime,
+			voterCount: item.voterCount
 		};
 	}
 </script>
@@ -116,5 +119,4 @@
 			{/each}
 		</ul>
 	</section>
-	<Newsletter />
 </div>

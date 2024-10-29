@@ -71,6 +71,8 @@ export type ProposalItem = {
 	voteOpen: boolean;
 	proposalId: number;
 	endTime: beet.bignum;
+	quorumThreshold: number;
+	quorumMetTime: beet.bignum;
 };
 
 export type ProposalData = {
@@ -103,6 +105,9 @@ export type CardItem = {
 	description: string;
 	url: string;
 	endtime?: beet.bignum;
+	quorumThreshold?: number;
+	quorumMetTime?: beet.bignum;
+	voterCount: number;
 };
 
 export type NftMetadata = {

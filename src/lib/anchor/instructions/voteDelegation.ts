@@ -45,6 +45,7 @@ export const voteDelegationStruct = new beet.FixableBeetArgsStruct<
  * Accounts required by the _voteDelegation_ instruction
  *
  * @property [_writable_, **signer**] voter
+ * @property [_writable_] feePayer (optional)
  * @property [_writable_] votebank
  * @property [_writable_] proposal
  * @property [_writable_] votes
@@ -57,6 +58,7 @@ export const voteDelegationStruct = new beet.FixableBeetArgsStruct<
  */
 export type VoteDelegationInstructionAccounts = {
   voter: web3.PublicKey
+  feePayer?: web3.PublicKey
   votebank: web3.PublicKey
   proposal: web3.PublicKey
   votes: web3.PublicKey
@@ -73,6 +75,11 @@ export const voteDelegationInstructionDiscriminator = [
 
 /**
  * Creates a _VoteDelegation_ instruction.
+ *
+ * Optional accounts that are not provided will be omitted from the accounts
+ * array passed with the instruction.
+ * An optional account that is set cannot follow an optional account that is unset.
+ * Otherwise an Error is raised.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
@@ -96,42 +103,50 @@ export function createVoteDelegationInstruction(
       isWritable: true,
       isSigner: true,
     },
-    {
-      pubkey: accounts.votebank,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.proposal,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.votes,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nftVoteMint,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.delegateAccount,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.treasury,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
   ]
+
+  if (accounts.feePayer != null) {
+    keys.push({
+      pubkey: accounts.feePayer,
+      isWritable: true,
+      isSigner: false,
+    })
+  }
+  keys.push({
+    pubkey: accounts.votebank,
+    isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.proposal,
+    isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.votes,
+    isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.nftVoteMint,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.delegateAccount,
+    isWritable: false,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.treasury,
+    isWritable: true,
+    isSigner: false,
+  })
+  keys.push({
+    pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+    isWritable: false,
+    isSigner: false,
+  })
 
   if (accounts.anchorRemainingAccounts != null) {
     for (const acc of accounts.anchorRemainingAccounts) {

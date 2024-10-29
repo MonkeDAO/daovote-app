@@ -22,6 +22,7 @@
 	import { onMount } from 'svelte';
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import ProposalProgress from './ProposalProgress.svelte';
 
 	let isMobile = false;
 	onMount(() => {
@@ -205,6 +206,7 @@
 			proposalData.proposal?.endTime &&
 			!isDefaultDate(bnToDate(proposalData.proposal.endTime)) &&
 			proposalData.proposal?.voteOpen
+			&& proposalData.proposal?.quorumThreshold <= 0
 		) {
 			const endTime = bnToDate(proposalData.proposal.endTime);
 			const remainingTime = getRemainingTime(endTime);
@@ -346,8 +348,24 @@
 			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
 				{#if ended}
 					<div>Created On: {new Date(proposal?.data?.time * 1000).toLocaleDateString()}</div>
+				{:else if proposal.quorumThreshold > 0}
+					<ProposalProgress 
+						proposal={{
+							endTime: proposal.quorumMetTime,
+							quorumThreshold: proposal.quorumThreshold,
+							quorumMetTime: proposal.quorumMetTime,
+							voterCount: proposal.voterCount
+						}} 
+					/>
 				{:else}
-					<CountDownCard targetDate={bnToDate(proposal.endTime)} displayLabel={true} />
+					<ProposalProgress 
+						proposal={{
+							endTime: proposal.endTime,
+							quorumThreshold: proposal.quorumThreshold,
+							quorumMetTime: proposal.quorumMetTime,
+							voterCount: proposal.voterCount
+						}} 
+					/>
 				{/if}
 			</div>
 			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">

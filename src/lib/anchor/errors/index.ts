@@ -495,13 +495,36 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * NotProposalOwner: 'Cannot cancel proposal that is not the original creator'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class NotProposalOwnerError extends Error {
+  readonly code: number = 0x184a
+  readonly name: string = 'NotProposalOwner'
+  constructor() {
+    super('Cannot cancel proposal that is not the original creator')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, NotProposalOwnerError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x184a, () => new NotProposalOwnerError())
+createErrorFromNameLookup.set(
+  'NotProposalOwner',
+  () => new NotProposalOwnerError()
+)
+
+/**
  * NotVotebankOwner: 'Not a votebank owner'
  *
  * @category Errors
  * @category generated
  */
 export class NotVotebankOwnerError extends Error {
-  readonly code: number = 0x184a
+  readonly code: number = 0x184b
   readonly name: string = 'NotVotebankOwner'
   constructor() {
     super('Not a votebank owner')
@@ -511,7 +534,7 @@ export class NotVotebankOwnerError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x184a, () => new NotVotebankOwnerError())
+createErrorFromCodeLookup.set(0x184b, () => new NotVotebankOwnerError())
 createErrorFromNameLookup.set(
   'NotVotebankOwner',
   () => new NotVotebankOwnerError()
@@ -524,7 +547,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class OwnerAlreadyExistsError extends Error {
-  readonly code: number = 0x184b
+  readonly code: number = 0x184c
   readonly name: string = 'OwnerAlreadyExists'
   constructor() {
     super('Already owner of the votebank')
@@ -534,7 +557,7 @@ export class OwnerAlreadyExistsError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x184b, () => new OwnerAlreadyExistsError())
+createErrorFromCodeLookup.set(0x184c, () => new OwnerAlreadyExistsError())
 createErrorFromNameLookup.set(
   'OwnerAlreadyExists',
   () => new OwnerAlreadyExistsError()
@@ -547,7 +570,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class OwnerNotFoundError extends Error {
-  readonly code: number = 0x184c
+  readonly code: number = 0x184d
   readonly name: string = 'OwnerNotFound'
   constructor() {
     super('Owner on votebank does not exist')
@@ -557,7 +580,7 @@ export class OwnerNotFoundError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x184c, () => new OwnerNotFoundError())
+createErrorFromCodeLookup.set(0x184d, () => new OwnerNotFoundError())
 createErrorFromNameLookup.set('OwnerNotFound', () => new OwnerNotFoundError())
 
 /**
@@ -567,7 +590,7 @@ createErrorFromNameLookup.set('OwnerNotFound', () => new OwnerNotFoundError())
  * @category generated
  */
 export class LastOwnerCannotBeRemovedError extends Error {
-  readonly code: number = 0x184d
+  readonly code: number = 0x184e
   readonly name: string = 'LastOwnerCannotBeRemoved'
   constructor() {
     super('There needs to be at least one owner')
@@ -577,7 +600,7 @@ export class LastOwnerCannotBeRemovedError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x184d, () => new LastOwnerCannotBeRemovedError())
+createErrorFromCodeLookup.set(0x184e, () => new LastOwnerCannotBeRemovedError())
 createErrorFromNameLookup.set(
   'LastOwnerCannotBeRemoved',
   () => new LastOwnerCannotBeRemovedError()
@@ -590,7 +613,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class TooManyDelegateAddressesError extends Error {
-  readonly code: number = 0x184e
+  readonly code: number = 0x184f
   readonly name: string = 'TooManyDelegateAddresses'
   constructor() {
     super('You can only delegate 5 addresses')
@@ -600,7 +623,7 @@ export class TooManyDelegateAddressesError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x184e, () => new TooManyDelegateAddressesError())
+createErrorFromCodeLookup.set(0x184f, () => new TooManyDelegateAddressesError())
 createErrorFromNameLookup.set(
   'TooManyDelegateAddresses',
   () => new TooManyDelegateAddressesError()
@@ -613,7 +636,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class DelegateAddressNotFoundError extends Error {
-  readonly code: number = 0x184f
+  readonly code: number = 0x1850
   readonly name: string = 'DelegateAddressNotFound'
   constructor() {
     super('Signer not found in delegate addresses')
@@ -623,7 +646,7 @@ export class DelegateAddressNotFoundError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x184f, () => new DelegateAddressNotFoundError())
+createErrorFromCodeLookup.set(0x1850, () => new DelegateAddressNotFoundError())
 createErrorFromNameLookup.set(
   'DelegateAddressNotFound',
   () => new DelegateAddressNotFoundError()
@@ -636,7 +659,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class DuplicateDelegateAddressesError extends Error {
-  readonly code: number = 0x1850
+  readonly code: number = 0x1851
   readonly name: string = 'DuplicateDelegateAddresses'
   constructor() {
     super('Duplicate delegate addresses found')
@@ -647,7 +670,7 @@ export class DuplicateDelegateAddressesError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1850,
+  0x1851,
   () => new DuplicateDelegateAddressesError()
 )
 createErrorFromNameLookup.set(
@@ -662,7 +685,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class DelegateAddressAlreadySignedError extends Error {
-  readonly code: number = 0x1851
+  readonly code: number = 0x1852
   readonly name: string = 'DelegateAddressAlreadySigned'
   constructor() {
     super('Delegate address cannot be signed on creation')
@@ -673,7 +696,7 @@ export class DelegateAddressAlreadySignedError extends Error {
 }
 
 createErrorFromCodeLookup.set(
-  0x1851,
+  0x1852,
   () => new DelegateAddressAlreadySignedError()
 )
 createErrorFromNameLookup.set(
@@ -688,7 +711,7 @@ createErrorFromNameLookup.set(
  * @category generated
  */
 export class CannotAddSelfAsDelegateError extends Error {
-  readonly code: number = 0x1852
+  readonly code: number = 0x1853
   readonly name: string = 'CannotAddSelfAsDelegate'
   constructor() {
     super('Cannot add self as delegate')
@@ -698,10 +721,82 @@ export class CannotAddSelfAsDelegateError extends Error {
   }
 }
 
-createErrorFromCodeLookup.set(0x1852, () => new CannotAddSelfAsDelegateError())
+createErrorFromCodeLookup.set(0x1853, () => new CannotAddSelfAsDelegateError())
 createErrorFromNameLookup.set(
   'CannotAddSelfAsDelegate',
   () => new CannotAddSelfAsDelegateError()
+)
+
+/**
+ * VoteCountMustBeZero: 'Vote count must be zero'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class VoteCountMustBeZeroError extends Error {
+  readonly code: number = 0x1854
+  readonly name: string = 'VoteCountMustBeZero'
+  constructor() {
+    super('Vote count must be zero')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, VoteCountMustBeZeroError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1854, () => new VoteCountMustBeZeroError())
+createErrorFromNameLookup.set(
+  'VoteCountMustBeZero',
+  () => new VoteCountMustBeZeroError()
+)
+
+/**
+ * FeePayerAlreadyInitialized: 'Fee payer is already initialized'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class FeePayerAlreadyInitializedError extends Error {
+  readonly code: number = 0x1855
+  readonly name: string = 'FeePayerAlreadyInitialized'
+  constructor() {
+    super('Fee payer is already initialized')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, FeePayerAlreadyInitializedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(
+  0x1855,
+  () => new FeePayerAlreadyInitializedError()
+)
+createErrorFromNameLookup.set(
+  'FeePayerAlreadyInitialized',
+  () => new FeePayerAlreadyInitializedError()
+)
+
+/**
+ * FeePayerNotInitialized: 'Fee payer is not initialized'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class FeePayerNotInitializedError extends Error {
+  readonly code: number = 0x1856
+  readonly name: string = 'FeePayerNotInitialized'
+  constructor() {
+    super('Fee payer is not initialized')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, FeePayerNotInitializedError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1856, () => new FeePayerNotInitializedError())
+createErrorFromNameLookup.set(
+  'FeePayerNotInitialized',
+  () => new FeePayerNotInitializedError()
 )
 
 /**

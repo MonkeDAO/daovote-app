@@ -10,6 +10,7 @@
 	import LoadingOverlay from '../LoadingOverlay.svelte';
 	import { uploadRequestStore } from '$lib/stores/uploadRequestStore';
 	import { nftStore } from '$lib/stores/nftStore';
+	import { PUBLIC_COLLECTION_SIZE } from '$env/static/public';
 
 	const dispatch = createEventDispatcher();
 	let generatedFile: File;
@@ -26,6 +27,7 @@
 	let useEditor = false;
 	let options = [{ id: 0, name: '' }];
 	let maxOptions = 1;
+	let quorumRequirement = 0;
 	$: if ($walletStore?.wallet?.publicKey && $workSpace?.provider?.connection) {
 		connection = $workSpace.provider.connection;
 		wallet = $walletStore.wallet;
@@ -53,6 +55,7 @@
 		endDate = null;
 		options = [{ id: 0, name: '' }];
 		maxOptions = 1;
+		quorumRequirement = 0;
 	}
 	function isSelectedDateValid(selectedDate: Date): boolean {
 		// Create a new Date object representing the current date and time
@@ -102,9 +105,9 @@
 		const settings = {
 			[settingsType]: settingsValue
 		};
-
+		const quorumThreshold = quorumRequirement > 0 ? Math.ceil((quorumRequirement / 100) * Number(PUBLIC_COLLECTION_SIZE)) : 0;
 		dispatch('submit-event', {
-			proposal: { title, description, settings, options, maxOptions, endDate },
+			proposal: { title, description, settings, options, maxOptions, endDate, quorumRequirement: quorumThreshold },
 			skipUpload: skipFileUpload,
 			file: generatedFile
 		});
@@ -222,6 +225,30 @@
 						/>
 					</div>
 				{/if} -->
+				<div class="flex flex-col">
+					<div class="rounded-lg bg-gray-300 dark:bg-gray-700 overflow-hidden">
+						<div class="px-4 py-3 dark:bg-gray-800 dark:text-white">
+							Quorum Requirement (%)
+						</div>
+						<div class="flex items-center px-4 py-3">
+							<input
+								type="number"
+								bind:value={quorumRequirement}
+								min="0"
+								max="100"
+								placeholder="0"
+								class="w-full bg-gray-300 dark:bg-gray-700 dark:text-white text-2xl focus:outline-none"
+								required
+							/>
+							<span class="dark:text-white text-2xl">%</span>
+						</div>
+						{#if typeof PUBLIC_COLLECTION_SIZE !== 'undefined'}
+							<div class="px-4 py-2 dark:bg-gray-900 dark:text-gray-400 text-sm">
+								{Math.ceil((quorumRequirement / 100) * Number(PUBLIC_COLLECTION_SIZE))} out of {PUBLIC_COLLECTION_SIZE} votes required
+							</div>
+						{/if}
+					</div>
+				</div>
 				<div class="flex flex-col">
 					<label for="options" class="leading-loose">Options</label>
 					{#each options as option (option.id)}

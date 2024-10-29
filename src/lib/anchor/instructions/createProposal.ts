@@ -27,6 +27,7 @@ export type CreateProposalInstructionArgs = {
   settings: SettingsData[]
   additionalAccountOffsets: AdditionalAccountIndices[]
   endTime: beet.bignum
+  quorumThreshold: number
 }
 /**
  * @category Instructions
@@ -47,6 +48,7 @@ export const createProposalStruct = new beet.FixableBeetArgsStruct<
     ['settings', beet.array(settingsDataBeet)],
     ['additionalAccountOffsets', beet.array(additionalAccountIndicesBeet)],
     ['endTime', beet.i64],
+    ['quorumThreshold', beet.u32],
   ],
   'CreateProposalInstructionArgs'
 )

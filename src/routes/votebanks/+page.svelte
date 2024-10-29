@@ -5,6 +5,7 @@
 	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
 	import type { VoteBankItem } from '$lib/types';
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
+	import { BN } from '@project-serum/anchor';
 	export let data: any;
 	let connection: Connection;
 	let wallet: any;
@@ -25,7 +26,10 @@
 		return {
 			title: item.title,
 			description: item.description,
-			url: `/votebank/${item.votebank}`
+			url: `/votebank/${item.votebank}`,
+			quorumThreshold: 0,
+			quorumMetTime: new BN(0),
+			voterCount: 0,
 		};
 	}
 
