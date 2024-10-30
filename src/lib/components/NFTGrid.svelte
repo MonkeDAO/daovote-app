@@ -116,4 +116,10 @@
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
+	:global(.avatar.online:before) {
+        background-color: hsl(var(--p) / var(--tw-bg-opacity));
+    }
+	:global(.avatar.offline:before) {
+        background-color: hsl(var(--n));
+    }
 </style>
