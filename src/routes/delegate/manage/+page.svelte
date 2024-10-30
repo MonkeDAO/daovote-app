@@ -114,6 +114,9 @@
 	const processTransaction = async (
 		instruction: TransactionInstruction | TransactionInstruction[]
 	) => {
+		try {
+
+		
 		if (!data?.delegateAccountAddress) {
 			return;
 		}
@@ -162,6 +165,13 @@
 		message.set('Success!');
 		await sleep(2000);
 		reset();
+		}
+		catch(err) {
+			console.error('Error processing transaction:', err);
+		}
+		finally {
+			reset();
+		}
 	};
 
     let tooltipMessage = "Copy link to clipboard";
@@ -314,18 +324,18 @@
 			</div>
 			<div class="mx-auto overflow-x-auto">
                 {#if data.delegateAccount.accounts.length > 0}
-				<table class="table-md mx-auto table max-w-xl text-gray-600">
+				<table class="table-md mx-auto table max-w-xl">
 					<thead>
 						<tr>
-							<th class="bg-gray-200">Address</th>
-							<th class="bg-gray-200">Status</th>
+							<th class="bg-primary/100">Address</th>
+							<th class="bg-primary/100">Status</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each data.delegateAccount.accounts as account (account.address)}
 							<tr>
-								<td class="bg-gray-300">{account.address}</td>
-								<td class="bg-gray-300">
+								<td class="bg-primary/80">{account.address}</td>
+								<td class="bg-primary/80">
 									<div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
 										{#if account.signed}
 											<div class="badge-success badge">Signed</div>

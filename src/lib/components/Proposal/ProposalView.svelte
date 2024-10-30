@@ -336,16 +336,16 @@
 	class="votecontent prose mx-auto mb-5 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
 >
 	<h1
-		class="mb-8 text-3xl font-bold tracking-tight text-black dark:text-white md:text-center md:text-5xl"
+		class="mb-8 text-3xl font-bold tracking-tight text-base-content md:text-center md:text-5xl"
 	>
 		{proposal.data.title}
 	</h1>
-	<h3 class="tracking-tight text-gray-500 dark:text-white">
+	<h3 class="tracking-tight text-base-content">
 		Proposal ID {proposal.proposalId}: {proposal.data.summary}
 	</h3>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
-			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
+			<div class="flex flex-col items-start text-sm text-accent-content">
 				{#if ended}
 					<div>Created On: {new Date(proposal?.data?.time * 1000).toLocaleDateString()}</div>
 				{:else if proposal.quorumThreshold > 0}
@@ -368,7 +368,7 @@
 					/>
 				{/if}
 			</div>
-			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
+			<div class="flex items-start text-sm text-base-content/70">
 				Status:
 				{#if proposal.voteOpen}
 					<div class="badge-success badge ml-1">Open</div>

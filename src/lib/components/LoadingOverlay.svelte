@@ -10,7 +10,7 @@
 </script>
 
 <div
-	class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+	class="fixed inset-0 z-50 flex items-center justify-center bg-primary/60 bg-opacity-50"
 	class:hidden={!$loading}
 >
 	<div class="relative flex flex-col items-center rounded bg-white p-5 shadow-md dark:bg-gray-900">
@@ -26,7 +26,7 @@
 		>
 			<div class="h-9 w-9 rounded-full bg-white dark:bg-gray-900" />
 		</div>
-		<p class="text-gray-900 dark:text-gray-100">{$message}</p>
+		<p class="text-base-content">{$message}</p>
 		<!-- The current message -->
 	</div>
 </div>

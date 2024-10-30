@@ -188,54 +188,60 @@
 	const processTransaction = async (
 		instruction: TransactionInstruction | TransactionInstruction[]
 	) => {
-		if (!data?.delegateAccountAddress) {
-			return;
-		}
-		if (!isOwner) {
-			toast.push('You are not the owner of this delegate account');
-			return;
-		}
-		loadingStore.set(true);
-		//push if its just a TransactionInstruction type otherwise push the array to the tx
-		const tx = new web3.Transaction();
-		if (Array.isArray(instruction)) {
-			instruction.forEach((instr) => {
-				tx.add(instr);
-			});
-		} else {
-			tx.add(instruction);
-		}
-
-		tx.feePayer = currentUser;
-		tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-		message.set('Simulating transaction...');
-		const t = await connection.simulateTransaction(tx);
-		if (t.value.err) {
-			const messages = extractCustomCodes(t.value.err);
-			if (messages.length > 0) {
-				const msgString = messages.join(', ');
-				message.set(`Error: ${msgString}`);
-				setTimeout(() => {
-					reset();
-				}, 2000);
+		try {
+			if (!data?.delegateAccountAddress) {
 				return;
 			}
-		}
-		message.set('Waiting for signature...');
-		const signature = await $walletStore.sendTransaction(tx, connection);
-		const latestBlockhash = await connection.getLatestBlockhash();
+			if (!isOwner) {
+				toast.push('You are not the owner of this delegate account');
+				return;
+			}
+			loadingStore.set(true);
+			//push if its just a TransactionInstruction type otherwise push the array to the tx
+			const tx = new web3.Transaction();
+			if (Array.isArray(instruction)) {
+				instruction.forEach((instr) => {
+					tx.add(instr);
+				});
+			} else {
+				tx.add(instruction);
+			}
 
-		await connection.confirmTransaction(
-			{
-				signature: signature,
-				lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-				blockhash: latestBlockhash.blockhash
-			},
-			'confirmed'
-		);
-		message.set('Success!');
-		await sleep(2000);
-		reset();
+			tx.feePayer = currentUser;
+			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			message.set('Simulating transaction...');
+			const t = await connection.simulateTransaction(tx);
+			if (t.value.err) {
+				const messages = extractCustomCodes(t.value.err);
+				if (messages.length > 0) {
+					const msgString = messages.join(', ');
+					message.set(`Error: ${msgString}`);
+					setTimeout(() => {
+						reset();
+					}, 2000);
+					return;
+				}
+			}
+			message.set('Waiting for signature...');
+			const signature = await $walletStore.sendTransaction(tx, connection);
+			const latestBlockhash = await connection.getLatestBlockhash();
+
+			await connection.confirmTransaction(
+				{
+					signature: signature,
+					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+					blockhash: latestBlockhash.blockhash
+				},
+				'confirmed'
+			);
+			message.set('Success!');
+			await sleep(2000);
+			reset();
+		} catch (err) {
+			console.error('Error processing transaction:', err);
+		} finally {
+			reset();
+		}
 	};
 
 	const createDelegate = async () => {
@@ -350,7 +356,7 @@
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 	<div class="py-5">
-		<div class="mx-auto max-w-md text-gray-900 dark:text-gray-100">
+		<div class="mx-auto max-w-md text-base-content">
 			<h3 class="text-2xl font-bold leading-relaxed">What is delegation?</h3>
 			<p>
 				Delegation is a process by which you can give the voting power of your ledger or wallet with
@@ -370,15 +376,15 @@
 			</p>
 			<h3 class="mt-8 text-2xl font-bold leading-relaxed">How delegate?</h3>
 			<p>
-				Request delegation permissions using the wallet you intend to vote from by entering 
-				the wallet address with your monke into the form. You then use a special generated link 
-				to approve delegation for the voting wallet wallet using the wallet your monke is in. 
-				You can remove and replace the address at any time.
+				Request delegation permissions using the wallet you intend to vote from by entering the
+				wallet address with your monke into the form. You then use a special generated link to
+				approve delegation for the voting wallet wallet using the wallet your monke is in. You can
+				remove and replace the address at any time.
 			</p>
 			<h3 class="mt-8 text-2xl font-bold leading-relaxed">Which wallet do I use?</h3>
 			<p>
-				You should use the wallet you intend to vote from on this site (burner or hot wallet). 
-				Your monke wallet should only be used to approve delegation requests.
+				You should use the wallet you intend to vote from on this site (burner or hot wallet). Your
+				monke wallet should only be used to approve delegation requests.
 			</p>
 			<div class="mb-8 mt-8 flex hidden items-center justify-center md:block">
 				{#if $isDark}
@@ -469,7 +475,9 @@
 							<div class="mb-2">
 								<div class="alert alert-warning mb-4">
 									<Fa icon={faWarning} class="ml-1" />
-									<span>Delegation is still not complete. Please complete the remaining steps below.</span>
+									<span
+										>Delegation is still not complete. Please complete the remaining steps below.</span
+									>
 								</div>
 								<ul class="steps">
 									<li data-content="✓" class="step-primary step text-black">Address Added</li>
@@ -538,10 +546,10 @@
 		font-size: 16px;
 		cursor: pointer;
 		color: white;
-		background-color: #4e44ce;
+		background-color: bg-primary;
 	}
 	.btn-primary {
-		background-color: #4e44ce;
+		background-color: bg-primary;
 		color: white;
 		border-radius: 5px;
 		padding: 8px;

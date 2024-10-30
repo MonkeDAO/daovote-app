@@ -29,8 +29,8 @@
 
 <nav
 	class="relative mx-auto flex w-full max-w-2xl items-center justify-between border-gray-200
-	py-8 text-gray-900 dark:border-gray-700 bg-base-100
-	dark:text-gray-100 sm:pb-16"
+	py-8 text-base-content dark:border-gray-700 bg-base-100
+	sm:pb-16"
 >
 	<a href="#skip" class="skip-nav">Skip to content</a>
 	<MobileMenu />

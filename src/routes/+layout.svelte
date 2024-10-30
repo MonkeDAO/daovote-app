@@ -113,7 +113,7 @@
 		</div>
 	</div>
 	<div>
-		<p>Copyright © 2023 - All right reserved by MonkeDAO</p>
+		<p>Copyright © {new Date().getFullYear()} - All rights reserved by MonkeDAO</p>
 	</div>
 </footer>
 <!-- <footer class="mx-auto pb-8 flex w-full max-w-2xl flex-col items-start justify-center">

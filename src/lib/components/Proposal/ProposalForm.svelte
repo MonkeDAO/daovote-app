@@ -325,7 +325,7 @@
 					</button>
 					<button
 						type="submit"
-						class="flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-3 text-white focus:outline-none"
+						class="flex w-full items-center justify-center rounded-md bg-primary px-4 py-3 text-white"
 						>Submit</button
 					>
 				</div>
@@ -365,7 +365,7 @@
 		font-size: 16px;
 		cursor: pointer;
 		color: white;
-		background-color: #4e44ce;
+		background-color: bg-primary;
 	}
 	.date-picker-container {
 		/* --date-picker-background: #1b1e27;
