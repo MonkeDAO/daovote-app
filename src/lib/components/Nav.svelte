@@ -15,10 +15,12 @@
 	function toggleDarkMode() {
 		if ($isDark) {
 			document.documentElement.classList.remove('dark');
+			document.documentElement.setAttribute('data-theme', 'monkedao');
 			localStorage.theme = 'light';
 			isDark.set(false);
 		} else {
 			document.documentElement.classList.add('dark');
+			document.documentElement.setAttribute('data-theme', 'monkedao_dark');
 			localStorage.theme = 'dark';
 			isDark.set(true);
 		}
@@ -27,8 +29,8 @@
 
 <nav
 	class="relative mx-auto flex w-full max-w-2xl items-center justify-between border-gray-200
-	bg-gray-50 bg-opacity-60 py-8 text-gray-900 dark:border-gray-700 dark:bg-gray-900
-	dark:text-gray-100 sm:pb-16"
+	py-8 text-base-content dark:border-gray-700 bg-base-100
+	sm:pb-16"
 >
 	<a href="#skip" class="skip-nav">Skip to content</a>
 	<MobileMenu />

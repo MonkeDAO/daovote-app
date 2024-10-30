@@ -23,6 +23,7 @@
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import ProposalProgress from './ProposalProgress.svelte';
+	import { isDark } from '$lib/stores/darkModeStore';
 
 	let isMobile = false;
 	onMount(() => {
@@ -336,16 +337,16 @@
 	class="votecontent prose mx-auto mb-5 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
 >
 	<h1
-		class="mb-8 text-3xl font-bold tracking-tight text-black dark:text-white md:text-center md:text-5xl"
+		class="mb-8 text-3xl font-bold tracking-tight text-base-content md:text-center md:text-5xl"
 	>
 		{proposal.data.title}
 	</h1>
-	<h3 class="tracking-tight text-gray-500 dark:text-white">
+	<h3 class="tracking-tight text-base-content">
 		Proposal ID {proposal.proposalId}: {proposal.data.summary}
 	</h3>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
-			<div class="flex flex-col items-start text-sm text-gray-700 dark:text-gray-300">
+			<div class="flex flex-col items-start text-sm text-accent-content">
 				{#if ended}
 					<div>Created On: {new Date(proposal?.data?.time * 1000).toLocaleDateString()}</div>
 				{:else if proposal.quorumThreshold > 0}
@@ -368,7 +369,7 @@
 					/>
 				{/if}
 			</div>
-			<div class="flex items-start text-sm text-gray-600 dark:text-gray-400">
+			<div class="flex items-start text-sm text-base-content/70">
 				Status:
 				{#if proposal.voteOpen}
 					<div class="badge-success badge ml-1">Open</div>
@@ -422,9 +423,9 @@
 		<div
 			class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
 		>
-			<div class="flex items-center justify-between space-x-4 text-gray-900 dark:text-gray-100">
+			<div class="flex items-center justify-between space-x-4 text-base-content">
 				<p class="text-lg font-bold md:text-xl">Vote</p>
-				<p class="mx-0 my-0 text-sm text-gray-800 dark:text-gray-200">
+				<p class="mx-0 my-0 text-sm text-base-content/80">
 					Number of votes cast is <span class="font-bold">{proposal.voterCount}</span>
 				</p>
 			</div>
@@ -433,7 +434,7 @@
 					Please connect your wallet to vote.
 				</p>
 			{/if}
-			<p class="text-sm text-gray-800 dark:text-gray-200">
+			<p class="text-sm text-base-content">
 				You can vote for a maximum of {proposal.maxOptionsSelectable} out of {proposal.options
 					.length}
 			</p>
@@ -441,7 +442,7 @@
 				{#each options as option (option)}
 					<div class="form-control">
 						<label class="label" class:cursor-pointer={wallet} class:cursor-not-allowed={!wallet}>
-							<span class="label-text text-black dark:text-gray-200">{option.title}</span>
+							<span class="label-text text-base-content">{option.title}</span>
 							{#if proposalData.proposal?.maxOptionsSelectable === 1}
 								<input
 									type="radio"
@@ -464,7 +465,7 @@
 				{/each}
 			</div>
 			<button
-				class="btn-primary btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded bg-gray-100 px-4 pt-1 font-medium text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-100"
+				class="btn-primary btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center rounded px-4 pt-1 font-medium"
 				on:click={handleVote}
 				disabled={ended || !wallet}
 				>Vote
@@ -519,7 +520,7 @@
 
 			<div class="justify-between sm:flex">
 				<div>
-					<h5 class="text-xl font-bold text-slate-900 dark:text-white">
+					<h5 class="text-xl font-bold text-base-content">
 						This proposal ended on {getDate(proposalData.proposal?.endTime)}
 					</h5>
 					<!-- <p class="mt-1 text-xs font-medium text-slate-600">It was made by {own}</p> -->
@@ -528,19 +529,19 @@
 
 			<dl class="mt-6 flex">
 				<div class="flex flex-col-reverse">
-					<dt class="text-sm font-medium text-slate-600 dark:text-white">
+					<dt class="text-sm font-medium text-base-content">
 						{proposal.maxOptionsSelectable}
 					</dt>
-					<dd class="text-xs text-slate-500 dark:text-white">Options Selectable</dd>
+					<dd class="text-xs text-base-content/70">Options Selectable</dd>
 				</div>
 
 				<div class="ml-3 flex flex-col-reverse sm:ml-6">
-					<dt class="text-sm font-medium text-slate-600 dark:text-white">{proposal.voterCount}</dt>
-					<dd class="text-xs text-slate-500 dark:text-white">Number of Voters</dd>
+					<dt class="text-sm font-medium text-base-content">{proposal.voterCount}</dt>
+					<dd class="text-xs text-base-content/70">Number of Voters</dd>
 				</div>
 				<div class="ml-3 flex flex-col-reverse sm:ml-6">
-					<dt class="text-sm font-medium text-slate-600 dark:text-white">{totalVotes}</dt>
-					<dd class="text-xs text-slate-500 dark:text-white">Votes Cast</dd>
+					<dt class="text-sm font-medium text-base-content">{totalVotes}</dt>
+					<dd class="text-xs text-base-content/70">Votes Cast</dd>
 				</div>
 				<!-- <div class="ml-3 flex flex-col-reverse sm:ml-6">
 					<dt class="text-sm font-medium text-slate-600 dark:text-white">
@@ -552,19 +553,19 @@
 		</div>
 		{#if !isMobile}
 			<div
-				class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+				class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-700 sm:rounded sm:border-x"
 			>
 				<Bar {data} options={{ responsive: true }} />
 			</div>
 		{/if}
 		{#if sortedTitles && sortedVotes && sortedPercentages}
-			<div class="overflow-x-auto">
+			<div class="overflow-x-auto text-base-content">
 				<table class="table-xs">
 					<!-- head -->
 					<thead>
 						<tr>
-							<th>Option</th>
-							<th>Votes</th>
+							<th class="text-base-content/90">Option</th>
+							<th class="text-base-content/90">Votes</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -593,7 +594,7 @@
 						Close proposal
 						{#if ended}
 							<button
-								class="text-white text-white underline dark:text-gray-700"
+								class="text-white underline dark:text-gray-700"
 								on:click={closeProposal}
 								disabled={!isOwner || !proposal.voteOpen}>here</button
 							>

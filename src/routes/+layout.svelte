@@ -29,6 +29,8 @@
 	import { forcedConnection } from '$lib/drive';
 	import { PUBLIC_RPC_URL, PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { clusterApiUrl } from '@solana/web3.js';
+	import { onMount } from 'svelte';
+	import { isDark } from '$lib/stores/darkModeStore';
 	const localStorageKey = 'walletAdapter';
 	//TODO: Configurable or env variable
 	const endpoint = PUBLIC_SOLANA_NETWORK as WalletAdapterNetwork;
@@ -51,6 +53,11 @@
 	$: $walletStore.connected &&
 		$walletStore.publicKey &&
 		shdwBalanceStore.getShdwBalance($walletStore.publicKey, forcedConnection);
+
+	onMount(() => {
+		const theme = $isDark ? 'monkedao_dark' : 'monkedao';
+		document.documentElement.setAttribute('data-theme', theme);
+	});
 </script>
 
 <svelte:head />
@@ -58,22 +65,21 @@
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
 <AnchorConnectionProvider {network} {idl} />
 <SvelteToast {options} />
-<div class="flex flex-col justify-center bg-gray-50 px-4 dark:bg-gray-900 sm:px-8">
+<div class="flex flex-col justify-center bg-base-100 px-4 sm:px-8">
 	<Nav />
 </div>
-<main class="flex flex-col justify-center bg-gray-50 px-4 dark:bg-gray-900 sm:px-8">
+<main class="flex flex-col justify-center bg-base-100 px-4 sm:px-8">
 	<slot />
 </main>
-<footer class="footer footer-center rounded bg-gray-200 p-10 text-base-content dark:bg-gray-900">
+<footer class="footer footer-center bg-base-100 p-10 text-base-content">
 	<div class="grid grid-flow-col gap-4">
-		<a class="text-gray-500 transition hover:text-gray-300" href="/">Home</a>
-		<a class="text-gray-500 transition hover:text-gray-300" href="/about">About</a>
-		<!-- <a class="text-gray-500 transition hover:text-gray-300" href="/#newsletter">Newsletter</a> -->
+		<a class="link link-hover" href="/">Home</a>
+		<a class="link link-hover" href="/about">About</a>
 	</div>
 	<div>
 		<div class="grid grid-flow-col gap-4">
 			<a
-				class="text-gray-500 transition hover:text-gray-300"
+				class="link link-hover"
 				target="_blank"
 				rel="noopener noreferrer"
 				href={'https://twitter.com/intent/follow?screen_name=' + MY_TWITTER_HANDLE}
@@ -89,7 +95,7 @@
 				></a
 			>
 			<a
-				class="text-gray-500 transition hover:text-gray-300"
+				class="link link-hover"
 				target="_blank"
 				rel="noopener noreferrer"
 				href={REPO_URL}
@@ -107,7 +113,7 @@
 		</div>
 	</div>
 	<div>
-		<p>Copyright © 2023 - All right reserved by MonkeDAO</p>
+		<p>Copyright © {new Date().getFullYear()} - All rights reserved by MonkeDAO</p>
 	</div>
 </footer>
 <!-- <footer class="mx-auto pb-8 flex w-full max-w-2xl flex-col items-start justify-center">

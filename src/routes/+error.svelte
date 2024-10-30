@@ -22,22 +22,22 @@
 	<title>{title}</title>
 </svelte:head>
 
-<section class="container prose mx-auto py-12 dark:prose-invert">
-	<h1>{$page.status}: {title}</h1>
+<section class="prose container mx-auto py-12 text-base-content">
+	<h1 class="text-base-content">{$page.status}: {title}</h1>
 
 	{#if $page.status === 404}
-		<p class="">There is no post at the slug <code>{$page.url.pathname}</code>.</p>
+		<p class="text-base-content">There is no post at the slug <code class="bg-base-300">{$page.url.pathname}</code>.</p>
 		<p>
-			<a href={'/blog?filter=' + $page.url.pathname.slice(1)}
-				>Try searching for "{displayPathname($page.url.pathname.slice(1))}" here!</a
-			>
+			<a href={'/blog?filter=' + $page.url.pathname.slice(1)} class="link link-primary">
+				Try searching for "{displayPathname($page.url.pathname.slice(1))}" here!
+			</a>
 		</p>
-		<p class="">If you believe this was a bug, please let me know!</p>
+		<p class="text-base-content">If you believe this was a bug, please let me know!</p>
 	{:else}
-		<p class="font-mono">{message}</p>
+		<p class="font-mono text-base-content">{message}</p>
 	{/if}
 	{#if dev && $page.error.stack}
-		<pre class="mono overflow-scroll bg-gray-800 p-8">{$page.error.stack}</pre>
+		<pre class="mono overflow-scroll bg-base-300 p-8">{$page.error.stack}</pre>
 	{/if}
 </section>
 

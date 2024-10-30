@@ -8,6 +8,23 @@ module.exports = {
 	darkMode: 'class',
 	theme: {
 		extend: {
+			colors: {
+				brand: {
+					dark: '#184623',
+					DEFAULT: '#4A8F5D',
+					light: '#86C994'
+				},
+				secondary: {
+					dark: '#0033A1',
+					DEFAULT: '#2F8DCC',
+					light: '#90C6EA'
+				},
+				accent: {
+					white: '#FFFFFF',
+					light: '#F3EFCD',
+					DEFAULT: '#FFC919'
+				}
+			},
 			typography: (theme) => ({
 				DEFAULT: {
 					css: {
@@ -72,6 +89,57 @@ module.exports = {
 				}
 			})
 		}
+	},
+	daisyui: {
+		themes: [
+			{
+				monkedao: {
+					"primary": "#4A8F5D",
+					"primary-focus": "#184623",
+					"primary-content": "#FFFFFF",
+					
+					"secondary": "#2F8DCC",
+					"secondary-focus": "#0033A1",
+					"secondary-content": "#FFFFFF",
+					
+					"accent": "#FFC919",
+					"accent-focus": "#F3EFCD",
+					"accent-content": "#184623",
+					
+					"neutral": "#184623",
+					"neutral-focus": "#4A8F5D",
+					"neutral-content": "#F3EFCD",
+					
+					"base-100": "#FFFFFF",
+					"base-200": "#F3EFCD",
+					"base-300": "#86C994",
+					"base-content": "#184623",
+				},
+				monkedao_dark: {
+					"primary": "#4A8F5D",
+					"primary-focus": "#86C994",
+					"primary-content": "#F3EFCD",
+					
+					"secondary": "#2F8DCC",
+					"secondary-focus": "#90C6EA",
+					"secondary-content": "#F3EFCD",
+					
+					"accent": "#FFC919",
+					"accent-focus": "#F3EFCD",
+					"accent-content": "#184623",
+					
+					"neutral": "#F3EFCD",
+					"neutral-focus": "#FFFFFF",
+					"neutral-content": "#184623",
+					
+					"base-100": "#184623",
+					"base-200": "#4A8F5D",
+					"base-300": "#86C994",
+					"base-content": "#F3EFCD",
+				}
+			}
+		],
+		darkTheme: "monkedao_dark",
 	},
 	variants: {},
 	plugins: [require('@tailwindcss/typography'), require('daisyui')]
