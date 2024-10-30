@@ -68,11 +68,11 @@
 	</button>
 	{#if isOpen}
 		<ul
-			class="menu absolute flex flex-col bg-gray-50 text-2xl uppercase dark:bg-gray-900"
+			class="menu absolute flex flex-col text-2xl uppercase bg-base-100"
 			class:menuRendered={isMenuRendered}
 		>
 			<li
-				class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
+				class=""
 				style="transition-delay: 150ms;"
 			>
 				<a
@@ -84,7 +84,7 @@
 			{#if $walletStore?.connected && isOwner}
 				<li />
 				<li
-					class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
+					class=""
 					style="transition-delay: 350ms;"
 				>
 					<a
@@ -95,7 +95,7 @@
 				</li>
 			{/if}
 			<li
-				class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
+				class=""
 				style="transition-delay: 350ms;"
 			>
 				<a
@@ -105,7 +105,7 @@
 				>
 			</li>
 			<li
-				class="border-b border-gray-300 font-semibold text-gray-900 dark:border-gray-700 dark:text-gray-100"
+				class=""
 				style="transition-delay: 400ms;"
 			>
 				<a

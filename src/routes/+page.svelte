@@ -48,23 +48,23 @@
 </svelte:head>
 
 <div
-	class="mx-auto flex max-w-2xl flex-col items-start justify-center border-gray-200 px-4 pb-16 dark:border-gray-700 sm:px-8"
+	class="mx-auto flex max-w-2xl flex-col items-start justify-center border-base-300 px-4 pb-16 sm:px-8"
 >
 	<div class="flex flex-col-reverse items-start sm:flex-row">
 		<div class="flex flex-col pr-8">
-			<h1 class="mb-3 text-3xl font-bold tracking-tight text-black dark:text-white md:text-5xl">
+			<h1 class="mb-3 text-3xl font-bold tracking-tight text-base-content md:text-5xl">
 				This is
 
 				<span
-					class="relative ml-2 inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-green-800"
+					class="relative ml-2 inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-primary"
 				>
-					<span class="relative skew-y-3 text-yellow-50">{SITE_TITLE}</span>
+					<span class="relative skew-y-3 text-primary-content">{SITE_TITLE}</span>
 				</span>
 				!
 			</h1>
-			<h2 class="mb-4 text-gray-700 dark:text-gray-200">
+			<h2 class="mb-4 text-base-content/70">
 				An on-chain voting solution built by <span class="font-semibold">Degens.</span> Made for
-				<a class="text-green-800 dark:text-yellow-50" href="https://monkedao.io">MonkeDAO</a>.
+				<a class="link link-primary" href="https://monkedao.io">MonkeDAO</a>.
 			</h2>
 			<!-- <p class="mb-16 text-gray-600 dark:text-gray-400">
 				<a href={REPO_URL}>View source and feature list here!</a>
@@ -76,23 +76,25 @@
 	</div>
 
 	<section class="mb-16 w-full">
-		<h3 class="mb-6 text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl">
+		<h3 class="mb-6 text-2xl font-bold tracking-tight text-base-content md:text-4xl">
 			Open Proposals
 		</h3>
-		<div class="flex flex-col gap-6 md:flex-row">
+		<div class="flex flex-col gap-6">
 			{#if loading}
 				<div class="flex items-center justify-center">
-					<span class="loading loading-bars loading-lg text-info" />
+					<span class="loading loading-bars loading-lg text-primary" />
 				</div>
 			{:else if open_proposals.length > 0}
-				<div class="grid w-full grid-cols-1 place-items-center gap-4 sm:grid-cols-1 xl:grid-cols-2">
+				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 					{#each open_proposals as item (item)}
-						<GeneralCard item={mapItemToCardItem(item)} />
+						<div class="flex justify-center">
+							<GeneralCard item={mapItemToCardItem(item)} />
+						</div>
 					{/each}
 				</div>
 			{:else}
 				<div class="flex items-center justify-center">
-					<p class="text-gray-500">No open proposals</p>
+					<p class="text-base-content/60">No open proposals</p>
 				</div>
 			{/if}
 		</div>
@@ -100,21 +102,23 @@
 	<section class="mb-8 w-full">
 		<h3
 			id="latest"
-			class="mb-6 text-2xl font-bold tracking-tight text-black dark:text-white md:text-4xl"
+			class="mb-6 text-2xl font-bold tracking-tight text-base-content md:text-4xl"
 		>
 			Closed Proposals
 		</h3>
-		<ul class="space-y-2 text-white">
+		<ul class="space-y-2">
 			{#each closed_proposals as item (item)}
 				<li>
 					<a
-						class="font-bold"
+						class="link link-primary font-bold"
 						data-sveltekit-preload-data
-						href="/votebank/{item.votebank}/proposal/{item.proposalId}">{item.data.title}</a
+						href="/votebank/{item.votebank}/proposal/{item.proposalId}"
 					>
-					<span class="hidden text-xs text-black dark:text-gray-400 sm:inline"
-						>{item.endTime ? bnToDate(item.endTime)?.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)}</span
-					>
+						{item.data.title}
+					</a>
+					<span class="hidden text-xs text-base-content/70 sm:inline">
+						{item.endTime ? bnToDate(item.endTime)?.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)}
+					</span>
 				</li>
 			{/each}
 		</ul>

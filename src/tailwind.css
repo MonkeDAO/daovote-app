@@ -11,38 +11,20 @@
 }
 
 html {
-	@apply bg-white;
+	@apply bg-base-100;
 }
 
 html.dark {
-	@apply bg-gray-900;
+	@apply bg-base-100;
 }
 
 body {
 	min-height: 100vh;
 	margin: 0;
-	@apply bg-white;
-	/* 
-		CUSTOM SCROLLBARS! 
-		- https://css-tricks.com/strut-your-stuff-with-a-custom-scrollbar/
-		*/
-	/* --scrollbar-primary-color: #3730a3; */
-	--scrollbar-primary-color: #facc15;
-	--text-color: #ef4444;
-	overflow: scroll; /* https://maxschmitt.me/posts/react-prevent-layout-shift-body-scrollable/ */
-}
-/* .dark body {
-    --scrollbar-primary-color: #8db2e5;
-  } */
-/* body::-webkit-scrollbar-track {
-    background-color: var(--bg-color);
-  } */
-body::-webkit-scrollbar {
-	width: 0.5rem;
-}
-body::-webkit-scrollbar-thumb {
-	background: linear-gradient(var(--scrollbar-primary-color), var(--text-color));
-	border-radius: 4px;
+	@apply bg-base-100;
+	--scrollbar-primary-color: var(--p);
+	--text-color: var(--er);
+	overflow: scroll;
 }
 
 pre {
@@ -58,26 +40,28 @@ pre {
 @layer components {
 	body {
 		--brand-accent: #facc15;
-		/* https://ishadeed.com/article/defensive-css */
 		overflow-wrap: break-word;
 		overflow-y: auto;
 		scrollbar-gutter: stable;
 	}
-	/* .dark > body {
-    --brand-accent: #a16207;
-  } */
+
 	:root {
 		accent-color: var(--brand-accent);
 	}
+
 	:focus-visible {
 		outline-color: var(--brand-accent);
 	}
+
 	::selection {
-		background-color: var(--brand-accent);
+		background-color: var(--p);
+		color: var(--pc);
 	}
+
 	.dark ::selection {
-		color: #1d1d1d;
+		color: var(--bc);
 	}
+
 	::marker {
 		color: var(--brand-accent);
 	}
@@ -91,11 +75,11 @@ pre {
 		color: var(--brand-accent);
 	}
 
-	/* https://css-tricks.com/two-issues-styling-the-details-element-and-how-to-solve-them/ */
 	details {
 		border: 2px solid var(--brand-accent);
 		padding: 0.5rem 1rem;
 	}
+
 	details > summary {
 		cursor: pointer;
 	}
@@ -105,42 +89,30 @@ pre {
 	}
 
 	img {
-		/* https://ishadeed.com/article/defensive-css */
 		max-width: 100%;
 		object-fit: cover;
 		background-color: grey;
 	}
 }
-/* bg-yellow-200 dark:hover:bg-yellow-800 */
+
 a {
-	@apply text-yellow-700 hover:text-yellow-700 hover:underline dark:text-yellow-400 dark:hover:text-yellow-200;
+	@apply text-accent hover:text-primary-focus hover:underline;
 }
 
-/* for the super long github links i drop */
 article.prose a {
 	word-break: break-word;
 }
+
 article.prose h1 a,
 h2 a,
 h3 a,
 h4 a,
 h5 a,
 h6 a {
-	/* margin-left: 1rem; */
 	text-decoration: none !important;
-	@apply text-orange-700 dark:text-orange-400;
+	@apply text-primary dark:text-accent;
 }
-/* article.prose h2::before {
-	content: '## ';
-}
-article.prose h3::before {
-	content: '### ';
-}
-article.prose h4::before {
-	content: '#### ';
-} */
 
-/* https://seek-oss.github.io/capsize/ */
 .capsize::before {
 	content: '';
 	margin-bottom: -0.098em;

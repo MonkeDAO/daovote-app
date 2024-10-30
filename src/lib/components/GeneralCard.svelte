@@ -11,26 +11,26 @@
 </script>
 
 <a
-	class="card-wrapper h-full w-full transform rounded-xl bg-gradient-to-r from-purple-400 via-blue-500 to-green-200 p-1 transition-all hover:scale-[1.04] md:w-auto md:max-w-xs"
+	class="card-wrapper h-full w-full transform rounded-xl bg-gradient-to-r from-primary via-secondary to-accent p-1 transition-all hover:scale-[1.04] md:w-auto md:max-w-xs"
 	href={item.url}
 >
-	<div class="flex h-full flex-col justify-between rounded-lg bg-white p-4 dark:bg-gray-900">
+	<div class="flex h-full flex-col justify-between rounded-lg bg-base-100 p-4">
 		<div class="card-content flex flex-col justify-between md:flex-row">
 			<h4
-				class="card-content mb-2 w-full text-lg font-medium tracking-tight text-gray-900 dark:text-gray-100 sm:mb-5 md:text-lg"
+				class="card-content mb-2 w-full text-lg font-medium tracking-tight text-base-content sm:mb-5 md:text-lg"
 			>
 				{item.title}
 			</h4>
 		</div>
-		<div class="capsize card-content mb-2 flex items-center text-gray-800 dark:text-gray-200">
+		<div class="capsize card-content mb-2 flex items-center text-base-content/70">
 			{truncateDescription(item.description)}
 		</div>
 		<ProposalProgress 
 			proposal={{
 				endTime: item.endtime,
-				quorumThreshold: item.quorumThreshold ?? 0,
-				quorumMetTime: item.quorumMetTime ?? 0,
-				voterCount: item.voterCount ?? 0
+					quorumThreshold: item.quorumThreshold ?? 0,
+					quorumMetTime: item.quorumMetTime ?? 0,
+					voterCount: item.voterCount ?? 0
 			}}
 			compact={true}
 		/>
