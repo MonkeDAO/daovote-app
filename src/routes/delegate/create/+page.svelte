@@ -405,7 +405,7 @@
 			<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 				<h1 class="text-2xl font-semibold text-gray-900">Delegate Vote</h1>
 				<p class="italic text-gray-600">
-					Make sure you're connected with the wallet you want to vote on proposals with.
+					<strong>Connected wallet ({currentUser?.toString().slice(0,5)}...{currentUser?.toString().slice(-5)})</strong> will be used to vote with NFTs the address you enter below owns.
 				</p>
 				{#if data?.delegateAccountAddress}
 					<div class="alert alert-warning mt-4">
@@ -508,6 +508,11 @@
 				{:else}
 					<p class="text-gray-900">Delegation is enabled but no addresses added yet.</p>
 				{/if}
+			</div>
+		{:else if !isFetching && !currentUser}
+			<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
+				<h1 class="text-2xl font-semibold text-gray-900">Please Connect Wallet</h1>
+				<p class="mt-2 text-gray-600">Remember to connect the wallet you want to use on this site to vote with.</p>
 			</div>
 		{/if}
 	</div>
