@@ -18,6 +18,14 @@ html.dark {
 	@apply bg-base-100;
 }
 
+.wallet-adapter-button-trigger {
+    @apply bg-secondary hover:bg-secondary-focus text-secondary-content !important;
+}
+
+html.dark .wallet-adapter-button-trigger {
+    @apply bg-accent hover:bg-accent-focus text-accent-content !important;
+}
+
 body {
 	min-height: 100vh;
 	margin: 0;

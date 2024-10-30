@@ -23,6 +23,7 @@
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import ProposalProgress from './ProposalProgress.svelte';
+	import { isDark } from '$lib/stores/darkModeStore';
 
 	let isMobile = false;
 	onMount(() => {
@@ -552,19 +553,19 @@
 		</div>
 		{#if !isMobile}
 			<div
-				class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-800 sm:rounded sm:border-x"
+				class="my-4 w-full border-y border-blue-200 bg-blue-50 p-6 dark:border-gray-600 dark:bg-gray-700 sm:rounded sm:border-x"
 			>
 				<Bar {data} options={{ responsive: true }} />
 			</div>
 		{/if}
 		{#if sortedTitles && sortedVotes && sortedPercentages}
-			<div class="overflow-x-auto">
+			<div class="overflow-x-auto text-base-content">
 				<table class="table-xs">
 					<!-- head -->
 					<thead>
 						<tr>
-							<th>Option</th>
-							<th>Votes</th>
+							<th class="text-base-content/90">Option</th>
+							<th class="text-base-content/90">Votes</th>
 						</tr>
 					</thead>
 					<tbody>
