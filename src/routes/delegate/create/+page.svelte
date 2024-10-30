@@ -350,8 +350,8 @@
 
 <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 	<div class="py-5">
-		<div class="mx-auto max-w-md text-gray-900 dark:text-gray-100">
-			<h3 class="text-2xl font-bold leading-relaxed">What is delegation?</h3>
+		<div class="mx-auto max-w-md text-secondary-dark dark:text-accent">
+			<h3 class="text-2xl font-bold leading-relaxed text-brand-dark dark:text-accent-light">What is delegation?</h3>
 			<p>
 				Delegation is a process by which you can give the voting power of your ledger or wallet with
 				SMB Gen2 in it to a different wallet.
@@ -396,9 +396,9 @@
 		{:else if !isFetching && !delegateAddressPublickey && currentUser}
 			<!-- Render the "Create Delegate Account" view -->
 
-			<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
-				<h1 class="text-2xl font-semibold text-gray-900">Delegate Vote</h1>
-				<p class="italic text-gray-600">
+			<div class="mx-auto max-w-3xl overflow-hidden bg-accent-light p-6 shadow sm:rounded-lg dark:bg-brand-dark">
+				<h1 class="text-2xl font-semibold text-brand-dark dark:text-accent-light">Delegate Vote</h1>
+				<p class="italic text-secondary dark:text-accent">
 					Make sure you're connected with the wallet you want to vote on proposals with.
 				</p>
 				{#if data?.delegateAccountAddress}
@@ -537,12 +537,12 @@
 		border-radius: 5px;
 		font-size: 16px;
 		cursor: pointer;
-		color: white;
-		background-color: #4e44ce;
+		color: theme('colors.accent.white');
+		background-color: theme('colors.brand.DEFAULT');
 	}
 	.btn-primary {
-		background-color: #4e44ce;
-		color: white;
+		background-color: theme('colors.brand.DEFAULT');
+		color: theme('colors.accent.white');
 		border-radius: 5px;
 		padding: 8px;
 		font-size: 16px;
@@ -554,6 +554,6 @@
 		font-size: 14px;
 	}
 	.custom-input {
-		@apply bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500;
+		@apply bg-accent-light text-secondary-dark placeholder-secondary dark:bg-secondary-dark dark:text-accent-light dark:placeholder-accent;
 	}
 </style>

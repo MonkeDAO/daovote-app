@@ -25,12 +25,16 @@
 
 <input type="checkbox" id="{id}" class="modal-toggle" bind:this={modalInput} />
 <div class="modal">
-	<div class="modal-box bg-gray-100 dark:bg-gray-900">
-		<h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Confirmation</h3>
-		<p class="py-4 text-gray-900 dark:text-gray-100">{message}</p>
+	<div class="modal-box bg-accent-light">
+		<h3 class="font-bold text-lg text-brand-dark">Confirmation</h3>
+		<p class="py-4 text-secondary-dark">{message}</p>
 		<div class="modal-action">
-			<label for="{id}" class="btn-error btn">Cancel</label>
-			<button class="btn-primary btn" on:click={handleClick}>Confirm</button>
+			<button class="btn bg-brand text-accent-white hover:bg-brand-dark" on:click={handleClick}>
+				Confirm
+			</button>
+			<button class="btn bg-secondary text-accent-white hover:bg-secondary-dark" on:click={closeModal}>
+				Cancel
+			</button>
 		</div>
 	</div>
 </div>

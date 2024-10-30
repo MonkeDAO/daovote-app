@@ -35,7 +35,7 @@
 	});
 </script>
 
-<div class="capsize card-content flex items-center text-gray-800 dark:text-gray-200">
+<div class="capsize card-content flex items-center text-secondary-dark dark:text-accent-light">
 	<span title="Clock countdown">
 		{#if !ended}
 			<span class="text-m countdown font-mono">
@@ -46,19 +46,19 @@
 				<span style="--value:{seconds};" />
 			</span>
 		{:else}
-			<p class="text-sm font-semibold">Ended</p>
+			<p class="text-sm font-semibold text-secondary dark:text-accent">Ended</p>
 		{/if}
 	</span>
 </div>
 
 <style lang="postcss">
 	.countdown-container {
-		@apply text-center text-black dark:bg-gray-600;
+		@apply text-center text-secondary-dark dark:bg-brand-dark;
 	}
 	.countdown-item {
 		@apply flex flex-col items-center;
 	}
 	.timer-heading {
-		@apply mb-2 text-sm leading-none;
+		@apply mb-2 text-sm leading-none text-secondary-dark dark:text-accent-light;
 	}
 </style>

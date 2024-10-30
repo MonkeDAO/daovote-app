@@ -8,6 +8,27 @@ module.exports = {
 	darkMode: 'class',
 	theme: {
 		extend: {
+			fontFamily: {
+				space: ['"Space Grotesk"', 'sans-serif']
+			},
+			colors: {
+				// Add our brand colors while preserving existing color config
+				brand: {
+					dark: '#1B4B28',    // Slightly deeper, richer dark green
+					DEFAULT: '#4A8F5D', // Keeping main green
+					light: '#8ED39B',   // Slightly adjusted light green for better contrast
+				},
+				accent: {
+					DEFAULT: '#FFD23F', // Slightly warmer yellow
+					light: '#F5F1E0',   // Warmer ivory
+					white: '#FFFFFF',   // Keeping white
+				},
+				secondary: {
+					dark: '#1A4B8C',    // Softer dark blue that's easier on the eyes
+					DEFAULT: '#3B95D2', // Slightly adjusted blue
+					light: '#A5D4F1',   // Lighter blue with better contrast
+				}
+			},
 			typography: (theme) => ({
 				DEFAULT: {
 					css: {
@@ -26,47 +47,78 @@ module.exports = {
 							content: ''
 						},
 
-						'code::before': false,
-						'code::after': false,
+						'code::before': {
+							content: ''
+						},
+						'code::after': {
+							content: ''
+						},
 						code: {
-							'border-radius': '0.25rem',
-							padding: '0.15rem 0.3rem',
-							borderWidth: '2px',
-							borderColor: 'rgba(0,0,0,0.1)'
-						},
-						pre: {
-							'border-radius': '0rem'
-						},
-						'a:hover': {
-							color: '#31cdce !important',
-							textDecoration: 'underline !important'
+							color: 'var(--tw-prose-code)',
+							backgroundColor: '#f3f4f6',
+							borderRadius: '0.25rem',
+							paddingLeft: '0.375rem',
+							paddingRight: '0.375rem'
+						}
+					}
+				},
+				dark: {
+					css: {
+						color: theme('colors.gray.300'),
+						'[class~="lead"]': {
+							color: theme('colors.gray.300')
 						},
 						a: {
-							color: '#2071ad',
-							textDecoration: 'none'
+							color: theme('colors.yellow.500')
+						},
+						strong: {
+							color: theme('colors.gray.100')
+						},
+						'ol > li::before': {
+							color: theme('colors.gray.400')
+						},
+						'ul > li::before': {
+							backgroundColor: theme('colors.gray.600')
+						},
+						hr: {
+							borderColor: theme('colors.gray.200')
+						},
+						blockquote: {
+							color: theme('colors.gray.200'),
+							borderLeftColor: theme('colors.gray.600')
+						},
+						h1: {
+							color: theme('colors.gray.100')
+						},
+						h2: {
+							color: theme('colors.gray.100')
+						},
+						h3: {
+							color: theme('colors.gray.100')
+						},
+						h4: {
+							color: theme('colors.gray.100')
+						},
+						'figure figcaption': {
+							color: theme('colors.gray.400')
+						},
+						code: {
+							color: theme('colors.gray.100'),
+							backgroundColor: theme('colors.gray.800')
 						},
 						'a code': {
-							color: 'unset'
+							color: theme('colors.yellow.500')
 						},
-						table: {
-							overflow: 'hidden'
+						pre: {
+							color: theme('colors.gray.200'),
+							backgroundColor: theme('colors.gray.800')
 						},
-						'li, ul, ol': {
-							margin: 0
+						thead: {
+							color: theme('colors.gray.100'),
+							borderBottomColor: theme('colors.gray.600')
 						},
-						'li > img': {
-							margin: 0,
-							display: 'inline'
-						},
-						'ol > li::marker': {
-							color: 'var(--tw-prose-body)'
-						},
-						'ul > li::marker': {
-							color: 'var(--tw-prose-body)'
-						},
-						'ul > li > p': {
-							marginTop: 0,
-							marginBottom: 0
+						'tbody tr': {
+							borderBottomColor: theme('colors.gray.700')
 						}
 					}
 				}

@@ -150,8 +150,8 @@
 
 <LoadingOverlay />
 <div>
-	<div class="divide-y divide-gray-200">
-		<div class="relative space-y-4 py-8 text-base leading-6 text-gray-700 sm:text-lg sm:leading-7">
+	<div class="divide-y divide-gray-200 dark:divide-secondary-dark">
+		<div class="relative space-y-4 py-8 text-base leading-6 text-secondary dark:text-accent sm:text-lg sm:leading-7">
 			<form on:submit|preventDefault={submitForm} class="space-y-4">
 				<div class="flex flex-col">
 					<label for="title" class="leading-loose">Title</label>
@@ -159,7 +159,7 @@
 						type="text"
 						id="title"
 						bind:value={title}
-						class="custom-input max-ws-xs input-bordered input-primary input mt-1 w-full rounded"
+						class="custom-input max-ws-xs input-bordered input-primary input mt-1 w-full rounded bg-accent-light text-secondary-dark placeholder-secondary dark:bg-secondary-dark dark:text-accent-light dark:placeholder-accent"
 						placeholder=" Proposal Title"
 						required
 					/>
@@ -169,7 +169,7 @@
 					<textarea
 						id="description"
 						bind:value={description}
-						class="textarea-primary textarea mt-1 block h-24 w-full rounded bg-gray-200 placeholder-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500"
+						class="textarea-primary textarea mt-1 block h-24 w-full rounded bg-accent-light text-secondary-dark placeholder-secondary dark:bg-secondary-dark dark:text-accent-light dark:placeholder-accent"
 						rows="3"
 						placeholder=" This proposal is to vote on whether..."
 					/>
@@ -318,14 +318,14 @@
 				<div class="flex items-center space-x-4 pt-4">
 					<button
 						type="button"
-						class="flex w-full items-center justify-center rounded-md px-4 py-3 text-gray-900 focus:outline-none"
+						class="flex w-full items-center justify-center rounded-md bg-secondary px-4 py-3 text-accent-white hover:bg-secondary-dark focus:outline-none"
 						on:click={() => resetForm()}
 					>
 						Reset
 					</button>
 					<button
 						type="submit"
-						class="flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-3 text-white focus:outline-none"
+						class="flex w-full items-center justify-center rounded-md bg-brand px-4 py-3 text-accent-white hover:bg-brand-dark focus:outline-none"
 						>Submit</button
 					>
 				</div>
@@ -365,7 +365,7 @@
 		font-size: 16px;
 		cursor: pointer;
 		color: white;
-		background-color: #4e44ce;
+		background-color: theme('colors.brand.DEFAULT');
 	}
 	.date-picker-container {
 		/* --date-picker-background: #1b1e27;
@@ -373,6 +373,6 @@
 		--date-input-width: 100%;
 	}
 	.custom-input {
-		@apply bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500;
+		@apply bg-accent-light text-secondary-dark placeholder-secondary dark:bg-secondary-dark dark:text-accent-light dark:placeholder-accent;
 	}
 </style>

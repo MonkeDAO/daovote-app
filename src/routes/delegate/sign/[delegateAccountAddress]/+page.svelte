@@ -154,18 +154,17 @@
 
 <LoadingOverlay />
 <section class="container mx-auto px-6 py-7 sm:px-8 lg:px-10">
-	<div class="mx-auto max-w-3xl bg-white p-8 shadow sm:rounded-lg">
+	<div class="mx-auto max-w-3xl bg-accent-light p-8 shadow sm:rounded-lg dark:bg-brand-dark">
 		{#if !data || !data.delegateAccount}
 			<div class="mb-5">
-				<h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
-				<p class="text-sm text-gray-600">{$page.data?.error || 'No delegate account found.'}</p>
+				<h2 class="text-2xl font-semibold text-brand-dark dark:text-accent-light">Not Found</h2>
+				<p class="text-secondary dark:text-accent">{$page.data?.error || 'No delegate account found.'}</p>
 			</div>
 		{/if}
 		{#if data && data.delegateAccount}
 			<div class="mb-5">
-				<h2 class="mb-3 text-2xl font-semibold text-gray-900">Delegation</h2>
-				<div class="alert alert-warning mb-3">
-					<!-- <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1s" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> -->
+				<h2 class="mb-3 text-2xl font-semibold text-brand-dark dark:text-accent-light">Delegation</h2>
+				<div class="alert alert-warning mb-3 bg-accent text-secondary-dark dark:bg-secondary dark:text-accent-light">
 					<Fa icon={faBookmark} class="ml-1" />
 					<span>Bookmark this link to revoke access incase your hot wallet is compromised.</span>
 				</div>

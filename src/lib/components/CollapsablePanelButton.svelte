@@ -6,10 +6,10 @@
 
 <div class="flex w-full flex-col items-center">
 	<button
-		class="btn-primary btn w-1/4 justify-center"
+		class="btn bg-secondary hover:bg-secondary-dark text-accent-white w-full justify-between"
 		on:click={() => (contentVisible = !contentVisible)}
 	>
-		{expanded ? `${title.replace("View", "Hide")}` : title}
+		<slot />
 	</button>
 	{#if contentVisible}
 		<div class="p-4">

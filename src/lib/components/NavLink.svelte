@@ -5,7 +5,7 @@
 </script>
 
 <a
-	class="hidden rounded-lg p-1 text-gray-800 transition-all hover:bg-yellow-200 dark:text-gray-200 dark:hover:bg-yellow-800 sm:px-3 sm:py-2 md:inline-block"
+	class="hidden rounded-lg p-1 text-secondary-dark transition-all hover:bg-brand-light dark:text-accent-light dark:hover:bg-secondary-dark sm:px-3 sm:py-2 md:inline-block"
 	class:font-semibold={isActive}
 	{href}
 	><span class="capsize"><slot /> </span>

@@ -283,58 +283,51 @@
 
 <LoadingOverlay />
 <section class="container mx-auto px-6 py-7 sm:px-8 lg:px-10">
-	<div class="mx-auto max-w-3xl bg-white p-8 shadow sm:rounded-lg">
+	<div class="mx-auto max-w-3xl bg-accent-light p-8 shadow sm:rounded-lg dark:bg-brand-dark">
 		{#if !data || !data.delegateAccount}
-        <div class="mb-5">
-            <h2 class="text-2xl font-semibold text-gray-900">Not Found</h2>
-            <p class="text-gray-900">
-                No delegation account created for the connected wallet. 
-                <button 
-                    class="inline-flex items-center btn btn-outline btn-sm btn-info text-white px-2 py-1"
-                    on:click={() => location.href='/delegate/create'}>
-                    Create one!
-                </button>
-            </p>
-        </div>
-			{#if loading}
-				<div class="fixed inset-0 flex items-center justify-center">
-					<div
-						class="h-16 w-16 animate-spin rounded-full border-t-4 border-solid border-blue-500"
-					/>
-				</div>
-			{/if}
+			<div class="mb-5">
+				<h2 class="text-2xl font-semibold text-brand-dark dark:text-accent-light">Not Found</h2>
+				<p class="text-secondary dark:text-accent">
+					No delegation account created for the connected wallet.
+					<button 
+						class="btn bg-brand text-accent-white hover:bg-brand-dark px-2 py-1"
+						on:click={() => location.href='/delegate/create'}>
+						Create one!
+					</button>
+				</p>
+			</div>
 		{/if}
 		{#if data && data.delegateAccount}
 			<div class="mb-5">
-				<h2 class="text-2xl font-semibold text-gray-900">Owner: {owner}</h2>
-				<p class="text-sm text-gray-600">
+				<h2 class="text-2xl font-semibold text-brand-dark dark:text-accent-light">Owner: {owner}</h2>
+				<p class="text-secondary dark:text-accent">
 					The owner address will be allowed to vote with any of the addresses below that approved
 					delegation.
 				</p>
 			</div>
 			<div class="mx-auto overflow-x-auto">
                 {#if data.delegateAccount.accounts.length > 0}
-				<table class="table-md mx-auto table max-w-xl text-gray-600">
+				<table class="table-md mx-auto table max-w-xl">
 					<thead>
 						<tr>
-							<th class="bg-gray-200">Address</th>
-							<th class="bg-gray-200">Status</th>
+							<th class="bg-brand-light text-brand-dark dark:bg-secondary-dark dark:text-accent-light">Address</th>
+							<th class="bg-brand-light text-brand-dark dark:bg-secondary-dark dark:text-accent-light">Status</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each data.delegateAccount.accounts as account (account.address)}
 							<tr>
-								<td class="bg-gray-300">{account.address}</td>
-								<td class="bg-gray-300">
-									<div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+								<td class="bg-accent text-secondary-dark dark:bg-secondary dark:text-accent">{account.address}</td>
+								<td class="bg-accent text-secondary-dark dark:bg-secondary dark:text-accent">
+									<div class="flex items-center space-x-2">
 										{#if account.signed}
-											<div class="badge-success badge">Signed</div>
+											<div class="badge bg-brand text-accent-white">Signed</div>
 										{:else}
-											<div class="badge-error badge">Missing Signer</div>
+											<div class="badge bg-secondary text-accent-white">Missing Signer</div>
 										{/if}
 										<button
 											type="button"
-											class="btn-primary btn-square btn-sm btn"
+											class="btn-square btn-sm btn bg-brand text-accent-white hover:bg-brand-dark border-0"
 											on:click={() => removeAccountAddress(account.address)}
 										>
 											<Fa icon={faCancel} />
@@ -346,13 +339,13 @@
 					</tbody>
 				</table>
                 {:else}
-                    <p class="text-gray-900">Delegation is enabled but no addresses added yet.</p>
+                    <p class="text-secondary-dark dark:text-accent">Delegation is enabled but no addresses added yet.</p>
                 {/if}
 			</div>
 			{#if data && data.delegateAccount.accounts.length < 5}
 				<div class="flex h-full flex-col justify-between">
 					<div class="mt-5">
-						<label for="delegateAddresses" class="leading-loose text-gray-900"
+						<label for="delegateAddresses" class="leading-loose text-brand-dark dark:text-accent-light"
 							>Add delegate addresses</label
 						>
 						{#each delegateAddresses as delegateAddress (delegateAddress.id)}
@@ -360,16 +353,15 @@
 								<input
 									type="text"
 									bind:value={delegateAddress.address}
-									class="custom-input max-ws-xs input-primary input mt-1 block w-full rounded"
+									class="custom-input input mt-1 block w-full rounded border-0 focus:ring-2 focus:ring-brand"
 									placeholder=" Address"
 									required
 									on:keypress={(event) => handleKeyPress(event)}
 								/>
 								<button
 									type="button"
-									class="btn-primary btn-square btn-sm btn"
+									class="btn-square btn-sm btn bg-brand text-accent-white hover:bg-brand-dark border-0"
 									on:click={() => removeDelegateAddress(delegateAddress.id)}
-									style="padding: 4px;"
 								>
 									<Fa icon={faCancel} />
 								</button>
@@ -377,9 +369,8 @@
 						{/each}
 						<button
 							type="button"
-							class="btn-primary btn-square btn-sm btn mt-2"
+							class="btn-square btn-sm btn mt-2 bg-brand text-accent-white hover:bg-brand-dark border-0"
 							on:click={addDelegateAddress}
-							style="padding: 4px;"
 						>
 							<Fa icon={faAdd} />
 						</button>
@@ -387,7 +378,7 @@
 					<div class="flex justify-end space-x-2 mt-5">
                         <button
                             type="button"
-                            class="btn-primary btn-md btn py-2 text-gray-100 self-end"
+                            class="btn bg-brand text-accent-white hover:bg-brand-dark border-0"
                             disabled={delegateAddresses.length === 0 ||
                                 delegateAddresses.length > 5 ||
                                 delegateAddresses.some((address) => !isValidSolAddress(address.address))}
@@ -396,10 +387,9 @@
                             {delegateAddresses.length > 1 && delegateAddresses.every(x => x.address) ? `Add ${delegateAddresses.length} Accounts` : 'Add Account'}
                         </button>
     
-                        <!-- Share button to copy link to clipboard -->
                         <div class="tooltip" data-tip={tooltipMessage}>
                             <button
-                                class="btn-primary btn-md btn self-end"
+                                class="btn bg-secondary text-accent-white hover:bg-secondary-dark border-0"
                                 on:click={() => copyToClipboard()}
                             >
                                 <Fa class="mr-2" icon={faShare} />
@@ -415,6 +405,20 @@
 
 <style lang="postcss">
 	.custom-input {
-		@apply bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500;
+		@apply bg-accent-light text-secondary-dark placeholder-secondary dark:bg-secondary-dark dark:text-accent-light dark:placeholder-accent;
+		@apply border-0 focus:ring-2 focus:ring-brand dark:focus:ring-accent;
+		@apply input-bordered;
+	}
+
+	:global(.btn) {
+		@apply border-0;
+	}
+
+	:global(.input-bordered) {
+		@apply border-0;
+	}
+
+	:global(.btn-primary) {
+		@apply bg-brand text-accent-white hover:bg-brand-dark;
 	}
 </style>

@@ -4,24 +4,24 @@
 @tailwind utilities;
 
 :root {
-	--font-body: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+	--font-body: 'Space Grotesk', Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
 		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	--font-mono: 'Fira Mono', monospace;
 	font-family: var(--font-body);
 }
 
 html {
-	@apply bg-white;
+	@apply bg-accent-white;
 }
 
 html.dark {
-	@apply bg-gray-900;
+	@apply bg-brand-dark;
 }
 
 body {
 	min-height: 100vh;
 	margin: 0;
-	@apply bg-white;
+	@apply bg-accent-white dark:bg-brand-dark text-secondary-dark dark:text-accent-light;
 	/* 
 		CUSTOM SCROLLBARS! 
 		- https://css-tricks.com/strut-your-stuff-with-a-custom-scrollbar/
@@ -113,7 +113,7 @@ pre {
 }
 /* bg-yellow-200 dark:hover:bg-yellow-800 */
 a {
-	@apply text-yellow-700 hover:text-yellow-700 hover:underline dark:text-yellow-400 dark:hover:text-yellow-200;
+	@apply text-secondary hover:text-secondary-dark hover:underline dark:text-accent dark:hover:text-accent-light;
 }
 
 /* for the super long github links i drop */
@@ -128,7 +128,7 @@ h5 a,
 h6 a {
 	/* margin-left: 1rem; */
 	text-decoration: none !important;
-	@apply text-orange-700 dark:text-orange-400;
+	@apply text-secondary-dark dark:text-accent;
 }
 /* article.prose h2::before {
 	content: '## ';

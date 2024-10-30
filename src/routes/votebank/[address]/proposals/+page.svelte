@@ -31,15 +31,9 @@
 <div class="container mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
 	<div class="flex flex-col-reverse items-start sm:flex-row">
 		<div class="flex flex-col pr-8">
-			<h1 class="mb-3 text-3xl font-bold tracking-tight text-black dark:text-white md:text-5xl">
+			<h1 class="mb-3 text-3xl font-bold tracking-tight text-secondary-dark dark:text-accent-light md:text-5xl">
 				This is
-
-				<span
-					class="relative ml-2 inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-green-800"
-				>
-					<span class="relative skew-y-3 text-yellow-50">{SITE_TITLE}</span>
-				</span>
-				!
+				<span class="text-brand dark:text-accent">{SITE_TITLE}</span>
 			</h1>
 			<h2 class="mb-4 text-gray-700 dark:text-gray-200">
 				An on-chain voting solution built by <span class="font-semibold">Degens.</span> Made for
@@ -48,6 +42,24 @@
 			<!-- <p class="mb-16 text-gray-600 dark:text-gray-400">
 				<a href={REPO_URL}>View source and feature list here!</a>
 			</p> -->
+			<div class="mb-4 flex space-x-4">
+				<button
+					class="rounded-lg px-4 py-2 text-secondary-dark dark:text-accent-light"
+					class:bg-brand-light={currentTab === 'open'}
+					class:dark:bg-secondary-dark={currentTab === 'open'}
+					on:click={() => (currentTab = 'open')}
+				>
+					Open Proposals
+				</button>
+				<button
+					class="rounded-lg px-4 py-2 text-secondary-dark dark:text-accent-light"
+					class:bg-brand-light={currentTab === 'closed'}
+					class:dark:bg-secondary-dark={currentTab === 'closed'}
+					on:click={() => (currentTab = 'closed')}
+				>
+					Closed Proposals
+				</button>
+			</div>
 		</div>
 		<!-- <div
 				class="w-[80px] h-[80px] rounded-full sm:w-[176px] sm:h-[136px] relative mb-8 sm:mb-0 mr-auto bg-cyan-300 bg-opacity-25"
@@ -58,22 +70,6 @@
 	>
 		Proposals
 	</h3>
-	<div class="tabs mb-6 flex justify-center">
-		<button
-			class="tab-bordered tab px-1 sm:px-4"
-			class:active={currentTab === 'open' ? 'tab-active' : 'tab-disabled'}
-			on:click={() => (currentTab = 'open')}
-		>
-			Open
-		</button>
-		<button
-			class="tab-bordered tab px-1 sm:px-4"
-			class:active={currentTab === 'closed' ? 'tab-active' : 'tab-disabled'}
-			on:click={() => (currentTab = 'closed')}
-		>
-			Closed
-		</button>
-	</div>
 	<section class="mb-16 w-full">
 		{#if currentTab === 'open'}
 			{#if loading}
