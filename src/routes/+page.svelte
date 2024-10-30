@@ -63,8 +63,8 @@
 				!
 			</h1>
 			<h2 class="mb-4 text-base-content/70">
-				An on-chain voting solution built by <span class="font-semibold">Degens.</span> Made for
-				<a class="link link-primary" href="https://monkedao.io">MonkeDAO</a>.
+				An on-chain voting solution built by <span class="font-semibold">MonkeDAO.</span> Made for
+				<a class="link link-seconday hover:link-primary" href="https://monkedao.io">MonkeDAO</a>.
 			</h2>
 			<!-- <p class="mb-16 text-gray-600 dark:text-gray-400">
 				<a href={REPO_URL}>View source and feature list here!</a>
@@ -110,7 +110,7 @@
 			{#each closed_proposals as item (item)}
 				<li>
 					<a
-						class="link link-primary font-bold"
+						class="link dark:link-secondary-light link-secondary hover:link-primary font-bold"
 						data-sveltekit-preload-data
 						href="/votebank/{item.votebank}/proposal/{item.proposalId}"
 					>

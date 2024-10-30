@@ -25,6 +25,13 @@ body {
 	--scrollbar-primary-color: var(--p);
 	--text-color: var(--er);
 	overflow: scroll;
+	body::-webkit-scrollbar {
+		width: 0.5rem;
+	}
+	body::-webkit-scrollbar-thumb {
+		background: linear-gradient(to right, var(--p), var(--s), var(--a));
+		border-radius: 4px;
+	}
 }
 
 pre {
