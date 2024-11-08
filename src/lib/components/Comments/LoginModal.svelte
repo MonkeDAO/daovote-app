@@ -6,7 +6,7 @@
     import { toast } from '@zerodevx/svelte-toast';
     import type { IGunInstance, GunAck, GunUser } from '$lib/types/gun';
     import { signMessage } from '$lib/utils/wallet';
-    import { nftStore } from '$lib/stores/nftStore';
+    import { nftStore, nftSyncStore, nftWalletDisconnectListener } from '$lib/stores/nftStore';
 	import { PUBLIC_COLLECTION_ADDRESSES, PUBLIC_SOLANA_NETWORK, PUBLIC_VOTEBANK } from '$env/static/public';
 
     export let showModal = false;
@@ -24,17 +24,18 @@
 
     const USER_PATH = `1${PUBLIC_SOLANA_NETWORK}-${PUBLIC_COLLECTION_ADDRESSES}-${PUBLIC_VOTEBANK}-users`;
 
-    // Subscribe to nftStore changes
+    // Subscribe to both stores to handle wallet changes and disconnects
     $: {
+        $nftSyncStore; // Handle wallet changes
+        $nftWalletDisconnectListener; // Handle wallet disconnects
         nftLoading = $nftStore.isFetching;
-        console.log('NFT store state:', { 
-            isFetching: $nftStore.isFetching, 
-            nftsCount: $nftStore.data?.length 
-        });
     }
 
-    // Check for existing user when wallet connects or modal opens
-    $: if (showModal && $walletStore?.publicKey) {
+    // Update wallet check to handle disconnects
+    $: if (!$walletStore?.wallet?.connected) {
+        existingUserData = null;
+        alias = '';
+    } else if (showModal && $walletStore?.publicKey) {
         checkExistingWallet().then(user => {
             existingUserData = user;
             if (user?.alias) {
@@ -73,7 +74,8 @@
     }
 
     async function checkNftOwnership(): Promise<boolean> {
-        // Wait for NFTs to load if they're still loading
+        if (!$walletStore?.wallet?.connected) return false;
+        
         if (nftLoading) {
             toast.push('Please wait while we check your NFTs...');
             return false;
@@ -83,7 +85,7 @@
         if (!nfts) return false;
 
         return nfts.some(nft => 
-            nft.collection?.address === PUBLIC_COLLECTION_ADDRESSES // Replace with actual collection address
+            nft.collection?.address === PUBLIC_COLLECTION_ADDRESSES
         );
     }
 
