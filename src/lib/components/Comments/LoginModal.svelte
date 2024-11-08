@@ -6,10 +6,14 @@
     import { toast } from '@zerodevx/svelte-toast';
     import type { IGunInstance, GunAck, GunUser } from '$lib/types/gun';
     import { signMessage } from '$lib/utils/wallet';
+    import { nftStore } from '$lib/stores/nftStore';
+	import { PUBLIC_COLLECTION_ADDRESSES, PUBLIC_SOLANA_NETWORK, PUBLIC_VOTEBANK } from '$env/static/public';
 
     export let showModal = false;
     let alias = '';
     let loading = false;
+    let nftLoading = true;
+    let existingUserData: GunUser | null = null;
     
     const gun: IGunInstance = Gun({
         peers: [
@@ -18,7 +22,26 @@
         ]
     });
 
-    const USER_PATH = 'md-wallet-users';
+    const USER_PATH = `1${PUBLIC_SOLANA_NETWORK}-${PUBLIC_COLLECTION_ADDRESSES}-${PUBLIC_VOTEBANK}-users`;
+
+    // Subscribe to nftStore changes
+    $: {
+        nftLoading = $nftStore.isFetching;
+        console.log('NFT store state:', { 
+            isFetching: $nftStore.isFetching, 
+            nftsCount: $nftStore.data?.length 
+        });
+    }
+
+    // Check for existing user when wallet connects or modal opens
+    $: if (showModal && $walletStore?.publicKey) {
+        checkExistingWallet().then(user => {
+            existingUserData = user;
+            if (user?.alias) {
+                alias = user.alias;
+            }
+        });
+    }
 
     async function checkExistingWallet(): Promise<GunUser | null> {
         if (!$walletStore?.publicKey) return null;
@@ -46,6 +69,26 @@
     async function handleClose() {
         showModal = false;
         alias = '';
+        existingUserData = null;
+    }
+
+    async function checkNftOwnership(): Promise<boolean> {
+        // Wait for NFTs to load if they're still loading
+        if (nftLoading) {
+            toast.push('Please wait while we check your NFTs...');
+            return false;
+        }
+
+        const nfts = $nftStore.data;
+        if (!nfts) return false;
+
+        return nfts.some(nft => 
+            nft.collection?.address === PUBLIC_COLLECTION_ADDRESSES // Replace with actual collection address
+        );
+    }
+
+    function getSignatureMessage(alias: string): string {
+        return `Sign in to MonkeDAO Chat as ${alias}`;
     }
 
     async function handleLogin() {
@@ -58,6 +101,13 @@
         const walletAddress = $walletStore.publicKey.toString();
         
         try {
+            const hasNft = await checkNftOwnership();
+            if (!hasNft) {
+                toast.push('You need to own a MonkeDAO NFT to participate in chat');
+                loading = false;
+                return;
+            }
+
             const existingUser = await checkExistingWallet();
             console.log('Login check:', { existingUser });
             
@@ -67,7 +117,7 @@
                 return;
             }
 
-            const signature = await signMessage(`Login-${existingUser.alias}`);
+            const signature = await signMessage(getSignatureMessage(existingUser.alias));
             console.log('Login signature:', signature);
             
             const user = gun.user();
@@ -104,6 +154,14 @@
         const walletAddress = $walletStore.publicKey.toString();
 
         try {
+            // Check NFT ownership first
+            const hasNft = await checkNftOwnership();
+            if (!hasNft) {
+                toast.push('You need to own a MonkeDAO NFT to participate in chat');
+                loading = false;
+                return;
+            }
+
             const existingUser = await checkExistingWallet();
             console.log('Signup checks:', { existingUser });
             
@@ -120,7 +178,7 @@
                 return;
             }
 
-            const signature = await signMessage(`Signup-${alias}`);
+            const signature = await signMessage(getSignatureMessage(alias));
             console.log('Signup signature:', signature);
 
             const user = gun.user();
@@ -165,44 +223,84 @@
 
 <div class="modal" class:modal-open={showModal}>
     <div class="modal-box">
-        <h3 class="font-bold text-lg mb-4">Set Chat Alias</h3>
+        <h3 class="font-bold text-lg mb-4">
+            {#if existingUserData}
+                Welcome Back, {existingUserData.alias}
+            {:else}
+                Set Chat Alias
+            {/if}
+        </h3>
         
-        <div class="form-control gap-4">
-            <input
-                type="text"
-                placeholder="Alias"
-                class="input input-bordered"
-                bind:value={alias}
-                disabled={loading}
-            />
-            
-            <div class="flex gap-2">
-                <button 
-                    class="btn btn-primary flex-1" 
-                    on:click={handleLogin}
-                    disabled={!alias || loading}
-                >
-                    {#if loading}
-                        <span class="loading loading-spinner loading-sm"></span>
-                    {:else}
-                        Login
-                    {/if}
-                </button>
-                <button 
-                    class="btn flex-1"
-                    on:click={handleSignup}
-                    disabled={!alias || loading}
-                >
-                    {#if loading}
-                        <span class="loading loading-spinner loading-sm"></span>
-                    {:else}
-                        Sign Up
-                    {/if}
-                </button>
+        {#if nftLoading}
+            <div class="flex flex-col items-center justify-center p-4">
+                <span class="loading loading-spinner loading-lg"></span>
+                <p class="mt-2">Checking NFT ownership...</p>
             </div>
-        </div>
+        {:else}
+            <div class="form-control gap-4">
+                <input
+                    type="text"
+                    placeholder="Alias"
+                    class="input input-bordered"
+                    bind:value={alias}
+                    disabled={loading || !!existingUserData}
+                />
+                
+                <div class="flex gap-2">
+                    {#if existingUserData}
+                        <!-- Show only login when user exists -->
+                        <button 
+                            class="btn btn-primary flex-1" 
+                            on:click={handleLogin}
+                            disabled={!alias || loading || nftLoading}
+                        >
+                            {#if loading}
+                                <span class="loading loading-spinner loading-sm"></span>
+                            {:else}
+                                Login
+                            {/if}
+                        </button>
+                    {:else}
+                        <!-- Show both options for new users -->
+                        <button 
+                            class="btn btn-primary flex-1" 
+                            on:click={handleLogin}
+                            disabled={!alias || loading || nftLoading}
+                        >
+                            {#if loading}
+                                <span class="loading loading-spinner loading-sm"></span>
+                            {:else}
+                                Login
+                            {/if}
+                        </button>
+                        <button 
+                            class="btn flex-1"
+                            on:click={handleSignup}
+                            disabled={!alias || loading || nftLoading}
+                        >
+                            {#if loading}
+                                <span class="loading loading-spinner loading-sm"></span>
+                            {:else}
+                                Sign Up
+                            {/if}
+                        </button>
+                    {/if}
+                </div>
+            </div>
+        {/if}
 
         <div class="modal-action">
+            {#if existingUserData}
+                <button 
+                    class="btn btn-sm btn-ghost"
+                    on:click={() => {
+                        existingUserData = null;
+                        alias = '';
+                    }}
+                >
+                    Use Different Alias
+                </button>
+            {/if}
             <button class="btn btn-sm btn-ghost" on:click={handleClose}>Close</button>
         </div>
     </div>
