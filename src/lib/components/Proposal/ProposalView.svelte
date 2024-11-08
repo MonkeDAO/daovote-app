@@ -24,6 +24,7 @@
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import ProposalProgress from './ProposalProgress.svelte';
 	import { isDark } from '$lib/stores/darkModeStore';
+	import CommentSection from '../Comments/CommentSection.svelte';
 
 	let isMobile = false;
 	onMount(() => {
@@ -36,25 +37,25 @@
 		labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
 		datasets: [
 			{
-				label: '% of Votes',
-				data: [12, 19, 3, 5, 2, 3],
-				backgroundColor: [
-					'rgba(255, 134,159,0.4)',
-					'rgba(98,  182, 239,0.4)',
-					'rgba(255, 218, 128,0.4)',
-					'rgba(113, 205, 205,0.4)',
-					'rgba(170, 128, 252,0.4)',
-					'rgba(255, 177, 101,0.4)'
-				],
-				borderWidth: 2,
-				borderColor: [
-					'rgba(255, 134, 159, 1)',
-					'rgba(98,  182, 239, 1)',
-					'rgba(255, 218, 128, 1)',
-					'rgba(113, 205, 205, 1)',
-					'rgba(170, 128, 252, 1)',
-					'rgba(255, 177, 101, 1)'
-				]
+					label: '% of Votes',
+					data: [12, 19, 3, 5, 2, 3],
+					backgroundColor: [
+						'rgba(255, 134,159,0.4)',
+						'rgba(98,  182, 239,0.4)',
+						'rgba(255, 218, 128,0.4)',
+						'rgba(113, 205, 205,0.4)',
+						'rgba(170, 128, 252,0.4)',
+						'rgba(255, 177, 101,0.4)'
+					],
+					borderWidth: 2,
+					borderColor: [
+						'rgba(255, 134, 159, 1)',
+						'rgba(98,  182, 239, 1)',
+						'rgba(255, 218, 128, 1)',
+						'rgba(113, 205, 205, 1)',
+						'rgba(170, 128, 252, 1)',
+						'rgba(255, 177, 101, 1)'
+					]
 			}
 		]
 	};
@@ -608,7 +609,7 @@
 		{#if isProposalCreator}
 			<div>
 				<button
-					class="btn-error btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center justify-center rounded px-4 pt-1 font-medium text-gray-900 dark:text-gray-100"
+					class="btn-error btn right-1 top-1 mt-5 flex h-8 w-28 items-center justify-center rounded px-4 pt-1 font-medium text-gray-900 dark:text-gray-100"
 					on:click={cancelProposal}
 					disabled={!isProposalCreator}
 					>Cancel Proposal
@@ -617,6 +618,13 @@
 		{/if}
 	</article>
 {/if}
+
+<div class="mt-8">
+	<CommentSection 
+		proposalId={proposal.proposalId.toString()} 
+		votebankAddress={proposal.votebank} 
+	/>
+</div>
 
 <style lang="postcss">
 	/* https://ryanmulligan.dev/blog/layout-breakouts/ */
