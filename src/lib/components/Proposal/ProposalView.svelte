@@ -24,6 +24,7 @@
 	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
 	import ProposalProgress from './ProposalProgress.svelte';
 	import { isDark } from '$lib/stores/darkModeStore';
+	import { getProposalEndTime } from '$lib/utils/proposal';
 
 	let isMobile = false;
 	onMount(() => {
@@ -196,28 +197,17 @@
 		notSupported = true;
 	}
 	if (proposalData.proposal?.options) {
-		options = proposalData.proposal.options.map((option: any) => {
-			return {
-				id: option.id,
-				title: option.title,
-				checked: false
-			};
-		}).sort((a: any, b: any) => a.id - b.id);
-		if (
-			proposalData.proposal?.endTime &&
-			!isDefaultDate(bnToDate(proposalData.proposal.endTime)) &&
-			proposalData.proposal?.voteOpen
-			&& proposalData.proposal?.quorumThreshold <= 0
-		) {
-			const endTime = bnToDate(proposalData.proposal.endTime);
-			const remainingTime = getRemainingTime(endTime);
-			if (remainingTime.ended) {
-				ended = true;
-			}
+		options = proposalData.proposal.options.map((option: any) => ({
+			id: option.id,
+			title: option.title,
+			checked: false
+		})).sort((a: any, b: any) => a.id - b.id);
+
+		// Check if proposal has ended
+		if (!proposalData.proposal.voteOpen || 
+			getRemainingTime(getProposalEndTime(proposalData.proposal)).ended) {
+			ended = true;
 		}
-	}
-	if (!proposalData.proposal.voteOpen) {
-		ended = true;
 	}
 
 	function handleRadioChange(e: any, optionId: any) {
