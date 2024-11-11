@@ -119,15 +119,13 @@
 			sortedVotes = proposal.options
 				.sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0))
 				.map((option) => (option.voteCount ? option.voteCount : 0));
-			totalVotes = sortedVotes.reduce(
-				(accumulator, currentValue) => accumulator + currentValue,
-				0
-			);
+			totalVotes = sortedVotes.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 			if ($walletStore?.wallet?.publicKey) {
-				isProposalCreator =
-					proposal.poster === $walletStore?.wallet?.publicKey?.toBase58();
+				isProposalCreator = proposal.poster === $walletStore?.wallet?.publicKey?.toBase58();
 			}
-			sortedPercentages = sortedVotes.map((voteCount) => ((voteCount / totalVotes) * 100).toFixed(2));
+			sortedPercentages = sortedVotes.map((voteCount) =>
+				((voteCount / totalVotes) * 100).toFixed(2)
+			);
 			data = {
 				labels: sortedTitles,
 				datasets: [
@@ -197,28 +195,31 @@
 		notSupported = true;
 	}
 	if (proposalData.proposal?.options) {
-		options = proposalData.proposal.options.map((option: any) => ({
-			id: option.id,
-			title: option.title,
-			checked: false
-		})).sort((a: any, b: any) => a.id - b.id);
+		options = proposalData.proposal.options
+			.map((option: any) => ({
+				id: option.id,
+				title: option.title,
+				checked: false
+			}))
+			.sort((a: any, b: any) => a.id - b.id);
 
 		// Check if proposal has ended
-		if (!proposalData.proposal.voteOpen || 
-			getRemainingTime(getProposalEndTime(proposalData.proposal)).ended) {
+		if (
+			!proposalData.proposal.voteOpen ||
+			getRemainingTime(getProposalEndTime(proposalData.proposal)).ended
+		) {
 			ended = true;
 		}
 	}
 
 	function handleRadioChange(e: any, optionId: any) {
-  		options.forEach(op => {
-        	if (op.id === optionId) {
-            	op.checked = true;
-        	}
-			else {
-            	op.checked = false;
-        	}
-    	});
+		options.forEach((op) => {
+			if (op.id === optionId) {
+				op.checked = true;
+			} else {
+				op.checked = false;
+			}
+		});
 		options = options;
 	}
 
@@ -326,9 +327,7 @@
 <article
 	class="votecontent prose mx-auto mb-5 mt-16 w-full max-w-none items-start justify-center dark:prose-invert"
 >
-	<h1
-		class="mb-8 text-3xl font-bold tracking-tight text-base-content md:text-center md:text-5xl"
-	>
+	<h1 class="mb-8 text-3xl font-bold tracking-tight text-base-content md:text-center md:text-5xl">
 		{proposal.data.title}
 	</h1>
 	<h3 class="tracking-tight text-base-content">
@@ -340,31 +339,31 @@
 				{#if ended}
 					<div>Created On: {new Date(proposal?.data?.time * 1000).toLocaleDateString()}</div>
 				{:else if proposal.quorumThreshold > 0}
-					<ProposalProgress 
+					<ProposalProgress
 						proposal={{
 							endTime: proposal.quorumMetTime,
 							quorumThreshold: proposal.quorumThreshold,
 							quorumMetTime: proposal.quorumMetTime,
 							voterCount: proposal.voterCount
-						}} 
+						}}
 					/>
 				{:else}
-					<ProposalProgress 
+					<ProposalProgress
 						proposal={{
 							endTime: proposal.endTime,
 							quorumThreshold: proposal.quorumThreshold,
 							quorumMetTime: proposal.quorumMetTime,
 							voterCount: proposal.voterCount
-						}} 
+						}}
 					/>
 				{/if}
 			</div>
 			<div class="flex items-start text-sm text-base-content/70">
 				Status:
 				{#if proposal.voteOpen}
-					<div class="badge-success badge ml-1">Open</div>
+					<div class="badge badge-success ml-1">Open</div>
 				{:else}
-					<div class="badge-error badge ml-1">Closed</div>
+					<div class="badge badge-error ml-1">Closed</div>
 				{/if}
 			</div>
 		</div>
@@ -440,14 +439,14 @@
 									disabled={!wallet}
 									value={option.id}
 									on:change={(e) => handleRadioChange(e, option.id)}
-									class="radio radio-primary"
+									class="radio-primary radio"
 								/>
 							{:else}
 								<input
 									type="checkbox"
 									disabled={!wallet}
 									bind:checked={option.checked}
-									class="checkbox checkbox-primary"
+									class="checkbox-primary checkbox"
 								/>
 							{/if}
 						</label>
@@ -529,16 +528,24 @@
 					<dt class="text-sm font-medium text-base-content">{proposal.voterCount}</dt>
 					<dd class="text-xs text-base-content/70">Number of Voters</dd>
 				</div>
+
+				{#if proposal.quorumThreshold > 0}
+					<div class="ml-3 flex flex-col-reverse sm:ml-6">
+						<dt class="text-sm font-medium text-base-content">{proposal.quorumThreshold}</dt>
+						<dd class="text-xs text-base-content/70">Quorum Threshold</dd>
+					</div>
+					<div class="ml-3 flex flex-col-reverse sm:ml-6">
+						<dt class="text-sm font-medium text-base-content">
+							{((proposal.voterCount / proposal.quorumThreshold) * 100).toFixed(1)}%
+						</dt>
+						<dd class="text-xs text-base-content/70">Quorum Progress</dd>
+					</div>
+				{/if}
+
 				<div class="ml-3 flex flex-col-reverse sm:ml-6">
 					<dt class="text-sm font-medium text-base-content">{totalVotes}</dt>
 					<dd class="text-xs text-base-content/70">Votes Cast</dd>
 				</div>
-				<!-- <div class="ml-3 flex flex-col-reverse sm:ml-6">
-					<dt class="text-sm font-medium text-slate-600 dark:text-white">
-						{findWinningVoteOptions(proposal?.options)}
-					</dt>
-					<dd class="text-xs text-slate-500 dark:text-white">Winning Option(s)</dd>
-				</div> -->
 			</dl>
 		</div>
 		{#if !isMobile}
