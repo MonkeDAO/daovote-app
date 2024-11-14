@@ -331,8 +331,11 @@
 		{proposal.data.title}
 	</h1>
 	<h3 class="tracking-tight text-base-content">
-		Proposal ID {proposal.proposalId}: {proposal.data.summary}
+		<span class="font-semibold">Proposal ID {proposal.proposalId}</span>
 	</h3>
+	<div class="mt-2 mb-4 max-w-prose text-base leading-relaxed text-base-content/80">
+		{proposal.data.summary}
+	</div>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
 			<div class="flex flex-col items-start text-sm text-accent-content">
