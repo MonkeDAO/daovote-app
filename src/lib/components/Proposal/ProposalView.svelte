@@ -113,6 +113,7 @@
 	}
 	$: {
 		if (proposal) {
+			console.log('proposal summary', proposal.data.summary);
 			sortedTitles = proposal.options
 				.sort((a, b) => (b.voteCount || 0) - (a.voteCount || 0))
 				.map((option) => option.title);
@@ -334,7 +335,7 @@
 		<span class="font-semibold">Proposal ID {proposal.proposalId}</span>
 	</h3>
 	<div class="mt-2 mb-4 max-w-prose text-base leading-relaxed text-base-content/80">
-		{proposal.data.summary}
+		<div class="whitespace-pre-line font-normal">{proposal.data.summary}</div>
 	</div>
 	<div class="bg border-red mt-2 flex w-full sm:items-start md:flex-row md:items-center">
 		<div class="flex w-full items-start justify-between">
