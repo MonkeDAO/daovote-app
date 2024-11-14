@@ -236,6 +236,7 @@
 								bind:value={quorumRequirement}
 								min="0"
 								max="100"
+								step="0.01"
 								placeholder="0"
 								class="w-full bg-gray-300 dark:bg-gray-700 dark:text-white text-2xl focus:outline-none"
 								required
