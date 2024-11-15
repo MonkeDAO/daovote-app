@@ -35,11 +35,11 @@
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
 	import { goto } from '$app/navigation';
 	import Fa from 'svelte-fa';
-	import { faCopy, faWarning } from '@fortawesome/free-solid-svg-icons';
+	import { faCopy, faWarning, faCancel, faAdd } from '@fortawesome/free-solid-svg-icons';
 	import { isDark } from '$lib/stores/darkModeStore';
 	import ConfirmationModal from '$lib/components/ConfirmationModal.svelte';
 
-	let delegateAddress = '';
+	let delegateAddresses = [{ id: 0, address: '' }];
 	let delegateAddressPublickey: PublicKey | null;
 	let data: {
 		delegateAccount: DelegateAccount | null;
@@ -182,7 +182,6 @@
 		await processTransaction(ix);
 		await fetchData(currentUser);
 		delegateAddressPublickey = null;
-		delegateAddress = '';
 	};
 
 	const processTransaction = async (
@@ -245,29 +244,41 @@
 	};
 
 	const createDelegate = async () => {
-		if (!isValidSolAddress(delegateAddress)) return;
-		const mappedAddress = [
-			{
-				address: new PublicKey(delegateAddress),
-				signed: false
-			}
-		];
+		const validAddresses = delegateAddresses.filter((address) => 
+			isValidSolAddress(address.address)
+		);
+		
+		if (validAddresses.length === 0) {
+			toast.push('Please enter at least one valid address');
+			return;
+		}
+
+		const mappedAddresses = validAddresses.map((address) => ({
+			address: new PublicKey(address.address),
+			signed: false
+		}));
+
 		loadingStore.set(true);
 		loading = true;
 		let ix;
 		const [delegateAccountAddress, _] = delegateAccountPda(currentUser);
+
 		if (data?.delegateAccount) {
-			ix = createAddDelegateAddressInstruction(
-				{
-					delegateAccount: new web3.PublicKey(delegateAccountAddress),
-					signer: currentUser,
-					systemProgram: web3.SystemProgram.programId,
-					treasury: TREASURY_ADDRESS
-				},
-				{
-					address: new PublicKey(delegateAddress)
-				}
+			// Create array of instructions for multiple addresses
+			const instructions = mappedAddresses.map(addr => 
+				createAddDelegateAddressInstruction(
+					{
+						delegateAccount: new web3.PublicKey(delegateAccountAddress),
+						signer: currentUser,
+						systemProgram: web3.SystemProgram.programId,
+						treasury: TREASURY_ADDRESS
+					},
+					{
+						address: addr.address
+					}
+				)
 			);
+			ix = instructions;
 		} else {
 			ix = createCreateDelegateInstruction(
 				{
@@ -277,59 +288,23 @@
 					systemProgram: SYSTEM_PROGRAM_ID
 				},
 				{
-					delegateAddresses: mappedAddress
+					delegateAddresses: mappedAddresses
 				}
 			);
 		}
 
-		try {
-			const tx = new Transaction().add(ix);
-			tx.feePayer = currentUser;
-			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-			message.set('Simulating transaction...');
-			const t = await connection.simulateTransaction(tx);
-			if (t.value.err) {
-				const messages = extractCustomCodes(t.value.err);
-				if (messages.length > 0) {
-					const msgString = messages.join(', ');
-					message.set(`Error: ${msgString}`);
-					setTimeout(() => {
-						reset();
-					}, 2000);
-					return;
-				}
-			}
-			message.set('Waiting for signature...');
-			const signature = await $walletStore.sendTransaction(tx, connection);
-			const latestBlockhash = await connection.getLatestBlockhash();
-
-			await connection.confirmTransaction(
-				{
-					signature: signature,
-					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-					blockhash: latestBlockhash.blockhash
-				},
-				'confirmed'
-			);
-			reset();
-			currentUser = currentUser;
-			// goto('/delegate/create', { replaceState: true, invalidateAll: true });
-		} catch (e) {
-			console.log(e);
-			reset();
-		} finally {
-			loading = false;
-		}
+		await processTransaction(ix);
 	};
 	function handleKeyPress(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			event.preventDefault();
+			addDelegateAddress();
 		}
 	}
 	function confirmAddress() {
-		if (!isValidSolAddress(delegateAddress)) {
-			toast.push('Please enter a valid address');
-			return;
+		if (!isValidSolAddress(delegateAddresses[0].address)) {
+				toast.push('Please enter a valid address');
+				return;
 		}
 		confirmationModal.openModal();
 	}
@@ -341,15 +316,29 @@
 		loadingStore.set(false);
 		message.set('');
 	}
+
+	const addDelegateAddress = () => {
+		if (delegateAddresses.length < 5) {
+			const newAddressID = delegateAddresses.length;
+			delegateAddresses = [...delegateAddresses, { id: newAddressID, address: '' }];
+		} else {
+			toast.push('Maximum of 5 addresses reached');
+		}
+	};
+
+	const removeDelegateAddress = (addressID: number) => {
+		if (delegateAddresses.length === 1) {
+			return;
+		}
+		delegateAddresses = delegateAddresses.filter((address) => address.id !== addressID);
+	};
 </script>
 
 <LoadingOverlay />
 <ConfirmationModal
-	data={delegateAddress}
+	data={delegateAddresses[0].address}
 	bind:this={confirmationModal}
-	message="This will allow {trimAddress(
-		currentUser?.toBase58()
-	)} to vote on proposals with the voting power of {delegateAddress}. Are you sure you want to continue?"
+	message="This will allow {trimAddress(currentUser?.toBase58())} to vote on proposals with the voting power of {delegateAddresses[0].address}. Are you sure you want to continue?"
 	eventOnConfirm="confirm"
 	on:confirm={handleConfirm}
 />
@@ -415,19 +404,41 @@
 				{/if}
 				<div class="flex h-full flex-col justify-between">
 					<div class="mt-5">
-						<label for="delegateAddresses" class="leading-loose text-gray-900"
-							>Enter Wallet Address with SMB Gen2</label
-						>
-						<div class="mb-5 flex items-center space-x-2">
-							<input
-								type="text"
-								bind:value={delegateAddress}
-								class="custom-input max-ws-xs input-primary input mt-1 block w-full rounded"
-								placeholder=" Address"
-								required
-								on:keypress={(event) => handleKeyPress(event)}
-							/>
-						</div>
+						<label for="delegateAddresses" class="leading-loose text-gray-900">
+							Enter Wallet Addresses with SMB Gen2
+						</label>
+						{#each delegateAddresses as delegateAddress (delegateAddress.id)}
+							<div class="flex items-center space-x-2">
+								<input
+									type="text"
+									bind:value={delegateAddress.address}
+									class="custom-input max-ws-xs input-primary input mt-1 block w-full rounded"
+									placeholder="Address"
+									required
+									on:keypress={(event) => handleKeyPress(event)}
+								/>
+								{#if delegateAddresses.length > 1}
+									<button
+										type="button"
+										class="btn-primary btn-square btn-sm btn"
+										on:click={() => removeDelegateAddress(delegateAddress.id)}
+										style="padding: 4px;"
+									>
+										<Fa icon={faCancel} />
+									</button>
+								{/if}
+							</div>
+						{/each}
+						{#if delegateAddresses.length < 5}
+							<button
+								type="button"
+								class="btn-primary btn-square btn-sm btn mt-2"
+								on:click={addDelegateAddress}
+								style="padding: 4px;"
+							>
+								<Fa icon={faAdd} />
+							</button>
+						{/if}
 					</div>
 					<button class="btn-primary btn self-end text-gray-900" on:click={confirmAddress}
 						>{#if loading}<span class="loading loading-spinner" />{/if}Transfer Vote Power</button
@@ -459,31 +470,38 @@
 							This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
 						</p>
 						<div class="mb-2 flex">
-							{#if !data.delegateAccount.accounts[0].signed}
+							{#if data.delegateAccount.accounts.some(account => account.signed)}
+								<div class="flex items-center text-sm text-gray-600">
+									<span class="mr-1 inline-block h-4 w-4 rounded-full bg-green-500" />
+									<em class="italic">Active</em>
+									{#if data.delegateAccount.accounts.some(account => !account.signed)}
+										<span class="ml-2 text-amber-500">
+											(Some addresses still need to sign)
+										</span>
+									{/if}
+								</div>
+							{:else}
 								<div class="mr-6 flex items-center text-sm text-gray-600">
 									<span class="mr-1 inline-block h-4 w-4 rounded-full bg-red-500" />
 									<em class="italic">Not Active</em>
 								</div>
-							{:else}
-								<div class="flex items-center text-sm text-gray-600">
-									<span class="mr-1 inline-block h-4 w-4 rounded-full bg-green-500" />
-									<em class="italic">Active</em>
-								</div>
 							{/if}
 						</div>
-						{#if !data.delegateAccount.accounts[0].signed}
+						{#if data.delegateAccount.accounts.some(account => !account.signed)}
 							<div class="mb-2">
 								<div class="alert alert-warning mb-4">
 									<Fa icon={faWarning} class="ml-1" />
-									<span
-										>Delegation is still not complete. Please complete the remaining steps below.</span
-									>
+									<span>
+										Some delegate addresses still need to complete the signing process.
+									</span>
 								</div>
 								<ul class="steps">
-									<li data-content="✓" class="step-primary step text-black">Address Added</li>
+									<li data-content="✓" class="step-primary step text-black">
+										{data.delegateAccount.accounts.length > 1 ? 'Addresses' : 'Address'} Added
+									</li>
 									<li data-content="1" class="step text-black">Go to copied sign link</li>
 									<li data-content="2" class="step text-black">
-										Connect with {trimAddress(data.delegateAccount.accounts[0].address.toBase58())}
+										Connect with {#if data.delegateAccount.accounts.length > 1}each address{:else}{trimAddress(data.delegateAccount.accounts[0].address.toBase58())}{/if}
 									</li>
 									<li data-content="3" class="step text-black">Sign to enable vote power</li>
 								</ul>

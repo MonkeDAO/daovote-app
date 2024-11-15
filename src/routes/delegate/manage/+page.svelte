@@ -204,19 +204,17 @@
 		const validAddresses = delegateAddresses.filter((address) =>
 			isValidSolAddress(address.address)
 		);
-		const mappedAddresses = validAddresses.map((address) => {
-			return {
-				address: new PublicKey(address.address),
-				signed: false
-			};
-		});
-		//if mappedaddresses is empty, return
+		const mappedAddresses = validAddresses.map((address) => ({
+			address: new PublicKey(address.address),
+			signed: false
+		}));
+
 		if (mappedAddresses.length === 0) {
 			toast.push('No valid addresses');
 			return;
 		}
+
 		let transactionIxs: TransactionInstruction[] = [];
-		//foreach address, map to createAddDelegateAddressInstruction
 		delegateAddresses.map((dAddress) => {
 			if (data?.delegateAccountAddress && dAddress.address) {
 				return transactionIxs.push(
@@ -236,6 +234,7 @@
 		});
 		await processTransaction(transactionIxs);
 		await fetchData(currentUser);
+		delegateAddresses = [{ id: 0, address: '' }];
 	};
 
 	const removeAccountAddress = async (address: PublicKey) => {
@@ -338,10 +337,10 @@
 								<td class="bg-primary/80">
 									<div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
 										{#if account.signed}
-											<div class="badge-success badge">Signed</div>
-										{:else}
-											<div class="badge-error badge">Missing Signer</div>
-										{/if}
+    <div class="badge-success badge">Signed</div>
+{:else}
+    <div class="badge-error badge whitespace-nowrap">Missing Signer</div>
+{/if}
 										<button
 											type="button"
 											class="btn-primary btn-square btn-sm btn"

@@ -1,7 +1,10 @@
 import { PRIVATE_SALT } from '$env/static/private';
 import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 import type { RequestHandler } from '@sveltejs/kit';
-import crypto from 'crypto';
+
+const crypto = typeof window === 'undefined' 
+  ? await import('node:crypto') 
+  : await import('crypto-browserify');
 
 export const POST: RequestHandler = async (req) => {
     const { delegateAccountAddress } = await req.request.json();
