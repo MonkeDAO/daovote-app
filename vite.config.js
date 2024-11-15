@@ -15,7 +15,7 @@ const config = {
 			stream: 'rollup-plugin-node-polyfills/polyfills/stream',
 			events: 'rollup-plugin-node-polyfills/polyfills/events',
 			assert: 'assert',
-			//crypto: 'crypto-browserify',
+			crypto: 'crypto-browserify',
 			util: 'util/'
 		}
 	},

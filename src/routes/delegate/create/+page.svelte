@@ -263,37 +263,52 @@
 		let ix;
 		const [delegateAccountAddress, _] = delegateAccountPda(currentUser);
 
-		if (data?.delegateAccount) {
-			// Create array of instructions for multiple addresses
-			const instructions = mappedAddresses.map(addr => 
-				createAddDelegateAddressInstruction(
+		try {
+			if (data?.delegateAccount) {
+				// Create array of instructions for multiple addresses
+				const instructions = mappedAddresses.map(addr => 
+					createAddDelegateAddressInstruction(
+						{
+							delegateAccount: new web3.PublicKey(delegateAccountAddress),
+							signer: currentUser,
+							systemProgram: web3.SystemProgram.programId,
+							treasury: TREASURY_ADDRESS
+						},
+						{
+							address: addr.address
+						}
+					)
+				);
+				ix = instructions;
+			} else {
+				ix = createCreateDelegateInstruction(
 					{
-						delegateAccount: new web3.PublicKey(delegateAccountAddress),
-						signer: currentUser,
-						systemProgram: web3.SystemProgram.programId,
-						treasury: TREASURY_ADDRESS
+						delegate: delegateAccountAddress,
+						delegator: currentUser,
+						treasury: TREASURY_ADDRESS,
+						systemProgram: SYSTEM_PROGRAM_ID
 					},
 					{
-						address: addr.address
+						delegateAddresses: mappedAddresses
 					}
-				)
-			);
-			ix = instructions;
-		} else {
-			ix = createCreateDelegateInstruction(
-				{
-					delegate: delegateAccountAddress,
-					delegator: currentUser,
-					treasury: TREASURY_ADDRESS,
-					systemProgram: SYSTEM_PROGRAM_ID
-				},
-				{
-					delegateAddresses: mappedAddresses
-				}
-			);
-		}
+				);
+			}
 
-		await processTransaction(ix);
+			await processTransaction(ix);
+			// Reset form state
+			delegateAddresses = [{ id: 0, address: '' }];
+			loading = false;
+			// Refresh data
+			await fetchData(currentUser);
+			// Show success message
+			toast.push('Addresses added successfully!');
+		} catch (error) {
+			console.error('Error creating delegate:', error);
+			toast.push('Failed to add addresses. Please try again.');
+			loading = false;
+		} finally {
+			loadingStore.set(false);
+		}
 	};
 	function handleKeyPress(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
