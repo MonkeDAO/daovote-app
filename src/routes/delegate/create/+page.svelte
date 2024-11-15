@@ -35,7 +35,7 @@
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
 	import { goto } from '$app/navigation';
 	import Fa from 'svelte-fa';
-	import { faCopy, faWarning, faCancel, faAdd } from '@fortawesome/free-solid-svg-icons';
+	import { faCopy, faWarning, faCancel, faAdd, faGear } from '@fortawesome/free-solid-svg-icons';
 	import { isDark } from '$lib/stores/darkModeStore';
 	import ConfirmationModal from '$lib/components/ConfirmationModal.svelte';
 
@@ -59,6 +59,7 @@
 	let isOwnerSigned: boolean;
 	let isFetching = false;
 	let generatedLink = '';
+	let selectedAddressToRemove: PublicKey | null = null;
 
 	const walletConnectionFactory = walletProgramConnection(walletStore, workSpace);
 	$: {
@@ -165,8 +166,8 @@
 		delegateAddressPublickey = data.delegateAccount.accounts[0].address;
 	}
 
-	const removeAccountAddress = async () => {
-		if (!data?.delegateAccountAddress || !delegateAddressPublickey) {
+	const removeAccountAddress = async (addressToRemove: PublicKey) => {
+		if (!data?.delegateAccountAddress) {
 			return;
 		}
 		const ix = createRemoveDelegateAddressInstruction(
@@ -176,12 +177,11 @@
 				systemProgram: web3.SystemProgram.programId
 			},
 			{
-				address: delegateAddressPublickey
+				address: addressToRemove
 			}
 		);
 		await processTransaction(ix);
 		await fetchData(currentUser);
-		delegateAddressPublickey = null;
 	};
 
 	const processTransaction = async (
@@ -451,24 +451,34 @@
 				<h1 class="text-2xl font-semibold text-gray-900">Delegation Details</h1>
 				{#if data.delegateAccount.accounts.length > 0}
 					<div class="flex h-full flex-col justify-between">
-						<p class="text-md font-semibold” mt-5 text-gray-900">
-							Wallet with Voting Power: <em class="italic"
-								><span class="font-normal">{owner}</span></em
-							>
+						<p class="text-md font-semibold mt-5 text-gray-900">
+							Wallet with Voting Power: <em class="italic">
+								<span class="font-normal">{owner}</span>
+							</em>
 						</p>
 						<p class="text-sm text-gray-600">This is the address you can cast votes from.</p>
-						<p class="text-md mt-5 font-semibold text-gray-900">
-							Wallet with SMB Gen2 NFTs: <em class="italic"
-								><span
-									class="font-normal {data.delegateAccount.accounts[0].signed
-										? 'text-green-500'
-										: 'text-red-500'}">{data.delegateAccount.accounts[0].address}</span
-								></em
-							>
-						</p>
-						<p class="mb-4 text-sm text-gray-600">
-							This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
-						</p>
+						
+						<div class="mt-4">
+							<p class="text-md font-semibold text-gray-900 mb-2">Wallets with SMB Gen2 NFTs:</p>
+							{#each data.delegateAccount.accounts as account}
+								<div class="flex items-center justify-between mt-2">
+									<span class="font-normal {account.signed ? 'text-green-500' : 'text-red-500'}">
+										{account.address.toString()}
+									</span>
+									<button
+										class="btn-error btn-sm btn ml-2"
+										on:click={() => removeAccountAddress(account.address)}
+									>
+										<Fa icon={faCancel} />
+										Remove
+									</button>
+								</div>
+							{/each}
+							<p class="mt-2 text-sm text-gray-600">
+								These are the addresses with your SMB Gen2 NFTs (usually ledger or cold wallets).
+							</p>
+						</div>
+						
 						<div class="mb-2 flex">
 							{#if data.delegateAccount.accounts.some(account => account.signed)}
 								<div class="flex items-center text-sm text-gray-600">
@@ -508,19 +518,21 @@
 							</div>
 						{/if}
 						<div class="mt-5 flex items-end justify-end space-x-4">
-							{#if delegateAddressPublickey}
-								<button
-									class="btn-primary btn mt-5 self-end text-gray-900"
-									on:click={removeAccountAddress}
-									>{#if loading}<span class="loading loading-spinner" />{/if}Remove Delegation</button
-								>
-							{/if}
 							<div class="tooltip ml-2" data-tip={tooltipMessage}>
 								<button class="btn-primary btn-md btn self-end" on:click={() => copyToClipboard()}>
 									<Fa class="ml-2" icon={faCopy} />
 									Generate Sign Link
 								</button>
 							</div>
+							{#if data.delegateAccount.accounts.length > 0}
+								<button 
+									class="btn-secondary btn-md btn self-end"
+									on:click={() => goto('/delegate/manage')}
+								>
+									<Fa class="mr-2" icon={faAdd} />
+									Manage Addresses
+								</button>
+							{/if}
 						</div>
 					</div>
 				{:else}
