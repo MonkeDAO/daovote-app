@@ -19,22 +19,30 @@ export async function load() {
 
 async function getOpenProposals() {
     const cacheKey = `openProposals-${PUBLIC_VOTEBANK}`;
-    const cached = getCachedData(cacheKey);
-    if (cached) return cached;
+    try {
+        const cached = getCachedData(cacheKey);
+        if (cached) return cached;
 
-    const connection = getEnvNetwork();
-    const data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(PUBLIC_VOTEBANK));
-    if (data.openProposals && data.openProposals.length > 0) {
+        const connection = getEnvNetwork();
+        const data = await Votebank.fromAccountAddress(connection, new web3.PublicKey(PUBLIC_VOTEBANK));
+        
+        if (!data.openProposals) return [];
+        
         const proposals = await fetchProposals(
             connection,
             new PublicKey(PUBLIC_VOTEBANK),
             data.openProposals
         );
-		
-        setCachedData(cacheKey, proposals);
-        return proposals;
+        
+        if (proposals && proposals.length > 0) {
+            setCachedData(cacheKey, proposals);
+        }
+        
+        return proposals || [];
+    } catch (error) {
+        console.error('Error fetching open proposals:', error);
+        return [];
     }
-    return [];
 }
 
 async function getClosedProposals() {
