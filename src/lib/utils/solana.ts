@@ -25,6 +25,7 @@ import {
 import { errorFromCode } from '$lib/anchor/errors';
 import { PUBLIC_SOLANA_NETWORK, PUBLIC_RPC_URL } from '$env/static/public';
 import { convertToUTCDate } from './date';
+import { withRetry } from './retry';
 
 export const CREATOR_SEED: string = 'monkedevs';
 export const VOTEBANK_SEED: string = 'votebank';
@@ -104,24 +105,34 @@ export async function fetchProposalById(
 	votebank: PublicKey,
 	proposalId: number
 ): Promise<ProposalItem | null> {
-	try {
-		const [proposalAddress] = proposalAccountPda(votebank, proposalId);
-		const proposalAccount = await Proposal.fromAccountAddress(connection, proposalAddress);
-		const { data, poster, ...rest } = proposalAccount;
-		const decode = new TextDecoder();
-		const dataDecoded = decode.decode(data);
-		const obj = JSON.parse(dataDecoded);
-		const proposalItem: ProposalItem = {
-			votebank: votebank.toBase58(),
-			poster: poster.toBase58(),
-			data: obj,
-			...rest
-		};
-		return proposalItem;
-	} catch (err) {
-		console.log('fetchProposalById', err);
+	return withRetry(async () => {
+		try {
+			const [proposalAddress] = proposalAccountPda(votebank, proposalId);
+			const proposalAccount = await Proposal.fromAccountAddress(connection, proposalAddress);
+			const { data, poster, ...rest } = proposalAccount;
+			const decode = new TextDecoder();
+			const dataDecoded = decode.decode(data);
+			const obj = JSON.parse(dataDecoded);
+			const proposalItem: ProposalItem = {
+				votebank: votebank.toBase58(),
+				poster: poster.toBase58(),
+				data: obj,
+				...rest
+			};
+			return proposalItem;
+		} catch (err) {
+			console.log(`fetchProposalById failed for proposal ${proposalId}:`, err);
+			throw err; // Rethrow to trigger retry
+		}
+	}, {
+		maxAttempts: 3,
+		initialDelay: 1000,
+		maxDelay: 5000,
+		backoffFactor: 2
+	}).catch(err => {
+		console.error(`All retries failed for proposal ${proposalId}:`, err);
 		return null;
-	}
+	});
 }
 export async function fetchProposals(
 	connection: Connection,
