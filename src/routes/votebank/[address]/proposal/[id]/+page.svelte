@@ -36,6 +36,7 @@
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 	import { createCancelProposalInstruction } from '$lib/anchor/instructions';
 	import { goto } from '$app/navigation';
+	import { getProposalEndTime, isQuorumMet } from '$lib/utils/proposal';
 
 	export let data: any;
 	let nfts: NftMetadata[];
@@ -161,7 +162,7 @@
 		nfts: NftMetadata[]
 	): Promise<Transaction[]> {
 		const transactions: Transaction[] = [];
-		const endTime = bnToDate(proposalItem.endTime);
+		const endTime = isQuorumMet(proposalItem) ? getProposalEndTime(proposalItem) :bnToDate(proposalItem.endTime);
 		const remainingTime = getRemainingTime(endTime);
 		const totalSecondsRemaining = getRemainingSeconds(remainingTime);
 		if (totalSecondsRemaining < 30 && !ended) {
