@@ -39,8 +39,8 @@
 	import { isDark } from '$lib/stores/darkModeStore';
 	import ConfirmationModal from '$lib/components/ConfirmationModal.svelte';
 
-	let delegateAddress = '';
-	let delegateAddressPublickey: PublicKey | null;
+	let delegateAddresses: { id: number; address: string }[] = [{ id: 0, address: '' }];
+	let newDelegateAddress = ''; // For adding to existing account
 	let data: {
 		delegateAccount: DelegateAccount | null;
 		delegateAccountAddress: string | null;
@@ -119,6 +119,22 @@
 		}, 1500);
 	}
 
+	const addDelegateAddress = () => {
+		if (delegateAddresses.length < 5) {
+			const newAddressID = delegateAddresses.length;
+			delegateAddresses = [...delegateAddresses, { id: newAddressID, address: '' }];
+		} else {
+			toast.push('Maximum of 5 addresses reached');
+		}
+	};
+
+	const removeDelegateAddress = (addressID: number) => {
+		if (delegateAddresses.length === 1) {
+			return;
+		}
+		delegateAddresses = delegateAddresses.filter((address) => address.id !== addressID);
+	};
+
 	async function fetchData(currentUser: PublicKey) {
 		isFetching = true;
 		const connection = getEnvNetwork();
@@ -154,19 +170,18 @@
 		owner = data.delegateAccount.delegateOwner.toString();
 	}
 
-	$: if (
-		data &&
-		data.delegateAccount &&
-		data.delegateAccount.accounts &&
-		data.delegateAccount.accounts[0] &&
-		currentUser
-	) {
-		isOwnerSigned = data.delegateAccount.accounts[0].signed;
-		delegateAddressPublickey = data.delegateAccount.accounts[0].address;
+	// Check if any of the delegate addresses are signed
+	$: if (data && data.delegateAccount && data.delegateAccount.accounts && currentUser) {
+		isOwnerSigned = data.delegateAccount.accounts.some((account) => account.signed);
 	}
 
-	const removeAccountAddress = async () => {
-		if (!data?.delegateAccountAddress || !delegateAddressPublickey) {
+	// Calculate how many addresses can still be added (max 5)
+	$: existingAddressCount = data?.delegateAccount?.accounts?.length ?? 0;
+	$: canAddMoreAddresses = existingAddressCount < 5;
+	$: remainingSlots = 5 - existingAddressCount;
+
+	const removeAccountAddressByKey = async (addressToRemove: PublicKey) => {
+		if (!data?.delegateAccountAddress || !addressToRemove) {
 			return;
 		}
 		const ix = createRemoveDelegateAddressInstruction(
@@ -176,13 +191,11 @@
 				systemProgram: web3.SystemProgram.programId
 			},
 			{
-				address: delegateAddressPublickey
+				address: addressToRemove
 			}
 		);
 		await processTransaction(ix);
 		await fetchData(currentUser);
-		delegateAddressPublickey = null;
-		delegateAddress = '';
 	};
 
 	const processTransaction = async (
@@ -245,42 +258,32 @@
 	};
 
 	const createDelegate = async () => {
-		if (!isValidSolAddress(delegateAddress)) return;
-		const mappedAddress = [
-			{
-				address: new PublicKey(delegateAddress),
-				signed: false
-			}
-		];
+		// Filter valid addresses from the array
+		const validAddresses = delegateAddresses.filter((addr) => isValidSolAddress(addr.address));
+		if (validAddresses.length === 0) {
+			toast.push('No valid addresses');
+			return;
+		}
+
+		const mappedAddresses = validAddresses.map((addr) => ({
+			address: new PublicKey(addr.address),
+			signed: false
+		}));
+
 		loadingStore.set(true);
 		loading = true;
-		let ix;
 		const [delegateAccountAddress, _] = delegateAccountPda(currentUser);
-		if (data?.delegateAccount) {
-			ix = createAddDelegateAddressInstruction(
-				{
-					delegateAccount: new web3.PublicKey(delegateAccountAddress),
-					signer: currentUser,
-					systemProgram: web3.SystemProgram.programId,
-					treasury: TREASURY_ADDRESS
-				},
-				{
-					address: new PublicKey(delegateAddress)
-				}
-			);
-		} else {
-			ix = createCreateDelegateInstruction(
-				{
-					delegate: delegateAccountAddress,
-					delegator: currentUser,
-					treasury: TREASURY_ADDRESS,
-					systemProgram: SYSTEM_PROGRAM_ID
-				},
-				{
-					delegateAddresses: mappedAddress
-				}
-			);
-		}
+		const ix = createCreateDelegateInstruction(
+			{
+				delegate: delegateAccountAddress,
+				delegator: currentUser,
+				treasury: TREASURY_ADDRESS,
+				systemProgram: SYSTEM_PROGRAM_ID
+			},
+			{
+				delegateAddresses: mappedAddresses
+			}
+		);
 
 		try {
 			const tx = new Transaction().add(ix);
@@ -311,9 +314,83 @@
 				},
 				'confirmed'
 			);
+			message.set('Success!');
+			await sleep(2000);
 			reset();
-			currentUser = currentUser;
-			// goto('/delegate/create', { replaceState: true, invalidateAll: true });
+			// Reset the addresses array
+			delegateAddresses = [{ id: 0, address: '' }];
+			// Refresh the data
+			await fetchData(currentUser);
+		} catch (e) {
+			console.log(e);
+			reset();
+		} finally {
+			loading = false;
+		}
+	};
+
+	const addAddressToExistingAccount = async () => {
+		if (!isValidSolAddress(newDelegateAddress)) {
+			toast.push('Please enter a valid address');
+			return;
+		}
+		if (!data?.delegateAccountAddress) {
+			return;
+		}
+		if (!canAddMoreAddresses) {
+			toast.push('Maximum of 5 addresses reached');
+			return;
+		}
+
+		loadingStore.set(true);
+		loading = true;
+		const ix = createAddDelegateAddressInstruction(
+			{
+				delegateAccount: new web3.PublicKey(data.delegateAccountAddress),
+				signer: currentUser,
+				systemProgram: web3.SystemProgram.programId,
+				treasury: TREASURY_ADDRESS
+			},
+			{
+				address: new PublicKey(newDelegateAddress)
+			}
+		);
+
+		try {
+			const tx = new Transaction().add(ix);
+			tx.feePayer = currentUser;
+			tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+			message.set('Simulating transaction...');
+			const t = await connection.simulateTransaction(tx);
+			if (t.value.err) {
+				const messages = extractCustomCodes(t.value.err);
+				if (messages.length > 0) {
+					const msgString = messages.join(', ');
+					message.set(`Error: ${msgString}`);
+					setTimeout(() => {
+						reset();
+					}, 2000);
+					return;
+				}
+			}
+			message.set('Waiting for signature...');
+			const signature = await $walletStore.sendTransaction(tx, connection);
+			const latestBlockhash = await connection.getLatestBlockhash();
+
+			await connection.confirmTransaction(
+				{
+					signature: signature,
+					lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+					blockhash: latestBlockhash.blockhash
+				},
+				'confirmed'
+			);
+			message.set('Success!');
+			await sleep(2000);
+			reset();
+			newDelegateAddress = '';
+			// Refresh the data
+			await fetchData(currentUser);
 		} catch (e) {
 			console.log(e);
 			reset();
@@ -327,8 +404,9 @@
 		}
 	}
 	function confirmAddress() {
-		if (!isValidSolAddress(delegateAddress)) {
-			toast.push('Please enter a valid address');
+		const validAddresses = delegateAddresses.filter((addr) => isValidSolAddress(addr.address));
+		if (validAddresses.length === 0) {
+			toast.push('Please enter at least one valid address');
 			return;
 		}
 		confirmationModal.openModal();
@@ -345,11 +423,16 @@
 
 <LoadingOverlay />
 <ConfirmationModal
-	data={delegateAddress}
+	data={delegateAddresses
+		.filter((addr) => isValidSolAddress(addr.address))
+		.map((a) => a.address)
+		.join(', ')}
 	bind:this={confirmationModal}
 	message="This will allow {trimAddress(
 		currentUser?.toBase58()
-	)} to vote on proposals with the voting power of {delegateAddress}. Are you sure you want to continue?"
+	)} to vote on proposals with the voting power of {delegateAddresses.filter((addr) =>
+		isValidSolAddress(addr.address)
+	).length} address(es). Are you sure you want to continue?"
 	eventOnConfirm="confirm"
 	on:confirm={handleConfirm}
 />
@@ -399,120 +482,195 @@
 			<div class="fixed inset-0 flex items-center justify-center">
 				<div class="h-16 w-16 animate-spin rounded-full border-t-4 border-solid border-blue-500" />
 			</div>
-		{:else if !isFetching && !delegateAddressPublickey && currentUser}
+		{:else if !isFetching && (!data || !data.delegateAccount) && currentUser}
 			<!-- Render the "Create Delegate Account" view -->
 
 			<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 				<h1 class="text-2xl font-semibold text-gray-900">Delegate Vote</h1>
 				<p class="italic text-gray-600">
-					<strong>Connected wallet ({currentUser?.toString().slice(0,5)}...{currentUser?.toString().slice(-5)})</strong> will be used to vote with NFTs the address you enter below owns.
+					<strong
+						>Connected wallet ({currentUser?.toString().slice(0, 5)}...{currentUser
+							?.toString()
+							.slice(-5)})</strong
+					> will be used to vote with NFTs the addresses you enter below own.
 				</p>
-				{#if data?.delegateAccountAddress}
-					<div class="alert alert-warning mt-4">
-						<Fa icon={faWarning} class="ml-1" />
-						<span>Delegation is enabled but no addresses added yet. Add an address below.</span>
-					</div>
-				{/if}
 				<div class="flex h-full flex-col justify-between">
 					<div class="mt-5">
 						<label for="delegateAddresses" class="leading-loose text-gray-900"
-							>Enter Wallet Address with SMB Gen2</label
+							>Enter Wallet Addresses with SMB Gen2 (up to 5)</label
 						>
-						<div class="mb-5 flex items-center space-x-2">
-							<input
-								type="text"
-								bind:value={delegateAddress}
-								class="custom-input max-ws-xs input-primary input mt-1 block w-full rounded"
-								placeholder=" Address"
-								required
-								on:keypress={(event) => handleKeyPress(event)}
-							/>
-						</div>
+						{#each delegateAddresses as delegateAddress (delegateAddress.id)}
+							<div class="mb-2 flex items-center gap-2">
+								<input
+									type="text"
+									bind:value={delegateAddress.address}
+									class="custom-input input input-primary mt-1 block w-full rounded"
+									placeholder="Enter Delegate Address"
+									required
+									on:keypress={(event) => handleKeyPress(event)}
+								/>
+								{#if delegateAddresses.length > 1}
+									<button
+										type="button"
+										class="btn btn-ghost btn-sm mt-1 text-error hover:bg-error hover:text-white"
+										on:click={() => removeDelegateAddress(delegateAddress.id)}
+										title="Remove address"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											stroke-width="2"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+											/>
+										</svg>
+									</button>
+								{/if}
+							</div>
+						{/each}
+						{#if delegateAddresses.length < 5}
+							<button
+								type="button"
+								class="btn btn-outline btn-sm mt-2"
+								on:click={addDelegateAddress}
+							>
+								+ Add Another Address
+							</button>
+						{/if}
 					</div>
-					<button class="btn-primary btn self-end text-gray-900" on:click={confirmAddress}
-						>{#if loading}<span class="loading loading-spinner" />{/if}Transfer Vote Power</button
-					>
+					<div class="mt-5 flex justify-end">
+						<button class="btn btn-primary text-gray-900" on:click={confirmAddress}
+							>{#if loading}<span class="loading loading-spinner" />{/if}Transfer Vote Power</button
+						>
+					</div>
 				</div>
 			</div>
 		{:else if !isFetching && data && data.delegateAccount}
 			<!-- Render the "Manage Delegate Account" view -->
 			<div class="mx-auto mb-5 max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 				<h1 class="text-2xl font-semibold text-gray-900">Delegation Details</h1>
-				{#if data.delegateAccount.accounts.length > 0}
-					<div class="flex h-full flex-col justify-between">
-						<p class="text-md font-semibold” mt-5 text-gray-900">
-							Wallet with Voting Power: <em class="italic"
-								><span class="font-normal">{owner}</span></em
-							>
-						</p>
-						<p class="text-sm text-gray-600">This is the address you can cast votes from.</p>
-						<p class="text-md mt-5 font-semibold text-gray-900">
-							Wallet with SMB Gen2 NFTs: <em class="italic"
-								><span
-									class="font-normal {data.delegateAccount.accounts[0].signed
-										? 'text-green-500'
-										: 'text-red-500'}">{data.delegateAccount.accounts[0].address}</span
-								></em
-							>
-						</p>
-						<p class="mb-4 text-sm text-gray-600">
-							This is the address with your SMB Gen2 NFTs (usually a ledger or cold wallet).
-						</p>
-						<div class="mb-2 flex">
-							{#if !data.delegateAccount.accounts[0].signed}
-								<div class="mr-6 flex items-center text-sm text-gray-600">
-									<span class="mr-1 inline-block h-4 w-4 rounded-full bg-red-500" />
-									<em class="italic">Not Active</em>
-								</div>
-							{:else}
-								<div class="flex items-center text-sm text-gray-600">
-									<span class="mr-1 inline-block h-4 w-4 rounded-full bg-green-500" />
-									<em class="italic">Active</em>
-								</div>
-							{/if}
+				<div class="flex h-full flex-col justify-between">
+					<p class="text-md mt-3 font-semibold text-gray-900">
+						Wallet with Voting Power: <em class="italic"
+							><span class="font-normal">{owner}</span></em
+						>
+					</p>
+					<p class="text-sm text-gray-600">This is the address you can cast votes from.</p>
+
+					{#if data.delegateAccount.accounts.length > 0}
+						<div class="mt-5">
+							<p class="text-md mb-2 font-semibold text-gray-900">
+								Delegated Wallets ({data.delegateAccount.accounts.length}/5)
+							</p>
+							<p class="mb-3 text-sm text-gray-600">
+								These are the wallets with your SMB Gen2 NFTs (usually ledgers or cold wallets).
+							</p>
+							<div class="overflow-x-auto">
+								<table class="table table-md w-full text-gray-600">
+									<thead>
+										<tr>
+											<th class="bg-gray-200 text-gray-700">Address</th>
+											<th class="bg-gray-200 text-gray-700">Status</th>
+											<th class="bg-gray-200 text-gray-700">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each data.delegateAccount.accounts as account (account.address)}
+											<tr>
+												<td class="bg-gray-100 font-mono text-sm"
+													>{trimAddress(account.address.toBase58())}</td
+												>
+												<td class="bg-gray-100">
+													{#if account.signed}
+														<div class="badge badge-success">Active</div>
+													{:else}
+														<div class="badge badge-error">Pending</div>
+													{/if}
+												</td>
+												<td class="bg-gray-100">
+													<button
+														class="btn btn-error btn-xs"
+														on:click={() => removeAccountAddressByKey(account.address)}
+														disabled={loading}
+													>
+														Remove
+													</button>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
 						</div>
-						{#if !data.delegateAccount.accounts[0].signed}
-							<div class="mb-2">
+
+						<!-- Show warning if any addresses are not signed -->
+						{#if data.delegateAccount.accounts.some((account) => !account.signed)}
+							<div class="mt-4">
 								<div class="alert alert-warning mb-4">
 									<Fa icon={faWarning} class="ml-1" />
-									<span
-										>Delegation is still not complete. Please complete the remaining steps below.</span
-									>
+									<span>Some addresses still need to sign. Use the sign link below.</span>
 								</div>
-								<ul class="steps">
-									<li data-content="✓" class="step-primary step text-black">Address Added</li>
-									<li data-content="1" class="step text-black">Go to copied sign link</li>
-									<li data-content="2" class="step text-black">
-										Connect with {trimAddress(data.delegateAccount.accounts[0].address.toBase58())}
-									</li>
+								<ul class="steps steps-vertical lg:steps-horizontal">
+									<li data-content="✓" class="step step-primary text-black">Address Added</li>
+									<li data-content="1" class="step text-black">Copy sign link</li>
+									<li data-content="2" class="step text-black">Connect with pending wallet</li>
 									<li data-content="3" class="step text-black">Sign to enable vote power</li>
 								</ul>
 							</div>
 						{/if}
-						<div class="mt-5 flex items-end justify-end space-x-4">
-							{#if delegateAddressPublickey}
+					{:else}
+						<p class="mt-4 text-gray-900">No addresses added yet.</p>
+					{/if}
+
+					<!-- Add more addresses section -->
+					{#if canAddMoreAddresses}
+						<div class="mt-6 rounded-lg border border-gray-200 p-4">
+							<p class="text-md mb-2 font-semibold text-gray-900">Add Another Address</p>
+							<p class="mb-3 text-sm text-gray-600">
+								You can add up to {remainingSlots} more address{remainingSlots > 1 ? 'es' : ''}.
+							</p>
+							<div class="flex items-center space-x-2">
+								<input
+									type="text"
+									bind:value={newDelegateAddress}
+									class="custom-input input input-primary block w-full rounded"
+									placeholder="Enter Delegate Address"
+									on:keypress={(event) => handleKeyPress(event)}
+								/>
 								<button
-									class="btn-primary btn mt-5 self-end text-gray-900"
-									on:click={removeAccountAddress}
-									>{#if loading}<span class="loading loading-spinner" />{/if}Remove Delegation</button
+									class="btn btn-primary btn-sm"
+									on:click={addAddressToExistingAccount}
+									disabled={loading}
 								>
-							{/if}
-							<div class="tooltip ml-2" data-tip={tooltipMessage}>
-								<button class="btn-primary btn-md btn self-end" on:click={() => copyToClipboard()}>
-									<Fa class="ml-2" icon={faCopy} />
-									Generate Sign Link
+									{#if loading}<span class="loading loading-spinner loading-xs" />{/if}
+									Add
 								</button>
 							</div>
 						</div>
+					{/if}
+
+					<div class="mt-5 flex items-end justify-end space-x-4">
+						<div class="tooltip" data-tip={tooltipMessage}>
+							<button class="btn btn-primary btn-md" on:click={() => copyToClipboard()}>
+								<Fa class="mr-2" icon={faCopy} />
+								Copy Sign Link
+							</button>
+						</div>
 					</div>
-				{:else}
-					<p class="text-gray-900">Delegation is enabled but no addresses added yet.</p>
-				{/if}
+				</div>
 			</div>
 		{:else if !isFetching && !currentUser}
 			<div class="mx-auto max-w-3xl overflow-hidden bg-white p-6 shadow sm:rounded-lg">
 				<h1 class="text-2xl font-semibold text-gray-900">Please Connect Wallet</h1>
-				<p class="mt-2 text-gray-600">Remember to connect the wallet you want to use on this site to vote with.</p>
+				<p class="mt-2 text-gray-600">
+					Remember to connect the wallet you want to use on this site to vote with.
+				</p>
 			</div>
 		{/if}
 	</div>
@@ -543,28 +701,6 @@
 		.container {
 			max-width: 1280px;
 		}
-	}
-	button {
-		border: none;
-		padding: 8px;
-		border-radius: 5px;
-		font-size: 16px;
-		cursor: pointer;
-		color: white;
-		background-color: bg-primary;
-	}
-	.btn-primary {
-		background-color: bg-primary;
-		color: white;
-		border-radius: 5px;
-		padding: 8px;
-		font-size: 16px;
-		cursor: pointer;
-		border: none;
-	}
-	.btn-sm {
-		padding: 4px 8px;
-		font-size: 14px;
 	}
 	.custom-input {
 		@apply bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500;
