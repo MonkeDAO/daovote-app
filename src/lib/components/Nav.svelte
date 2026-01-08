@@ -1,9 +1,9 @@
 <script lang="ts">
 	import MobileMenu from './MobileMenu.svelte';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 	import { PUBLIC_VOTEBANK } from '$env/static/public';
 	import NavLink from './NavLink.svelte';
-	import { WalletMultiButton } from '@svelte-on-solana/wallet-adapter-ui';
+	import { WalletMultiButton } from '@aztemi/svelte-on-solana-wallet-adapter-ui';
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
 	import { isDark } from '$lib/stores/darkModeStore';
 

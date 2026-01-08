@@ -1,6 +1,6 @@
 // nftStore.ts
 import { writable } from 'svelte/store';
-//import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+//import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 import type { DelegateAccountType } from '$lib/types';
 
 interface DelegateAccountStore {

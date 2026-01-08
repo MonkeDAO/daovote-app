@@ -16,7 +16,11 @@ const config = {
 			events: 'rollup-plugin-node-polyfills/polyfills/events',
 			assert: 'assert',
 			crypto: 'crypto-browserify',
-			util: 'util/'
+			util: 'util/',
+			'react': "",
+			'react-dom': "",
+			"@keystonehq": "",
+			"@solana/wallet-adapter-keystone": ""
 		}
 	},
 	define: {
@@ -43,7 +47,7 @@ const config = {
 		}
 	},
 	// optimizeDeps: {
-	// 	include: ['@project-serum/anchor', '@solana/web3.js', 'buffer'],
+	// 	include: ['@coral-xyz/anchor', '@solana/web3.js', 'buffer'],
 	// 	// ... use the same implementation from the SvelteKit ui
 	// },
 	// define: {

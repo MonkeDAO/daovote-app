@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { DateInput } from 'date-picker-svelte';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import type { Connection } from '@solana/web3.js';
 	import { toast } from '@zerodevx/svelte-toast';
 	import Fa from 'svelte-fa';

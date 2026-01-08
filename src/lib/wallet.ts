@@ -1,6 +1,6 @@
 import { type Readable, derived } from 'svelte/store';
-import type { WalletStore } from '@svelte-on-solana/wallet-adapter-core';
-import type { WorkSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+import type { WalletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+import type { WorkSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 import { Metaplex, walletAdapterIdentity } from '@metaplex-foundation/js';
 
 export const walletProgramConnection = (

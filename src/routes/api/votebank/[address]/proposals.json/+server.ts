@@ -1,7 +1,7 @@
 import { Votebank } from '$lib/anchor/accounts';
 import type { VoteBankProposalsNumeric } from '$lib/types';
 import { getEnvNetwork as getEnvConnection } from '$lib/utils/solana';
-import { web3 } from '@project-serum/anchor';
+import { web3 } from '@coral-xyz/anchor';
 import { error } from '@sveltejs/kit';
 /**
  * @type {import('@sveltejs/kit').RequestHandler}

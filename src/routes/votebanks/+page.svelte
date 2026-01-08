@@ -1,11 +1,11 @@
 <script lang="ts">
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import { PublicKey, type Connection } from '@solana/web3.js';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import type { VoteBankItem } from '$lib/types';
 	import GeneralCard from '$lib/components/GeneralCard.svelte';
-	import { BN } from '@project-serum/anchor';
+	import { BN } from '@coral-xyz/anchor';
 	export let data: any;
 	let connection: Connection;
 	let wallet: any;

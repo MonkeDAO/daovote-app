@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { DelegateAccount } from '$lib/anchor/accounts';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 	import { walletProgramConnection } from '$lib/wallet';
-	import { web3 } from '@project-serum/anchor';
+	import { web3 } from '@coral-xyz/anchor';
 	import { toast } from '@zerodevx/svelte-toast';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { message } from '$lib/stores/messageStore';
@@ -14,7 +14,7 @@
 		isValidSolAddress,
 		sleep
 	} from '$lib/utils/solana';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import { PublicKey, type Connection, type TransactionInstruction } from '@solana/web3.js';
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
 	import Fa from 'svelte-fa';

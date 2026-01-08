@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { DelegateAccount } from '$lib/anchor/accounts';
 	import { createSignDelegateAddressInstruction } from '$lib/anchor/instructions/signDelegateAddress';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 	import { walletProgramConnection } from '$lib/wallet';
-	import { web3 } from '@project-serum/anchor';
+	import { web3 } from '@coral-xyz/anchor';
 	import { toast } from '@zerodevx/svelte-toast';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { message } from '$lib/stores/messageStore';
 	import { extractCustomCodes, sleep } from '$lib/utils/solana';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import type { Connection, PublicKey } from '@solana/web3.js';
 	import { createRevokeDelegateAddressInstruction } from '$lib/anchor/instructions/revokeDelegateAddress';

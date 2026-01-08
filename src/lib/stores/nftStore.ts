@@ -1,7 +1,7 @@
 // nftStore.ts
 import { derived, writable, get } from 'svelte/store';
 import type { DelegateAccountType, NftMetadata } from '$lib/types';
-import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 
 interface NftStore {
 	data: NftMetadata[] | undefined;

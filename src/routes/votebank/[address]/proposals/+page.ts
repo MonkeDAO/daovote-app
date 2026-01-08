@@ -1,7 +1,7 @@
 import { Votebank } from '$lib/anchor/accounts';
 import type { ProposalItem, VoteBankProposals } from '$lib/types';
 import { fetchProposals, getEnvNetwork } from '$lib/utils/solana';
-import { web3 } from '@project-serum/anchor';
+import { web3 } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { error } from '@sveltejs/kit';
 

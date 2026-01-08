@@ -1,6 +1,6 @@
 <!-- <script lang="ts">
-    import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-    import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+    import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+    import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import { PublicKey, Transaction } from '@solana/web3.js';
     import { toast } from '@zerodevx/svelte-toast'
     let value: any;

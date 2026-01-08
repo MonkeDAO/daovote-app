@@ -1,7 +1,7 @@
 <!-- src/routes/votebank/[address]/+page.svelte -->
 <script lang="ts">
 	import type { Connection } from '@solana/web3.js';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import VoteBankCard from '$lib/components/Vote/VoteBanks/VoteBankCard.svelte';
 	/** @type {import('./$types').PageData} */
 	export let data: any;

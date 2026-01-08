@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Votebank } from '$lib/anchor/accounts';
 import { isSettingsDataOwnerInfo } from '$lib/anchor/types';

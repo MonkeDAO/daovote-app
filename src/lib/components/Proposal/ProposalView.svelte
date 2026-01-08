@@ -8,7 +8,7 @@
 	import type { NftMetadata, ProposalItem } from '$lib/types';
 	import { bnToDate, extractRestrictionData } from '$lib/utils/solana';
 	import { getRemainingTime, isDefaultDate } from '$lib/utils/date';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import CountDownCard from '../CountDownCard.svelte';
 	import ConfirmationModal from '../ConfirmationModal.svelte';
 	import NftGrid from '../NFTGrid.svelte';
@@ -21,7 +21,7 @@
 	import { Chart, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 	import { onMount } from 'svelte';
 	import type { Adapter } from '@solana/wallet-adapter-base';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 	import ProposalProgress from './ProposalProgress.svelte';
 	import { isDark } from '$lib/stores/darkModeStore';
 	import { getProposalEndTime } from '$lib/utils/proposal';

@@ -11,14 +11,14 @@
 		createAddDelegateAddressInstruction
 	} from '$lib/anchor/instructions';
 	import { walletProgramConnection } from '$lib/wallet';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import type { DelegateAccount } from '$lib/anchor/accounts';
 	import { message } from '$lib/stores/messageStore';
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
-	import type { Program } from '@project-serum/anchor';
+	import type { Program } from '@coral-xyz/anchor';
 	import type { Adapter } from '@solana/wallet-adapter-base';
-	import { web3 } from '@project-serum/anchor';
+	import { web3 } from '@coral-xyz/anchor';
 	import { toast } from '@zerodevx/svelte-toast';
 	import {
 		SYSTEM_PROGRAM_ID,

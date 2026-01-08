@@ -2,8 +2,8 @@
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import ProposalForm from '../../../../lib/components/Proposal/ProposalForm.svelte';
 	import { PublicKey, type Connection, Transaction } from '@solana/web3.js';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 	import { createStorageAccount, getStorageAccounts, uploadToShadowDrive } from '$lib/drive';
 	import { shdwBalanceStore } from '$lib/shdwbalance';
@@ -23,7 +23,7 @@
 		sleep,
 		toAccountMetadata
 	} from '$lib/utils/solana';
-	import type { Program } from '@project-serum/anchor';
+	import type { Program } from '@coral-xyz/anchor';
 	import { getAssociatedTokenAddress } from '@solana/spl-token';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { SettingsData } from '$lib/anchor/types';

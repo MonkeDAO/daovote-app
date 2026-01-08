@@ -2,7 +2,7 @@
 	import { onDestroy, onMount, createEventDispatcher } from 'svelte';
 	import type { Readable } from 'svelte/store';
 	import { Editor, EditorContent, FloatingMenu, BubbleMenu, createEditor } from 'svelte-tiptap';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 	import Fa from 'svelte-fa';
 	import {
 		faHeading,

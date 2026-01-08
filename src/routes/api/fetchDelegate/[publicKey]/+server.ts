@@ -1,6 +1,6 @@
 // src/routes/+your-page/fetchDelegate.ts
 import type { RequestHandler } from '@sveltejs/kit';
-import { web3 } from '@project-serum/anchor';
+import { web3 } from '@coral-xyz/anchor';
 import { getDelegateAccount, getEnvNetwork } from '$lib/utils/solana';
 
 export const GET: RequestHandler = async (request) => {

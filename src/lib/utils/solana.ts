@@ -8,7 +8,7 @@ import {
 	type Cluster,
 	Transaction
 } from '@solana/web3.js';
-import * as anchor from '@project-serum/anchor';
+import * as anchor from '@coral-xyz/anchor';
 import { DelegateAccount, Proposal, VoteAccount } from '$lib/anchor/accounts';
 import type { DelegateAccountType, ProposalItem } from '$lib/types';
 import {

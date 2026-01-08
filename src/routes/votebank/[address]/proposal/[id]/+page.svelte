@@ -12,13 +12,13 @@
 		sleep,
 		trimAddress
 	} from '$lib/utils/solana';
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+	import { workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import 'prism-themes/themes/prism-shades-of-purple.min.css';
 	import { PublicKey, type Connection, Transaction, TransactionInstruction, ComputeBudgetProgram } from '@solana/web3.js';
 	import { Votebank } from '$lib/anchor/accounts';
 	import type { Metaplex } from '@metaplex-foundation/js';
-	import type { Program } from '@project-serum/anchor';
+	import type { Program } from '@coral-xyz/anchor';
 	import { walletProgramConnection } from '$lib/wallet';
 	import type { SettingsData, VoteEntry } from '$lib/anchor/types';
 	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
@@ -32,7 +32,7 @@
 	import { loading as loadingStore } from '$lib/stores/loadingStore';
 	import { PUBLIC_SOLANA_NETWORK } from '$env/static/public';
 	import { buildNftVoteIx, buildTokenVoteIx } from '$lib/utils/votehelpers';
-	import { set } from '@project-serum/anchor/dist/cjs/utils/features';
+	import { set } from '@coral-xyz/anchor/dist/cjs/utils/features';
 	import { filteredNftStore } from '$lib/stores/filteredNftStore';
 	import { createCancelProposalInstruction } from '$lib/anchor/instructions';
 	import { goto } from '$app/navigation';

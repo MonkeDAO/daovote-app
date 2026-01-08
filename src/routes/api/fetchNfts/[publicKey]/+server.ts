@@ -1,7 +1,7 @@
 // src/routes/+your-page/fetchNfts.ts
 import { Metaplex, guestIdentity, type Metadata, PublicKey } from '@metaplex-foundation/js';
 import type { RequestHandler } from '@sveltejs/kit';
-import { web3 } from '@project-serum/anchor';
+import { web3 } from '@coral-xyz/anchor';
 import type { NftMetadata } from '$lib/types';
 import { getEnvNetwork } from '$lib/utils/solana';
 

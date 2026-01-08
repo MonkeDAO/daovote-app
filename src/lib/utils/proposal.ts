@@ -1,4 +1,4 @@
-import type { BN } from '@project-serum/anchor';
+import type { BN } from '@coral-xyz/anchor';
 import { bnToDate } from './solana';
 
 export function isProposalClosed(proposal: {

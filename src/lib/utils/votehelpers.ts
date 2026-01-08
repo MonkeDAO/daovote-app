@@ -9,7 +9,7 @@ import {
 } from '$lib/anchor/instructions';
 import type { NftMetadata, ProposalItem } from '$lib/types';
 import { PublicKey } from '@metaplex-foundation/js';
-import { web3 } from '@project-serum/anchor';
+import { web3 } from '@coral-xyz/anchor';
 import type { Connection, TransactionInstruction } from '@solana/web3.js';
 import {
 	TREASURY_ADDRESS,

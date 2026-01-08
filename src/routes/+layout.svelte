@@ -8,10 +8,10 @@
 	import '../tailwind.css';
 	import Nav from '$lib/components/Nav.svelte';
 	import { MY_TWITTER_HANDLE, REPO_URL } from '$lib/siteConfig';
-	import { WalletProvider } from '@svelte-on-solana/wallet-adapter-ui';
+	import { WalletProvider } from '@aztemi/svelte-on-solana-wallet-adapter-ui';
 	import type { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-	import { getLocalStorage, walletStore } from '@svelte-on-solana/wallet-adapter-core';
-	import { AnchorConnectionProvider, workSpace } from '@svelte-on-solana/wallet-adapter-anchor';
+	import { getLocalStorage, walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
+	import { AnchorConnectionProvider, workSpace } from '@aztemi/svelte-on-solana-wallet-adapter-anchor';
 	import idl from '$lib/anchor/omcvote/omcvote.json';
 	import { browser } from '$app/environment';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
@@ -63,7 +63,7 @@
 <svelte:head />
 
 <WalletProvider {localStorageKey} {wallets} {autoConnect} />
-<AnchorConnectionProvider {network} {idl} />
+<AnchorConnectionProvider endpoint={network} idl={idl} />
 <SvelteToast {options} />
 <div class="flex flex-col justify-center bg-base-100 px-4 sm:px-8">
 	<Nav />

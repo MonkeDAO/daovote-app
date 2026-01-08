@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { walletStore } from '@svelte-on-solana/wallet-adapter-core';
+	import { walletStore } from '@aztemi/svelte-on-solana-wallet-adapter-core';
 	import { ownerCheckStore, ownerCheckSyncStore } from '$lib/stores/ownerStore';
 	import { PUBLIC_VOTEBANK } from '$env/static/public';
 	let isOwner: boolean;

@@ -1,6 +1,6 @@
 // src/routes/+your-page/fetchNftsV2.ts
 import type { RequestHandler } from '@sveltejs/kit';
-import { web3 } from '@project-serum/anchor';
+import { web3 } from '@coral-xyz/anchor';
 import type { HeliusDigitalAssetsResult, NftMetadata, HeliusDigitalAsset } from '$lib/types';
 import { PRIVATE_HELIUS_URL } from '$env/static/private';
 import { PUBLIC_COLLECTION_ADDRESSES } from '$env/static/public';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { BN } from '@project-serum/anchor';
+	import type { BN } from '@coral-xyz/anchor';
 	import CountDownCard from '../CountDownCard.svelte';
 	import { isQuorumMet, getProposalEndTime } from '$lib/utils/proposal';
 
